@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Reply Draft</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      direction: rtl;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #0078d4;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .header-icon { font-size: 18px; }
+    .header-title { font-size: 14px; font-weight: 600; }
+    .header-sub { font-size: 11px; opacity: 0.8; margin-top: 1px; }
+
+    /* ── Tone selector ── */
+    .tone-bar {
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 8px 12px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .tone-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid #d0d0d0;
+      background: transparent;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .tone-btn:hover { border-color: #0078d4; color: #0078d4; }
+    .tone-btn.active { background: #0078d4; border-color: #0078d4; color: white; }
+
+    /* ── Main area ── */
+    .main { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Email preview ── */
+    .email-preview {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .email-preview-label { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .email-from { font-size: 12px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+    .email-subject { font-size: 12px; color: #444; margin-bottom: 6px; }
+    .email-body {
+      font-size: 11px;
+      color: #666;
+      line-height: 1.5;
+      max-height: 60px;
+      overflow: hidden;
+      direction: ltr;
+      text-align: left;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 6px;
+    }
+    .lang-tag {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .lang-en { background: #deeeff; color: #0050a0; }
+    .lang-he { background: #dff0e0; color: #1a6e30; }
+
+    /* ── Draft area ── */
+    .draft-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .draft-label-row { display: flex; align-items: center; justify-content: space-between; }
+    .draft-label { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
+    .draft-text {
+      font-size: 12px;
+      line-height: 1.75;
+      color: #1a1a1a;
+      white-space: pre-wrap;
+      flex: 1;
+      direction: ltr;
+      text-align: left;
+    }
+    .draft-text.generating { color: #999; font-style: italic; }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #d0d0d0;
+      background: white;
+      color: #333;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #f5f5f5; }
+    .btn-primary { background: #0078d4; color: white; border-color: #0078d4; }
+    .btn-primary:hover { background: #006cbe; }
+    .btn-success { background: #107c10; color: white; border-color: #107c10; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Loading spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #0078d4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 20px auto;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; color: #888; text-align: center; padding: 20px;
+    }
+    .empty-icon { font-size: 32px; }
+    .empty-text { font-size: 13px; line-height: 1.5; }
+
+    /* ── Cursor blink ── */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .cursor { display: inline-block; width: 2px; height: 12px; background: #0078d4; margin-right: 1px; vertical-align: text-bottom; animation: blink 0.9s infinite; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <span class="header-icon">✉️</span>
+    <div>
+      <div class="header-title">AI Reply Draft</div>
+      <div class="header-sub">Claude · Elsight</div>
+    </div>
+  </div>
+
+  <!-- Tone selector -->
+  <div class="tone-bar">
+    <button class="tone-btn active" data-tone="professional" onclick="setTone(this)">💼 Professional</button>
+    <button class="tone-btn" data-tone="friendly" onclick="setTone(this)">😊 Friendly</button>
+    <button class="tone-btn" data-tone="brief" onclick="setTone(this)">⚡ Brief</button>
+    <button class="tone-btn" data-tone="formal" onclick="setTone(this)">🎩 Formal</button>
+  </div>
+
+  <!-- Main content -->
+  <div class="main" id="main">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-text">Loading email...</div>
+    </div>
+  </div>
+
+  <!-- Action buttons (hidden until draft ready) -->
+  <div class="btn-row" id="btnRow" style="display:none; padding: 0 12px 12px;">
+    <button class="btn" onclick="regenerate()">🔄 Regenerate</button>
+    <button class="btn btn-primary" onclick="copyDraft()">📋 Copy</button>
+    <button class="btn btn-success" onclick="insertReply()">✅ Insert Reply</button>
+  </div>
+
+<script>
+  const ANTHROPIC_API_KEY = "YOUR-ANTHROPIC-API-KEY"; // ← הכנס את ה-API Key שלך
+
+  let currentTone = "professional";
+  let currentDraft = "";
+  let emailData = null;
+  let isGenerating = false;
+
+  // ── Init Office ──
+  Office.onReady(async (info) => {
+    if (info.host === Office.HostType.Outlook) {
+      await readEmailAndGenerate();
+    }
+  });
+
+  // ── Read email from Outlook ──
+  async function readEmailAndGenerate() {
+    const item = Office.context.mailbox.item;
+
+    const subject = item.subject || "(No subject)";
+    const from = item.from ? `${item.from.displayName} <${item.from.emailAddress}>` : "Unknown";
+
+    // Read email body
+    item.body.getAsync(Office.CoercionType.Text, async (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        const body = result.value.trim().slice(0, 1500); // first 1500 chars
+        const detectedLang = detectLanguage(body + " " + subject);
+
+        emailData = { subject, from, body, lang: detectedLang };
+        renderEmailPreview();
+        await generateDraft();
+      } else {
+        showError("Could not read email body.");
+      }
+    });
+  }
+
+  // ── Simple language detection ──
+  function detectLanguage(text) {
+    const hebrewChars = (text.match(/[\u0590-\u05FF]/g) || []).length;
+    return hebrewChars > 10 ? "he" : "en";
+  }
+
+  // ── Render email preview ──
+  function renderEmailPreview() {
+    const { subject, from, body, lang } = emailData;
+    const langLabel = lang === "he" ? "עברית" : "English";
+    const langClass = lang === "he" ? "lang-he" : "lang-en";
+
+    document.getElementById("main").innerHTML = `
+      <div class="email-preview">
+        <div class="email-preview-label">Received email</div>
+        <span class="lang-tag ${langClass}">${langLabel}</span>
+        <div class="email-from">${escHtml(from)}</div>
+        <div class="email-subject">${escHtml(subject)}</div>
+        <div class="email-body">${escHtml(body.slice(0, 200))}</div>
+      </div>
+      <div class="draft-card" id="draftCard">
+        <div class="draft-label-row">
+          <span class="draft-label">✨ Draft Reply</span>
+        </div>
+        <div class="spinner"></div>
+      </div>
+    `;
+  }
+
+  // ── Generate draft via Claude API ──
+  async function generateDraft() {
+    if (!emailData || isGenerating) return;
+    isGenerating = true;
+    currentDraft = "";
+
+    const { subject, from, body, lang } = emailData;
+    const langInstruction = lang === "he"
+      ? "Reply in Hebrew."
+      : "Reply in English.";
+
+    const prompt = `You are a professional email assistant for Oz Segal, CPA, Finance Director at Elsight Ltd.
+
+Write a ${currentTone} reply to this email. ${langInstruction}
+Write only the email body — appropriate greeting and sign-off as "Oz Segal, CPA\\nFinance Director | Elsight".
+
+Email:
+From: ${from}
+Subject: ${subject}
+Body:
+${body}`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 800,
+          stream: true,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let started = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            const delta = parsed?.delta?.text || "";
+            if (delta) {
+              if (!started) {
+                started = true;
+                showDraftBox();
+              }
+              currentDraft += delta;
+              updateDraftText(currentDraft, true);
+            }
+          } catch {}
+        }
+      }
+
+      updateDraftText(currentDraft, false);
+      document.getElementById("btnRow").style.display = "flex";
+    } catch (err) {
+      showError("Error connecting to Claude API. Check your API key.");
+    } finally {
+      isGenerating = false;
+    }
+  }
+
+  // ── UI helpers ──
+  function showDraftBox() {
+    const card = document.getElementById("draftCard");
+    if (card) card.innerHTML = `
+      <div class="draft-label-row">
+        <span class="draft-label">✨ Draft Reply</span>
+      </div>
+      <div class="draft-text generating" id="draftText"></div>
+    `;
+  }
+
+  function updateDraftText(text, streaming) {
+    const el = document.getElementById("draftText");
+    if (!el) return;
+    el.className = "draft-text";
+    el.innerHTML = escHtml(text) + (streaming ? '<span class="cursor"></span>' : "");
+  }
+
+  function showError(msg) {
+    document.getElementById("main").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-text">${msg}</div>
+      </div>
+    `;
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\n/g, "<br>");
+  }
+
+  // ── Tone change ──
+  function setTone(btn) {
+    document.querySelectorAll(".tone-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTone = btn.dataset.tone;
+    if (emailData) {
+      renderEmailPreview();
+      generateDraft();
+    }
+  }
+
+  // ── Regenerate ──
+  function regenerate() {
+    if (emailData) {
+      renderEmailPreview();
+      generateDraft();
+    }
+  }
+
+  // ── Copy draft ──
+  function copyDraft() {
+    if (!currentDraft) return;
+    Office.context.mailbox.item.displayReplyAllForm({
+      htmlBody: currentDraft.replace(/\n/g, "<br>")
+    });
+  }
+
+  // ── Insert into reply window ──
+  function insertReply() {
+    if (!currentDraft) return;
+    Office.context.mailbox.item.displayReplyAllForm({
+      htmlBody: `<p dir="auto">${currentDraft.replace(/\n/g, "<br>")}</p>`
+    });
+  }
+</script>
+</body>
+</html>
