@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>קפריסין – עוז ושרית</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e5a7a">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
+  <div id="loc" class="loc">מיקום כבוי</div>
+</header>
+<div id="prompt" class="prompt" hidden></div>
+<nav id="tabs"></nav>
+<main id="list"></main>
+<footer>
+  <button id="btnLoc">📍 מיקום</button>
+  <button id="btnAdapt" class="primary">🤖 התאם תוכנית</button>
+  <button id="btnSet">⚙️</button>
+</footer>
+
+<dialog id="dlgMove">
+  <form method="dialog">
+    <h3 id="mvTitle">הזזה</h3>
+    <label>יום <select id="mvDay"></select></label>
+    <label>שעה <input id="mvTime" type="time"></label>
+    <menu><button value="cancel">ביטול</button><button id="mvOk" value="ok" class="primary">הזז</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlgAdapt">
+  <form method="dialog">
+    <h3>התאמת התוכנית</h3>
+    <p id="adNow" class="muted"></p>
+    <div class="row">
+      <label>מאחרים ב-<input id="adDelay" type="number" min="5" step="5" value="30"> דקות</label>
+      <button type="button" id="adShift">חשב</button>
+    </div>
+    <div id="adLocal"></div>
+    <hr>
+    <label>בקשה חופשית ל-Claude
+      <textarea id="adText" rows="3" placeholder="למשל: התעייפנו, רוצים משהו רגוע וקרוב עם נוף. או: יורד גשם."></textarea>
+    </label>
+    <button type="button" id="adAI" class="primary">🤖 בקש הצעות מ-Claude</button>
+    <div id="adStatus" class="muted"></div>
+    <div id="adAIList"></div>
+    <menu><button value="close">סגור</button></menu>
+  </form>
+</dialog>
+
+<dialog id="dlgSet">
+  <form method="dialog">
+    <h3>הגדרות</h3>
+    <label>כתובת שרת ה-AI (Worker)<input id="stEndpoint" type="url" placeholder="https://…workers.dev"></label>
+    <label>טוקן אפליקציה (אופציונלי)<input id="stToken" type="text" autocomplete="off"></label>
+    <hr>
+    <label><input id="stSim" type="checkbox"> מצב הדגמה (שעה ויום מדומים)</label>
+    <div class="row">
+      <select id="stSimDay"></select>
+      <input id="stSimTime" type="time" value="14:00">
+    </div>
+    <button type="button" id="stReset" class="danger">איפוס כל הסימונים וההזזות</button>
+    <menu><button value="cancel">ביטול</button><button id="stOk" value="ok" class="primary">שמור</button></menu>
+  </form>
+</dialog>
+
+<script src="plan.js"></script>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

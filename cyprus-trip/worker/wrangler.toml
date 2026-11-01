@@ -1,0 +1,5 @@
+name = "cyprus-trip-ai"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+[vars]
+MODEL = "claude-sonnet-5-5"
