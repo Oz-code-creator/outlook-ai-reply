@@ -271,7 +271,7 @@
     renderLoc();
   });
 
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
   setInterval(render, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   render();
