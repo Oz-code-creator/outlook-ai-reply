@@ -137,9 +137,33 @@
     if (b.dataset.ap === "local") refreshLocal();
   });
 
+  const SYSTEM = `אתה עוזר טיולים בזמן אמת לזוג בלימסול, קפריסין. תקבל JSON עם: השעה והיום הנוכחיים, מיקום (אם קיים), כל פריטי התוכנית עם סטטוס (pending/done/skipped), חלונות זמן ליום, הקשר והעדפות, ובקשה חופשית.
+תפקידך להציע התאמות להמשך הטיול: להזיז פעילויות שלא הספיקו ליום אחר, לדלג, לקצר או להוסיף אפשרויות קרובות ורלוונטיות לזמן ולמיקום.
+כללים:
+- פריטים עם fixed=true (הזמנות, טיסות, ארוחות בוקר) לא זזים אלא אם המשתמש ביקש במפורש.
+- כבד שעות פתיחה (open/close/closedDays), שקיעה בסביבות 16:45, ואל תחפוף לפריטים קיימים (השאר ~20 דקות מרווח נסיעה).
+- אל תציע דבר שהוא בעבר. יום 4 (30/11) מסתיים בנסיעה לשדה — אל תעמיס עליו.
+- הצעות הוספה (add) רק למקומות אמיתיים שאתה בטוח בהם; ציין בהערות לאמת שעות פתיחה. אל תמציא קואורדינטות — השמט lat/lng אם אינך בטוח.
+- מקסימום 4 הצעות, קצרות, בעברית.
+החזר JSON בלבד, ללא טקסט נוסף, בצורה:
+{"summary":"משפט אחד","proposals":[{"text":"תיאור קצר","ops":[
+ {"op":"move","id":"<id קיים>","day":1-4,"start":"HH:MM"},
+ {"op":"skip","id":"<id קיים>"},
+ {"op":"add","item":{"day":1-4,"start":"HH:MM","dur":15-480,"type":"sight|food|rest|shop|travel","title":"...","notes":"..."}}]}]}`;
+  async function callClaude(key, body) {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      body: JSON.stringify({ model: "claude-sonnet-5-5", max_tokens: 1500, system: SYSTEM, messages: [{ role: "user", content: JSON.stringify(body) }] })
+    });
+    if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : r.status === 400 ? " – ייתכן שאין קרדיט בחשבון" : r.status === 429 ? " – יותר מדי בקשות" : ""));
+    const d = await r.json(), text = (d.content || []).map(b => b.text || "").join(""), m = text.match(/\{[\s\S]*\}/);
+    try { return JSON.parse(m ? m[0] : text); } catch { return { summary: "התשובה לא הייתה בפורמט תקין, נסו שוב.", proposals: [] }; }
+  }
+
   $("adAI").addEventListener("click", async () => {
     const st = S.settings, n = now();
-    if (!st.endpoint) { $("adStatus").textContent = "צריך להגדיר כתובת שרת AI בהגדרות (⚙️). ראו README."; return; }
+    if (!st.apiKey && !st.endpoint) { $("adStatus").textContent = "צריך להדביק מפתח Claude בהגדרות (⚙️)."; return; }
     $("adStatus").textContent = "Claude חושב…"; $("adAIList").innerHTML = "";
     try {
       const body = {
@@ -148,9 +172,13 @@
         items: L.eff(P, S).map(i => ({ id: i.id, day: i.day, start: L.fmt(i.start), dur: i.dur, type: i.type, title: i.title, fixed: !!i.fixed, status: i.status, open: i.open, close: i.close, closedDays: i.closedDays, notes: i.notes })),
         request: $("adText").value.trim()
       };
-      const r = await fetch(st.endpoint, { method: "POST", headers: Object.assign({ "content-type": "application/json" }, st.token ? { "x-app-token": st.token } : {}), body: JSON.stringify(body) });
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const data = await r.json();
+      let data;
+      if (st.apiKey) data = await callClaude(st.apiKey, body);
+      else {
+        const r = await fetch(st.endpoint, { method: "POST", headers: Object.assign({ "content-type": "application/json" }, st.token ? { "x-app-token": st.token } : {}), body: JSON.stringify(body) });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        data = await r.json();
+      }
       aiList = L.validateProposals(P, S, data.proposals);
       $("adStatus").textContent = "";
       $("adAIList").innerHTML = (data.summary ? `<div class="sum">${esc(data.summary)}</div>` : "") + (aiList.length ? proposalsHtml(aiList, "ai") : "<p class='muted'>אין הצעות תקינות. נסו לנסח אחרת.</p>");
@@ -164,12 +192,12 @@
   $("stSimDay").innerHTML = P.days.map(d => `<option value="${d.n}">${d.label}</option>`).join("");
   $("btnSet").addEventListener("click", () => {
     const st = S.settings;
-    $("stEndpoint").value = st.endpoint || ""; $("stToken").value = st.token || "";
+    $("stKey").value = st.apiKey || ""; $("stEndpoint").value = st.endpoint || ""; $("stToken").value = st.token || "";
     $("stSim").checked = !!st.sim; $("stSimDay").value = st.simDay || 1; $("stSimTime").value = st.simTime || "14:00";
     $("dlgSet").showModal();
   });
   $("stOk").addEventListener("click", () => {
-    Object.assign(S.settings, { endpoint: $("stEndpoint").value.trim(), token: $("stToken").value.trim(), sim: $("stSim").checked, simDay: +$("stSimDay").value, simTime: $("stSimTime").value });
+    Object.assign(S.settings, { apiKey: $("stKey").value.trim(), endpoint: $("stEndpoint").value.trim(), token: $("stToken").value.trim(), sim: $("stSim").checked, simDay: +$("stSimDay").value, simTime: $("stSimTime").value });
     if (S.settings.sim) selDay = S.settings.simDay;
     save(); render();
   });

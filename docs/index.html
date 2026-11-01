@@ -55,8 +55,11 @@
 <dialog id="dlgSet">
   <form method="dialog">
     <h3>הגדרות</h3>
-    <label>כתובת שרת ה-AI (Worker)<input id="stEndpoint" type="url" placeholder="https://…workers.dev"></label>
-    <label>טוקן אפליקציה (אופציונלי)<input id="stToken" type="text" autocomplete="off"></label>
+    <label>מפתח Claude API (נשמר רק בטלפון הזה)<input id="stKey" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+    <details><summary class="muted">מתקדם: שרת Worker במקום מפתח</summary>
+      <label>כתובת שרת ה-AI (Worker)<input id="stEndpoint" type="url" placeholder="https://…workers.dev"></label>
+      <label>טוקן אפליקציה (אופציונלי)<input id="stToken" type="text" autocomplete="off"></label>
+    </details>
     <hr>
     <label><input id="stSim" type="checkbox"> מצב הדגמה (שעה ויום מדומים)</label>
     <div class="row">

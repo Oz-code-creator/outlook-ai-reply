@@ -14,7 +14,10 @@ cd docs && python3 -m http.server 8000   # ואז http://localhost:8000
 לשימוש בטלפון צריך HTTPS (GPS ו-service worker דורשים זאת): העלו את התיקייה ל-GitHub Pages / Netlify / Cloudflare Pages, פתחו בטלפון ו"הוסף למסך הבית".
 לבדיקה בלי להיות בקפריסין: ⚙️ ← מצב הדגמה (יום ושעה מדומים).
 
-## חיבור Claude (אופציונלי)
+## חיבור Claude – הדרך הפשוטה
+ב-⚙️ מדביקים מפתח API מ-console.anthropic.com. המפתח נשמר רק בדפדפן של הטלפון (לא בקוד ולא ב-GitHub) ונשלח ישירות ל-Anthropic. מומלץ לתת למפתח תאריך תפוגה ולמחוק אותו אחרי הטיול.
+
+## חיבור Claude דרך Worker (אופציונלי, מתקדם)
 המפתח לא נשמר באפליקציה אלא ב-Worker:
 ```bash
 cd cyprus-worker
