@@ -27,7 +27,7 @@ window.PLAN = {
     { id: "d1-molos", day: 1, start: "15:15", dur: 60, type: "sight", daylight: true, title: "טיילת מולוס", notes: "הליכה על הטיילת.", lat: 34.6743, lng: 33.0475 },
     { id: "d1-rest", day: 1, start: "16:30", dur: 120, type: "rest", soft: true, title: "מנוחה ומקלחת במלון", notes: "הפסקת התרעננות לפני הערב.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d1-port", day: 1, start: "18:30", dur: 90, type: "sight", title: "הנמל הישן ופארק חג המולד", notes: "אורות, דוכנים, יין חם. פעיל מ-21/11.", lat: 34.6704, lng: 33.0443 },
-    { id: "d1-dinner", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Zero Sei Trattoria", notes: "איטלקית-רומאית, ג׳ון קנדי 1. עד 22:30.", reserve: "להזמין שולחן ל-20:00", lat: 34.6863836, lng: 33.0587532 },
+    { id: "d1-dinner", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "לוודא הזמנת שולחן ל-20:00", lat: 34.673984, lng: 33.039054 },
 
     { id: "d2-bf", day: 2, start: "08:30", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d2-kolossi", day: 2, start: "10:30", dur: 45, type: "sight", daylight: true, open: "08:30", close: "17:00", title: "טירת קולוסי", notes: "שעות חורף 8:30–17:00. אפשר לוותר כדי להשאיר זמן לספא.", lat: 34.6644, lng: 32.9306 },
