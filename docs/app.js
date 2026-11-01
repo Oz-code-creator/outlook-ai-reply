@@ -150,15 +150,68 @@
  {"op":"move","id":"<id קיים>","day":1-4,"start":"HH:MM"},
  {"op":"skip","id":"<id קיים>"},
  {"op":"add","item":{"day":1-4,"start":"HH:MM","dur":15-480,"type":"sight|food|rest|shop|travel","title":"...","notes":"..."}}]}]}`;
+  const TOOL = {
+    name: "propose_changes",
+    description: "החזרת הצעות התאמה לתוכנית הטיול",
+    input_schema: {
+      type: "object",
+      properties: {
+        summary: { type: "string", description: "משפט אחד בעברית" },
+        proposals: {
+          type: "array", maxItems: 4,
+          items: {
+            type: "object",
+            properties: {
+              text: { type: "string", description: "תיאור קצר בעברית" },
+              ops: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    op: { type: "string", enum: ["move", "skip", "add"] },
+                    id: { type: "string", description: "id קיים (move/skip)" },
+                    day: { type: "integer" },
+                    start: { type: "string", description: "HH:MM" },
+                    item: {
+                      type: "object",
+                      description: "לפעולת add",
+                      properties: {
+                        day: { type: "integer" }, start: { type: "string" }, dur: { type: "integer" },
+                        type: { type: "string", enum: ["sight", "food", "rest", "shop", "travel"] },
+                        title: { type: "string" }, notes: { type: "string" }
+                      },
+                      required: ["day", "start", "dur", "type", "title"]
+                    }
+                  },
+                  required: ["op"]
+                }
+              }
+            },
+            required: ["text", "ops"]
+          }
+        }
+      },
+      required: ["summary", "proposals"]
+    }
+  };
   async function callClaude(key, body) {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-      body: JSON.stringify({ model: "claude-sonnet-5-5", max_tokens: 1500, system: SYSTEM, messages: [{ role: "user", content: JSON.stringify(body) }] })
+      body: JSON.stringify({
+        model: "claude-sonnet-5-5", max_tokens: 4000,
+        system: SYSTEM + "\nהחזר את התשובה אך ורק דרך הכלי propose_changes.",
+        tools: [TOOL], tool_choice: { type: "tool", name: "propose_changes" },
+        messages: [{ role: "user", content: JSON.stringify(body) }]
+      })
     });
     if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : r.status === 400 ? " – ייתכן שאין קרדיט בחשבון" : r.status === 429 ? " – יותר מדי בקשות" : ""));
-    const d = await r.json(), text = (d.content || []).map(b => b.text || "").join(""), m = text.match(/\{[\s\S]*\}/);
-    try { return JSON.parse(m ? m[0] : text); } catch { return { summary: "התשובה לא הייתה בפורמט תקין, נסו שוב.", proposals: [] }; }
+    const d = await r.json(), blocks = d.content || [];
+    const tu = blocks.find(b => b.type === "tool_use");
+    if (tu && tu.input) return tu.input;
+    const text = blocks.map(b => b.text || "").join(""), m = text.match(/\{[\s\S]*\}/);
+    try { return JSON.parse(m ? m[0] : text); }
+    catch { throw new Error("תשובה לא תקינה (" + (d.stop_reason || "?") + "): " + text.slice(0, 80)); }
   }
 
   $("adAI").addEventListener("click", async () => {
