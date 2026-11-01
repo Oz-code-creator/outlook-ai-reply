@@ -33,12 +33,13 @@
 
   function card(i, isNow) {
     const nav = i.lat ? `<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}">🧭 נווט</a>` : "";
+    const ta = (i.ta ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta)}">⭐ TripAdvisor</a>` : "") + (i.ta2 ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta2)}">⭐ To Piperi</a>` : "");
     const moved = (S.ov[i.id] && (S.ov[i.id].day || S.ov[i.id].start)) ? `<span class="chip">הוזז</span>` : "";
     const added = String(i.id).startsWith("add-") ? `<span class="chip">נוסף</span>` : "";
     const st = i.status === "done" ? "✅" : i.status === "skipped" ? "⏭" : "";
     const acts = i.status === "pending"
-      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}`
-      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}`;
+      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}`
+      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}${ta}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
       <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${esc(i.reserve)}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
   }
