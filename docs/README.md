@@ -9,7 +9,7 @@ PWA בעברית (עובדת בטלפון, גם בלי אינטרנט) שמלו�
 
 ## הרצה
 ```bash
-cd cyprus-trip && python3 -m http.server 8000   # ואז http://localhost:8000
+cd docs && python3 -m http.server 8000   # ואז http://localhost:8000
 ```
 לשימוש בטלפון צריך HTTPS (GPS ו-service worker דורשים זאת): העלו את התיקייה ל-GitHub Pages / Netlify / Cloudflare Pages, פתחו בטלפון ו"הוסף למסך הבית".
 לבדיקה בלי להיות בקפריסין: ⚙️ ← מצב הדגמה (יום ושעה מדומים).
@@ -17,17 +17,17 @@ cd cyprus-trip && python3 -m http.server 8000   # ואז http://localhost:8000
 ## חיבור Claude (אופציונלי)
 המפתח לא נשמר באפליקציה אלא ב-Worker:
 ```bash
-cd worker
+cd cyprus-worker
 npx wrangler deploy
 npx wrangler secret put ANTHROPIC_API_KEY
 npx wrangler secret put APP_TOKEN        # אופציונלי, מונע שימוש לא מורשה
 ```
 ב-⚙️ באפליקציה מדביקים את כתובת ה-Worker (ואת ה-APP_TOKEN). בלי זה ההצעות המקומיות ממשיכות לעבוד.
 
-## קבצים
+## קבצים (האפליקציה בתיקיית docs)
 - `plan.js` – התוכנית (פריט = יום, שעה, משך, סוג, `fixed` להזמנות/טיסות שלא זזות). ערכו כאן.
 - `logic.js` – מנוע ההתאמה (נבדק ב-Node). `app.js` / `index.html` / `styles.css` – ממשק. `sw.js` – offline.
-- `worker/` – מתווך ל-Claude API.
+- `cyprus-worker/` – מתווך ל-Claude API.
 
 ## מגבלות ידועות
 - **קואורדינטות משוערות** – לאמת לפני הטיול (בעיקר Mostra Meze, Zero Sei, Kai Sushi, Chris Blue, אגיו אנדראו).
