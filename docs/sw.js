@@ -1,4 +1,4 @@
-const V = "cyprus-v18", CFG = "cyprus-cfg";
+const V = "cyprus-v19", CFG = "cyprus-cfg";
 const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "badge-96.png"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== CFG).map(k => caches.delete(k)))).then(() => self.clients.claim())));
@@ -27,7 +27,7 @@ self.addEventListener("push", e => e.waitUntil((async () => {
     const actions = twoStep ? [full[0], { action: "later", title: "❌ לא הספקנו" }] : full.slice(0, max);
     await self.registration.showNotification(String(n.title || "טיול קפריסין"), {
       body: String(n.body || ""), tag: String(n.id || "n"), lang: "he", dir: "rtl", requireInteraction: true,
-      data: { itemId: n.itemId || null, name: n.name || null }, actions, ...iconOpts()
+      data: { itemId: n.itemId || null, name: n.name || null, url: n.url || null }, actions, ...iconOpts()
     });
   }
 })()));
@@ -36,6 +36,8 @@ self.addEventListener("notificationclick", e => {
   const itemId = e.notification.data && e.notification.data.itemId, act = e.action;
   const status = { done: "done", skip: "skipped", drop: "dropped" }[act];
   e.waitUntil((async () => {
+    const url = e.notification.data && e.notification.data.url;
+    if (act === "nav" && url) return self.clients.openWindow(url);
     if (itemId && act === "later") { // התראת המשך: מה לעשות עם מה שלא הספקנו
       const name = (e.notification.data && e.notification.data.name) || "הפעילות";
       return self.registration.showNotification("לא הספקתם: " + name, {

@@ -23,12 +23,12 @@
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
-    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button>`);
+    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>`);
     if (typeof selDay === "string") { $("list").innerHTML = listHtml(selDay); renderPrompt(); renderLoc(); return; }
     const day = P.days[selDay - 1];
     const list = items.filter(i => i.day === selDay).sort((a, b) => a.start - b.start);
     const cur = n.day === selDay ? list.find(i => i.status === "pending" && i.start <= n.min && n.min < i.start + i.dur) : null;
-    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>");
+    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>${wxLine(day)}` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>");
     if (!n.day) $("list").insertAdjacentHTML("afterbegin", `<p class="muted">הטיול עוד לא התחיל (מצב צפייה). אפשר להפעיל מצב הדגמה בהגדרות.</p>`);
     renderPrompt();
     renderLoc();
@@ -104,6 +104,11 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
+    if (t.dataset.rain) {
+      const d = P.days[+t.dataset.rain - 1];
+      openAdapt(); $("adText").value = `צפוי גשם ב${d.label}. הצע חלופות מתוך: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים והספא במלון, ושמור על ההזמנות.`;
+      return;
+    }
     if (t.dataset.lx) { const arr = lists()[t.dataset.lx], i = arr.findIndex(x => x.id === t.dataset.lid); if (i >= 0) { arr.splice(i, 1); save(); render(); } return; }
     if (t.dataset.mic) { dictate(t.dataset.mic); return; }
     if (t.dataset.ladd) { addListItem(t.dataset.ladd); return; }
@@ -258,7 +263,7 @@
     try {
       const body = {
         now: { day: n.day, time: L.fmt(n.min), position: pos ? { lat: +pos.lat.toFixed(5), lng: +pos.lng.toFixed(5) } : null },
-        days: P.days, windows: P.windows, context: P.context,
+        days: P.days, windows: P.windows, context: P.context, weather: W ? W.daily : null,
         items: L.eff(P, S).map(i => ({ id: i.id, day: i.day, start: L.fmt(i.start), dur: i.dur, type: i.type, title: i.title, fixed: !!i.fixed, status: i.status, open: i.open, close: i.close, closedDays: i.closedDays, notes: i.notes })),
         request: $("adText").value.trim()
       };
@@ -279,8 +284,41 @@
   $("btnAdapt").addEventListener("click", openAdapt);
 
 
-  // ---- רשימות: אריזה ומשימות ----
-  const LISTS = { pack: { title: "🎒 רשימת אריזה", def: () => P.packing }, todo: { title: "✅ משימות לפני הטיול", def: () => P.todos } };
+
+  // ---- מזג אוויר (Open-Meteo, חינמי ובלי מפתח; זמין כ-16 יום מראש) ----
+  const WK = "cyprus-weather";
+  let W = null, wxNote = "";
+  try { W = JSON.parse(localStorage.getItem(WK) || "null"); } catch (e) { W = null; }
+  const wxIcon = c => c === 0 ? "☀️" : c <= 2 ? "🌤" : c === 3 ? "☁️" : c <= 48 ? "🌫" : c <= 57 ? "🌦" : c <= 67 ? "🌧" : c <= 77 ? "❄️" : c <= 82 ? "🌧" : "⛈";
+  function wxFor(date) {
+    const d = W && W.daily, i = d && d.time ? d.time.indexOf(date) : -1;
+    if (i < 0) return null;
+    const code = (d.weather_code || d.weathercode || [])[i];
+    return { icon: wxIcon(code), max: Math.round(d.temperature_2m_max[i]), min: Math.round(d.temperature_2m_min[i]), pp: (d.precipitation_probability_max || [])[i], sum: (d.precipitation_sum || [])[i] };
+  }
+  const rainy = w => !!w && ((w.pp || 0) >= 50 || (w.sum || 0) >= 2);
+  function wxLine(day) {
+    const w = wxFor(day.date);
+    if (!w) return wxNote ? `<div class="muted" style="margin:0 4px 8px">${esc(wxNote)}</div>` : "";
+    return `<div class="wx">${w.icon} ${w.max}°/${w.min}°${w.pp != null ? " · גשם " + w.pp + "%" : ""}${rainy(w) ? ` <button data-rain="${day.n}">☔ תוכנית גשם</button>` : ""}</div>`;
+  }
+  async function loadWeather() {
+    if (W && Date.now() - W.ts < 3 * 3600e3) return;
+    const first = P.days[0].date, last = P.days[P.days.length - 1].date;
+    try {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=34.68&longitude=33.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=Asia%2FNicosia&start_date=${first}&end_date=${last}`);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const j = await r.json(); if (!j.daily || !j.daily.time) throw new Error("no data");
+      W = { ts: Date.now(), daily: j.daily }; wxNote = ""; localStorage.setItem(WK, JSON.stringify(W)); render();
+    } catch (e) {
+      const from = new Date(first + "T00:00:00"); from.setDate(from.getDate() - 16);
+      wxNote = Date.now() < from.getTime() ? "תחזית מזג אוויר תופיע החל מ-" + from.getDate() + "/" + (from.getMonth() + 1) + " (זמינה כ-16 יום לפני)" : "";
+      if (wxNote) render();
+    }
+  }
+
+  // ---- רשימות: אריזה, משימות ומידע ----
+  const LISTS = { pack: { title: "🎒 רשימת אריזה", def: () => P.packing }, todo: { title: "✅ משימות לפני הטיול", def: () => P.todos }, info: { title: "ℹ️ מידע שימושי", def: () => P.info, plain: true } };
   const mkItems = arr => arr.map((t, i) => ({ id: "d" + i, t, done: false, o: i }));
   function lists() {
     if (!S.lists) S.lists = {};
@@ -290,10 +328,14 @@
     }
     return S.lists;
   }
+  const linkify = s => s.replace(/(\+?\d[\d ]{6,}\d|\b112\b)/g, m => `<a href="tel:${m.replace(/\s/g, "")}">${m}</a>`);
+  const rowHtml = (key, x) => LISTS[key].plain
+    ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
+    : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
   function listHtml(key) {
     const arr = lists()[key], done = arr.filter(x => x.done).length;
-    return `<div class="theme">${LISTS[key].title} · ${done}/${arr.length}</div>
-      <div class="lst">${arr.map(x => `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
+    return `<div class="theme">${LISTS[key].title}${LISTS[key].plain ? "" : " · " + done + "/" + arr.length}</div>
+      <div class="lst">${arr.map(x => rowHtml(key, x)).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
       <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120">${SR ? `<button class="mic" id="liMic" data-mic="${key}" aria-label="הקלטה קולית">🎤</button>` : ""}<button class="primary" data-ladd="${key}">הוסף</button></div>
       <div id="liHint" class="muted" style="margin:6px 4px"></div>
       <div class="acts" style="margin:10px 4px">${window.Sync && Sync.enabled() ? '<button data-share="1">📤 הזמן את שרית</button>' : ""}<button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
@@ -443,5 +485,6 @@
     onStatus: t => { const el = $("syncSt"); if (el) el.textContent = t ? " · " + t : ""; }
   });
   joinFromLink().then(() => render());
+  loadWeather();
   render();
 })();

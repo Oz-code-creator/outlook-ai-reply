@@ -42,3 +42,5 @@ dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 
 .mic{font-size:18px;padding:6px 12px}.mic.rec{background:#fde8e8;border-color:var(--bad);animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.5}}
 
 .item.dropped{opacity:.4}.item.dropped h3{text-decoration:line-through}
+
+.wx{margin:0 4px 10px;font-size:15px}.wx button{font-size:12px;padding:3px 8px;margin-inline-start:6px}.li .tx{flex:1;font-size:15px;line-height:1.5}.li a{color:var(--pri);font-weight:600}

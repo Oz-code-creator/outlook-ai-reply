@@ -10,7 +10,7 @@
 // הגישה לחדר מוגנת בקוד הסודי בלבד. נתונים נמחקים 90 יום אחרי הכתיבה האחרונה.
 
 // PLAN-BEGIN
-const PLAN = {"days":[{"n":1,"date":"2026-11-27","label":"שישי 27/11"},{"n":2,"date":"2026-11-28","label":"שבת 28/11"},{"n":3,"date":"2026-11-29","label":"ראשון 29/11"},{"n":4,"date":"2026-11-30","label":"שני 30/11"}],"items":[{"id":"d1-hotel","day":1,"start":"12:00","dur":30,"type":"rest","title":"הגעה למלון"},{"id":"d1-lunch","day":1,"start":"13:00","dur":75,"type":"food","title":"ארוחת צהריים – Mostra Meze"},{"id":"d1-castle","day":1,"start":"14:15","dur":60,"type":"sight","title":"טירת לימסול והמוזיאון הימי-ביניימי"},{"id":"d1-molos","day":1,"start":"15:15","dur":60,"type":"sight","title":"טיילת מולוס"},{"id":"d1-rest","day":1,"start":"16:30","dur":120,"type":"rest","title":"מנוחה ומקלחת במלון"},{"id":"d1-port","day":1,"start":"18:30","dur":90,"type":"sight","title":"הנמל הישן ופארק חג המולד"},{"id":"d1-dinner","day":1,"start":"20:00","dur":90,"type":"food","title":"ארוחת ערב – Mazema"},{"id":"d2-bf","day":2,"start":"08:30","dur":60,"type":"food","title":"ארוחת בוקר במלון"},{"id":"d2-kolossi","day":2,"start":"10:30","dur":45,"type":"sight","title":"טירת קולוסי"},{"id":"d2-kourion","day":2,"start":"11:30","dur":120,"type":"sight","title":"קוריון העתיקה"},{"id":"d2-lunch","day":2,"start":"13:45","dur":90,"type":"food","title":"צהריים – Chris Blue Beach"},{"id":"d2-spa","day":2,"start":"16:00","dur":120,"type":"rest","title":"ספא או מנוחה במלון"},{"id":"d2-shop","day":2,"start":"18:30","dur":60,"type":"shop","title":"אגיו אנדראו – קניות ומתנות"},{"id":"d2-dinner","day":2,"start":"19:30","dur":100,"type":"food","title":"ארוחת ערב – MEZE Taverna"},{"id":"d3-bf","day":3,"start":"08:45","dur":60,"type":"food","title":"ארוחת בוקר במלון"},{"id":"d3-lefkara","day":3,"start":"11:00","dur":135,"type":"shop","title":"פאנו לפקארה – תחרה, כסף ומתנות"},{"id":"d3-lunch","day":3,"start":"13:15","dur":90,"type":"food","title":"צהריים – Iason Tavern (גיבוי: To Piperi)"},{"id":"d3-rest","day":3,"start":"16:30","dur":160,"type":"rest","title":"מנוחה במלון"},{"id":"d3-dinner","day":3,"start":"20:00","dur":90,"type":"food","title":"ארוחת ערב – Kai Sushi"},{"id":"d4-bf","day":4,"start":"08:30","dur":45,"type":"food","title":"ארוחת בוקר"},{"id":"d4-walk","day":4,"start":"09:15","dur":45,"type":"sight","title":"הליכה על החוף"},{"id":"d4-checkout","day":4,"start":"10:15","dur":30,"type":"rest","title":"צ׳ק-אאוט"},{"id":"d4-airport","day":4,"start":"10:45","dur":60,"type":"travel","title":"נסיעה לשדה לרנקה"},{"id":"d4-flight","day":4,"start":"14:40","dur":60,"type":"travel","title":"טיסה חזרה"}]};
+const PLAN = {"days":[{"n":1,"date":"2026-11-27","label":"שישי 27/11"},{"n":2,"date":"2026-11-28","label":"שבת 28/11"},{"n":3,"date":"2026-11-29","label":"ראשון 29/11"},{"n":4,"date":"2026-11-30","label":"שני 30/11"}],"items":[{"id":"d1-hotel","day":1,"start":"12:00","dur":30,"type":"rest","title":"הגעה למלון","fixed":true,"lat":34.6974038,"lng":33.0949755},{"id":"d1-lunch","day":1,"start":"13:00","dur":75,"type":"food","title":"ארוחת צהריים – Mostra Meze","fixed":false,"lat":34.6754273,"lng":33.0431423},{"id":"d1-castle","day":1,"start":"14:15","dur":60,"type":"sight","title":"טירת לימסול והמוזיאון הימי-ביניימי","fixed":false,"lat":34.6727,"lng":33.0431},{"id":"d1-molos","day":1,"start":"15:15","dur":60,"type":"sight","title":"טיילת מולוס","fixed":false,"lat":34.6743,"lng":33.0475},{"id":"d1-rest","day":1,"start":"16:30","dur":120,"type":"rest","title":"מנוחה ומקלחת במלון","fixed":false,"lat":34.6974038,"lng":33.0949755},{"id":"d1-port","day":1,"start":"18:30","dur":90,"type":"sight","title":"הנמל הישן ופארק חג המולד","fixed":false,"lat":34.6704,"lng":33.0443},{"id":"d1-dinner","day":1,"start":"20:00","dur":90,"type":"food","title":"ארוחת ערב – Mazema","fixed":true,"lat":34.673984,"lng":33.039054},{"id":"d2-bf","day":2,"start":"08:30","dur":60,"type":"food","title":"ארוחת בוקר במלון","fixed":true,"lat":34.6974038,"lng":33.0949755},{"id":"d2-kolossi","day":2,"start":"10:30","dur":45,"type":"sight","title":"טירת קולוסי","fixed":false,"lat":34.6644,"lng":32.9306},{"id":"d2-kourion","day":2,"start":"11:30","dur":120,"type":"sight","title":"קוריון העתיקה","fixed":false,"lat":34.6641,"lng":32.8856},{"id":"d2-lunch","day":2,"start":"13:45","dur":90,"type":"food","title":"צהריים – Chris Blue Beach","fixed":false,"lat":34.6658863,"lng":32.8771663},{"id":"d2-spa","day":2,"start":"16:00","dur":120,"type":"rest","title":"ספא או מנוחה במלון","fixed":false,"lat":34.6974038,"lng":33.0949755},{"id":"d2-shop","day":2,"start":"18:30","dur":60,"type":"shop","title":"אגיו אנדראו – קניות ומתנות","fixed":false,"lat":34.6764937,"lng":33.0475766},{"id":"d2-dinner","day":2,"start":"19:30","dur":100,"type":"food","title":"ארוחת ערב – MEZE Taverna","fixed":true,"lat":34.6764937,"lng":33.0475766},{"id":"d3-bf","day":3,"start":"08:45","dur":60,"type":"food","title":"ארוחת בוקר במלון","fixed":true,"lat":34.6974038,"lng":33.0949755},{"id":"d3-lefkara","day":3,"start":"11:00","dur":135,"type":"shop","title":"פאנו לפקארה – תחרה, כסף ומתנות","fixed":false,"lat":34.8666,"lng":33.3028},{"id":"d3-lunch","day":3,"start":"13:15","dur":90,"type":"food","title":"צהריים – Iason Tavern (גיבוי: To Piperi)","fixed":false,"lat":34.8672,"lng":33.3033},{"id":"d3-rest","day":3,"start":"16:30","dur":160,"type":"rest","title":"מנוחה במלון","fixed":false,"lat":34.6974038,"lng":33.0949755},{"id":"d3-dinner","day":3,"start":"20:00","dur":90,"type":"food","title":"ארוחת ערב – Kai Sushi","fixed":true,"lat":34.688916,"lng":33.0711665},{"id":"d4-bf","day":4,"start":"08:30","dur":45,"type":"food","title":"ארוחת בוקר","fixed":true,"lat":34.6974038,"lng":33.0949755},{"id":"d4-walk","day":4,"start":"09:15","dur":45,"type":"sight","title":"הליכה על החוף","fixed":false,"lat":34.6974038,"lng":33.0949755},{"id":"d4-checkout","day":4,"start":"10:15","dur":30,"type":"rest","title":"צ׳ק-אאוט","fixed":true,"lat":34.6974038,"lng":33.0949755},{"id":"d4-airport","day":4,"start":"10:45","dur":60,"type":"travel","title":"נסיעה לשדה לרנקה","fixed":true,"lat":34.8751,"lng":33.6249},{"id":"d4-flight","day":4,"start":"14:40","dur":60,"type":"travel","title":"טיסה חזרה","fixed":true,"lat":34.8751,"lng":33.6249}]};
 // PLAN-END
 
 const BAD = new Set(["__proto__", "constructor", "prototype"]);
@@ -89,9 +89,14 @@ function effItems(room) {
   const ov = room.ov || {};
   return PLAN.items.concat(Object.values(room.added || {})).map(it => {
     const m = Object.assign({}, it, ov[it.id] || {});
-    return { id: m.id, day: m.day, start: typeof m.start === "string" ? toMin(m.start) : m.start, dur: m.dur, type: m.type, title: m.title };
+    return { id: m.id, day: m.day, start: typeof m.start === "string" ? toMin(m.start) : m.start, dur: m.dur, type: m.type, title: m.title, fixed: !!m.fixed, lat: m.lat, lng: m.lng };
   });
 }
+const fmt = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+// תזכורת "צריך לצאת": אתרים וקניות, ארוחות ערב עם הזמנה, ונסיעה לשדה (לא ארוחות רגילות)
+const remindable = i => NOTIFY_TYPES.includes(i.type) || (i.type === "food" && i.fixed && !/-bf$/.test(i.id)) || i.id === "d4-airport";
+const leadOf = i => (i.type === "food" ? 30 : 20);
+
 async function tick(env, when) {
   const { date, min } = nowCY(when || new Date());
   const day = PLAN.days.find(d => d.date === date);
@@ -106,16 +111,38 @@ async function tick(env, when) {
   for (const code of codes) {
     const room = (await env.ROOMS.get("room:" + code, { type: "json" })) || {};
     const notified = (await env.ROOMS.get("notified:" + code, { type: "json" })) || {};
-    const due = effItems(room).filter(i => i.day === day.n && NOTIFY_TYPES.includes(i.type) && !/-bf$/.test(i.id) &&
-      !(room.status || {})[i.id] && !notified[i.id] && min >= i.start + i.dur + 10 && min <= i.start + i.dur + 180).sort((a, b) => a.start - b.start)[0];
-    if (!due) continue;
-    notified[due.id] = Date.now();
+    const status = room.status || {}, items = effItems(room), out = [];
+
+    // 1) הודעת בוקר עם תוכנית היום (08:00–10:00, פעם ביום)
+    const mk = "morning:" + date;
+    if (min >= 480 && min <= 600 && !notified[mk]) {
+      const todays = items.filter(i => i.day === day.n && !status[i.id] && ["sight", "shop", "food"].includes(i.type) && !/-bf$/.test(i.id)).sort((a, b) => a.start - b.start);
+      if (todays.length) {
+        notified[mk] = Date.now();
+        out.push({ id: "m" + Date.now(), title: "בוקר טוב! " + day.label, body: todays.slice(0, 5).map(i => fmt(i.start) + " " + i.title).join("\n"), actions: [] });
+      }
+    }
+    // 2) "צריך לצאת": 20 דק' לפני (30 לארוחת ערב עם הזמנה)
+    for (const i of items.filter(x => x.day === day.n && remindable(x) && !status[x.id]).sort((a, b) => a.start - b.start)) {
+      const k = "pre:" + i.id;
+      if (notified[k] || !(min >= i.start - leadOf(i) && min < i.start)) continue;
+      notified[k] = Date.now();
+      const n = { id: "p" + Date.now() + out.length, title: `בעוד ${i.start - min} דק׳: ${i.title}`, body: "מתי יוצאים? בדקו זמן נסיעה.", actions: [] };
+      if (typeof i.lat === "number" && typeof i.lng === "number") { n.actions = [{ action: "nav", title: "🧭 נווט" }]; n.url = `https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}`; }
+      out.push(n);
+    }
+    // 3) "הספקתם?" אחרי שעבר הזמן (אתרים וקניות)
+    const due = items.filter(i => i.day === day.n && NOTIFY_TYPES.includes(i.type) && !status[i.id] && !notified[i.id] &&
+      min >= i.start + i.dur + 10 && min <= i.start + i.dur + 180).sort((a, b) => a.start - b.start)[0];
+    if (due) {
+      notified[due.id] = Date.now();
+      out.push({ id: "n" + Date.now(), itemId: due.id, name: due.title, title: "הספקתם? " + due.title, body: "עברו כמה דקות מהזמן המתוכנן. מה קרה?",
+        actions: [{ action: "done", title: "✅ הספקנו" }, { action: "skip", title: "⏭ דילגנו" }, { action: "drop", title: "✖ ויתרנו" }] });
+    }
+    if (!out.length) continue;
     await env.ROOMS.put("notified:" + code, JSON.stringify(notified), { expirationTtl: 7 * 86400 });
-    await notify(env, code, await listSubs(env, code), {
-      id: "n" + Date.now(), itemId: due.id, name: due.title, title: "הספקתם? " + due.title, body: "עברו כמה דקות מהזמן המתוכנן. מה קרה?",
-      actions: [{ action: "done", title: "✅ הספקנו" }, { action: "skip", title: "⏭ דילגנו" }, { action: "drop", title: "✖ ויתרנו" }]
-    });
-    sent++;
+    const subs = await listSubs(env, code);
+    for (const n of out.slice(0, 4)) { await notify(env, code, subs, n); sent++; }
   }
   return sent;
 }

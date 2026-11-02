@@ -1,7 +1,7 @@
 // סנכרון חי בין מכשירים דרך שרת REST (Cloudflare Worker, או Firebase Realtime Database; , בדיקה כל 5 שניות).
 // נתונים מסונכרנים: רשימות (אריזה/משימות), סימוני פעילויות, הזזות ופעילויות שנוספו. לא מסונכרנים: מפתח API והגדרות.
 (function () {
-  const LK = "cyprus-sync-last", KEYS = ["pack", "todo"];
+  const LK = "cyprus-sync-last", KEYS = ["pack", "todo", "info"];
   const HOST_OK = u => {
     try {
       const x = new URL(u);
