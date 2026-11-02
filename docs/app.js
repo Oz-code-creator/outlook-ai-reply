@@ -254,6 +254,13 @@
     if (S.settings.sim) selDay = S.settings.simDay;
     save(); render();
   });
+  $("stRefresh").addEventListener("click", async () => {
+    try {
+      if ("serviceWorker" in navigator) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+      if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+    } catch (e) { /* ignore */ }
+    location.href = location.pathname + "?fresh=" + Date.now();
+  });
   $("stReset").addEventListener("click", () => {
     if (!confirm("לאפס את כל הסימונים וההזזות?")) return;
     S.status = {}; S.ov = {}; S.added = []; save(); dismissed.clear(); $("dlgSet").close(); render();
