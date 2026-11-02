@@ -35,4 +35,28 @@ assert.equal(await worker._tick(env, at("2026-11-28T08:15:00Z")), 0); console.lo
 await call("PATCH", `/rooms/${CODE}.json`, { "ov/d2-kourion": { title: "קוריון (שם חדש)", start: 15 * 60, day: 2 }, "booked/d2-dinner": true });
 assert.equal(await worker._tick(env, at("2026-11-28T12:45:00Z")), 1); o = await out(); // 14:45 מקומי, 15 דק' לפני 15:00
 assert.ok(o.some(x => x.title.includes("קוריון (שם חדש)"))); console.log("overridden title and time used in notification ✔");
+
+// ---- זמני התראות מותאמים (notif בחדר) ----
+const CODE2 = "yyyyyyyyyy2222222222";
+const reg2 = await (await call("POST", `/subs/${CODE2}`, { sub: { endpoint: "https://fcm.googleapis.com/fcm/send/y" } })).json();
+const out2 = async () => (await (await call("GET", `/outbox/${CODE2}/${reg2.hash}`)).json());
+await call("PATCH", `/rooms/${CODE2}.json`, { init: true, "notif/morning": 600, "notif/lead": 40, "notif/after": 30 });
+await worker._tick(env, at("2026-11-29T06:10:00Z")); // 08:10 מקומי: לפני שעת הבוקר שנקבעה (10:00)
+assert.equal((await out2()).length, 0); console.log("custom morning: nothing at 08:10 ✔");
+await worker._tick(env, at("2026-11-29T08:05:00Z")); // 10:05
+o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^בוקר טוב/); console.log("custom morning 10:00 ✔");
+await worker._tick(env, at("2026-11-29T08:15:00Z")); // 10:15: עוד לא 40 דק' לפני 11:00
+assert.equal((await out2()).length, 0);
+await worker._tick(env, at("2026-11-29T08:21:00Z")); // 10:21
+o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^בעוד 39 דק׳: פאנו לפקארה/); console.log("custom lead 40 min ✔");
+await worker._tick(env, at("2026-11-29T11:30:00Z")); // 13:30: לפקארה נגמרת 13:15, ההגדרה 30 דק' אחרי
+assert.equal((await out2()).length, 0);
+await worker._tick(env, at("2026-11-29T11:46:00Z")); // 13:46
+o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^הספקתם\? פאנו לפקארה/); console.log("custom after 30 min ✔");
+// ערכים לא תקינים: חסומים לטווח (ארוחה בערב 20:00, foodLead=9999 → 120)
+await call("PATCH", `/rooms/${CODE2}.json`, { "notif/foodLead": 9999, "notif/lead": "abc", "booked/d3-dinner": true });
+await worker._tick(env, at("2026-11-29T15:55:00Z")); // 17:55: לפני 18:00 (120 לפני 20:00)
+assert.equal((await out2()).length, 0);
+await worker._tick(env, at("2026-11-29T16:05:00Z")); // 18:05
+o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^בעוד 115 דק׳: ארוחת ערב – Kai Sushi/); console.log("invalid values clamped (120 max) ✔");
 console.log("ALL WORKER2 TESTS OK");

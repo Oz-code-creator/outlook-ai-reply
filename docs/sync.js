@@ -9,6 +9,7 @@
       return x.protocol === "https:" && /\.(workers\.dev|firebasedatabase\.app|firebaseio\.com)$/.test(x.hostname);
     } catch (e) { return false; }
   };
+  const NK = { morning: [300, 720], lead: [5, 120], foodLead: [5, 120], after: [0, 120] }; // זמני התראות (דקות), כמו ב-Worker
   const CODE_OK = c => /^[a-z0-9]{10,40}$/.test(c || "");
   const clone = v => JSON.parse(JSON.stringify(v));
   const canon = v => v && typeof v === "object" ? "{" + Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canon(v[k])).join(",") + "}" : JSON.stringify(v === undefined ? null : v);
@@ -24,12 +25,13 @@
     Object.entries(st.ov || {}).forEach(([id, v]) => { m[`ov/${id}`] = clone(v); });
     (st.added || []).forEach(it => { m[`added/${it.id}`] = clone(it); });
     Object.keys(st.booked || {}).forEach(id => { if (st.booked[id]) m[`booked/${id}`] = true; });
+    Object.entries(st.notif || {}).forEach(([k, v]) => { if (NK[k] && Number.isFinite(v)) m[`notif/${k}`] = v; });
     return m;
   }
   function flatRemote(r) {
     const m = {}; if (!r) return m;
     KEYS.forEach(k => Object.entries((r.lists || {})[k] || {}).forEach(([id, v]) => { m[`lists/${k}/${id}`] = v; }));
-    ["status", "ov", "added", "booked"].forEach(s => Object.entries(r[s] || {}).forEach(([id, v]) => { m[`${s}/${id}`] = v; }));
+    ["status", "ov", "added", "booked", "notif"].forEach(s => Object.entries(r[s] || {}).forEach(([id, v]) => { m[`${s}/${id}`] = v; }));
     return m;
   }
   function unflat(r) {
@@ -53,7 +55,8 @@
     });
     added.sort((a, b) => (a.id < b.id ? -1 : 1));
     const booked = {}; Object.entries(r.booked || {}).forEach(([id, v]) => { if (v === true) booked[id] = true; });
-    return { lists, status: st, ov, added, booked };
+    const notif = {}; Object.entries(r.notif || {}).forEach(([k, v]) => { if (NK[k] && Number.isFinite(v) && v >= NK[k][0] && v <= NK[k][1]) notif[k] = Math.round(v); });
+    return { lists, status: st, ov, added, booked, notif };
   }
 
   const url = () => `${cfg.url}/rooms/${cfg.code}.json`;

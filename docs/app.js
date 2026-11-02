@@ -613,8 +613,23 @@
     const c = S.settings.sync; $("syDb").value = c ? c.url : ""; $("syCode").value = c ? c.code : "";
     syMsg(c ? "סנכרון פעיל." : "לא מחובר. ראו הוראות הקמה ב-README.");
   }
-  $("btnSet").addEventListener("click", () => { fillSync(); });
+  $("btnSet").addEventListener("click", () => { fillSync(); fillNotif(); });
   const pnMsg = t => { $("pnMsg").textContent = t; };
+  // ---- זמני התראות (נשמרים בחדר המסונכרן; ה-Worker קורא אותם) ----
+  const NDEF = { morning: 480, lead: 20, foodLead: 30, after: 10 }, NRNG = { morning: [300, 720], lead: [5, 120], foodLead: [5, 120], after: [0, 120] };
+  const hm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  function fillNotif() {
+    const n = Object.assign({}, NDEF, S.notif || {});
+    $("ntMorning").value = hm(n.morning); $("ntLead").value = n.lead; $("ntFood").value = n.foodLead; $("ntAfter").value = n.after;
+    $("ntMsg").textContent = Sync.enabled() ? "" : "ההגדרות נשמרות בחדר המסונכרן. קודם מפעילים סנכרון חי.";
+  }
+  function saveNotif() {
+    const [h, m] = ($("ntMorning").value || "08:00").split(":").map(Number), v = { morning: h * 60 + m, lead: +$("ntLead").value, foodLead: +$("ntFood").value, after: +$("ntAfter").value }, out = {};
+    for (const k of Object.keys(NDEF)) { const x = Number.isFinite(v[k]) ? Math.round(v[k]) : NDEF[k]; out[k] = Math.min(NRNG[k][1], Math.max(NRNG[k][0], x)); }
+    S.notif = out; save(); fillNotif(); $("ntMsg").textContent = Sync.enabled() ? "נשמר ✅ (חל על ההתראות הבאות)" : $("ntMsg").textContent;
+  }
+  ["ntMorning", "ntLead", "ntFood", "ntAfter"].forEach(id => $(id).addEventListener("change", saveNotif));
+  $("ntDefault").addEventListener("click", () => { S.notif = {}; save(); fillNotif(); $("ntMsg").textContent = Sync.enabled() ? "הוחזרו ברירות המחדל ✅" : $("ntMsg").textContent; });
   async function fillPush() { pnMsg("מצב: " + (window.Push ? await Push.state() : "לא נתמך")); }
   $("btnSet").addEventListener("click", fillPush);
   $("pnEnable").addEventListener("click", async () => { pnMsg("מפעיל…"); try { await Push.enable(); pnMsg("ההתראות הופעלו ✅ " + await Push.state() + ". לחצו 'שלח בדיקת התראה'."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
@@ -654,8 +669,8 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { render(); } });
   Sync.init({
     cfg: S.settings.sync, days: P.days.length,
-    get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added, booked: S.booked || {} }; },
-    set: st => { S.lists = st.lists; S.status = st.status; S.ov = st.ov; S.added = st.added; S.booked = st.booked || {}; saveQuiet(); if (!(document.activeElement && document.activeElement.id === "liNew")) render(); },
+    get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added, booked: S.booked || {}, notif: S.notif || {} }; },
+    set: st => { S.lists = st.lists; S.status = st.status; S.ov = st.ov; S.added = st.added; S.booked = st.booked || {}; S.notif = st.notif || {}; saveQuiet(); fillNotif(); if (!(document.activeElement && document.activeElement.id === "liNew")) render(); },
     onStatus: t => { const el = $("syncSt"); if (el) el.textContent = t ? " · " + t : ""; }
   });
   joinFromLink().then(() => render());

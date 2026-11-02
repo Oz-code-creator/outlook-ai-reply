@@ -97,7 +97,15 @@ function effItems(room) {
 const fmt = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 // תזכורת "צריך לצאת": אתרים וקניות, מסעדות שסומנו "הוזמן", ונסיעה לשדה
 const remindable = (i, booked) => NOTIFY_TYPES.includes(i.type) || (i.type === "food" && !!booked[i.id]) || i.id === "d4-airport";
-const leadOf = i => (i.type === "food" ? 30 : 20);
+// זמני התראות שהמשתמש קובע באפליקציה (נשמרים בחדר כ-notif). ערכים לא תקינים או חסרים: ברירת מחדל. הכול בדקות.
+const NOTIF_DEF = { morning: 480, lead: 20, foodLead: 30, after: 10 };
+const NOTIF_RANGE = { morning: [300, 720], lead: [5, 120], foodLead: [5, 120], after: [0, 120] };
+function notifCfg(room) {
+  const n = (room && room.notif && typeof room.notif === "object") ? room.notif : {}, out = {};
+  for (const k of Object.keys(NOTIF_DEF)) { const v = Number(n[k]); out[k] = Number.isFinite(v) ? Math.min(NOTIF_RANGE[k][1], Math.max(NOTIF_RANGE[k][0], Math.round(v))) : NOTIF_DEF[k]; }
+  return out;
+}
+const leadOf = (i, c) => (i.type === "food" ? c.foodLead : c.lead);
 
 async function tick(env, when) {
   const { date, min } = nowCY(when || new Date());
@@ -113,21 +121,21 @@ async function tick(env, when) {
   for (const code of codes) {
     const room = (await env.ROOMS.get("room:" + code, { type: "json" })) || {};
     const notified = (await env.ROOMS.get("notified:" + code, { type: "json" })) || {};
-    const status = room.status || {}, items = effItems(room), out = [];
+    const status = room.status || {}, items = effItems(room), out = [], cf = notifCfg(room);
 
-    // 1) הודעת בוקר עם תוכנית היום (08:00–10:00, פעם ביום)
+    // 1) הודעת בוקר עם תוכנית היום (מהשעה שנקבעה ועד שעתיים אחריה, פעם ביום; ברירת מחדל 08:00)
     const mk = "morning:" + date;
-    if (min >= 480 && min <= 600 && !notified[mk]) {
+    if (min >= cf.morning && min <= cf.morning + 120 && !notified[mk]) {
       const todays = items.filter(i => i.day === day.n && !status[i.id] && ["sight", "shop", "food"].includes(i.type) && !/-bf$/.test(i.id)).sort((a, b) => a.start - b.start);
       if (todays.length) {
         notified[mk] = Date.now();
         out.push({ id: "m" + Date.now(), title: "בוקר טוב! " + day.label, body: todays.slice(0, 5).map(i => fmt(i.start) + " " + i.title).join("\n"), actions: [] });
       }
     }
-    // 2) "צריך לצאת": 20 דק' לפני (30 לארוחת ערב עם הזמנה)
+    // 2) "צריך לצאת": לפני הפעילות (ברירת מחדל 20 דק', 30 למסעדה שהוזמנה)
     for (const i of items.filter(x => x.day === day.n && remindable(x, room.booked || {}) && !status[x.id]).sort((a, b) => a.start - b.start)) {
       const k = "pre:" + i.id;
-      if (notified[k] || !(min >= i.start - leadOf(i) && min < i.start)) continue;
+      if (notified[k] || !(min >= i.start - leadOf(i, cf) && min < i.start)) continue;
       notified[k] = Date.now();
       const n = { id: "p" + Date.now() + out.length, title: `בעוד ${i.start - min} דק׳: ${i.title}`, body: "מתי יוצאים? בדקו זמן נסיעה.", actions: [] };
       if (typeof i.lat === "number" && typeof i.lng === "number") { n.actions = [{ action: "nav", title: "🧭 נווט" }]; n.url = `https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}`; }
@@ -135,7 +143,7 @@ async function tick(env, when) {
     }
     // 3) "הספקתם?" אחרי שעבר הזמן (אתרים וקניות)
     const due = items.filter(i => i.day === day.n && NOTIFY_TYPES.includes(i.type) && !status[i.id] && !notified[i.id] &&
-      min >= i.start + i.dur + 10 && min <= i.start + i.dur + 180).sort((a, b) => a.start - b.start)[0];
+      min >= i.start + i.dur + cf.after && min <= i.start + i.dur + cf.after + 170).sort((a, b) => a.start - b.start)[0];
     if (due) {
       notified[due.id] = Date.now();
       out.push({ id: "n" + Date.now(), itemId: due.id, name: due.title, title: "הספקתם? " + due.title, body: "עברו כמה דקות מהזמן המתוכנן. מה קרה?",
