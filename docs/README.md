@@ -16,6 +16,14 @@ cd docs && python3 -m http.server 8000   # ואז http://localhost:8000
 לשימוש בטלפון צריך HTTPS (GPS ו-service worker דורשים זאת): העלו את התיקייה ל-GitHub Pages / Netlify / Cloudflare Pages, פתחו בטלפון ו"הוסף למסך הבית".
 לבדיקה בלי להיות בקפריסין: ⚙️ ← מצב הדגמה (יום ושעה מדומים).
 
+## סנכרון חי בין הטלפונים (Cloudflare Worker + KV)
+1. ב-dash.cloudflare.com: **Workers & Pages** ← **KV** ← **Create** (שם: `cyprus-rooms`).
+2. פותחים Worker (אפשר להשתמש בקיים), **Edit code**, מדביקים את `cyprus-worker/sync-worker.js`, **Deploy**.
+3. ב-Worker: **Settings** ← **Bindings** ← **Add** ← **KV namespace**; Variable name: `ROOMS`; בוחרים את ה-namespace. **Deploy**.
+4. באפליקציה ⚙️ ← סנכרון חי: מדביקים את כתובת ה-Worker, **צור קוד**, **התחל סנכרון**, ואז **הזמן את שרית** (קישור לשליחה).
+הגישה לחדר מוגנת בקוד הסודי בלבד. נתונים נמחקים 90 יום אחרי הכתיבה האחרונה. מסונכרנים: רשימות, סימוני פעילויות, הזזות ופעילויות שנוספו. לא מסונכרנים: מפתח ה-API וההגדרות.
+בלי קליטה: השינויים נשמרים מקומית ויישלחו כשהחיבור חוזר.
+
 ## חיבור Claude – הדרך הפשוטה
 ב-⚙️ מדביקים מפתח API מ-console.anthropic.com. המפתח נשמר רק בדפדפן של הטלפון (לא בקוד ולא ב-GitHub) ונשלח ישירות ל-Anthropic. מומלץ לתת למפתח תאריך תפוגה ולמחוק אותו אחרי הטיול.
 

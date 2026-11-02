@@ -7,13 +7,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 9</div>
+  <div class="ver">גרסה 10<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -67,6 +67,12 @@
       <select id="stSimDay"></select>
       <input id="stSimTime" type="time" value="14:00">
     </div>
+    <details open><summary>🔄 סנכרון חי בין הטלפונים</summary>
+      <label>כתובת שרת הסנכרון (Cloudflare Worker)<input id="syDb" type="url" placeholder="https://…workers.dev"></label>
+      <label>קוד טיול (נשאר בסוד)<input id="syCode" type="text" autocomplete="off" placeholder="10–40 אותיות קטנות ומספרים"></label>
+      <div class="acts"><button type="button" id="syGen">צור קוד</button><button type="button" id="syStart" class="primary">התחל סנכרון</button><button type="button" id="syStop">הפסק</button><button type="button" id="syInvite">📤 הזמן את שרית</button></div>
+      <div id="syMsg" class="muted"></div>
+    </details>
     <button type="button" id="stShare">📤 שלח לשרית את הרשימות והסימונים</button>
     <button type="button" id="stRefresh">🔄 רענן גרסה (לא מוחק מפתח או סימונים)</button>
     <button type="button" id="stReset" class="danger">איפוס כל הסימונים וההזזות</button>
@@ -74,8 +80,9 @@
   </form>
 </dialog>
 
-<script src="plan.js?v=9"></script>
-<script src="logic.js?v=9"></script>
-<script src="app.js?v=9"></script>
+<script src="plan.js?v=10"></script>
+<script src="logic.js?v=10"></script>
+<script src="sync.js?v=10"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>

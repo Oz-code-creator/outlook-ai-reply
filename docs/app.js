@@ -3,7 +3,8 @@
   const KEY = "cyprus-trip-v1";
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
   const S = Object.assign({ status: {}, ov: {}, added: [], settings: {} }, load());
-  const save = () => localStorage.setItem(KEY, JSON.stringify(S));
+  const saveQuiet = () => localStorage.setItem(KEY, JSON.stringify(S));
+  const save = () => { saveQuiet(); if (window.Sync) Sync.touch(); };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const dismissed = new Set();
   let pos = null, watchId = null, selDay = null;
@@ -255,10 +256,13 @@
 
   // ---- רשימות: אריזה ומשימות ----
   const LISTS = { pack: { title: "🎒 רשימת אריזה", def: () => P.packing }, todo: { title: "✅ משימות לפני הטיול", def: () => P.todos } };
-  const mkItems = arr => arr.map((t, i) => ({ id: "d" + i, t, done: false }));
+  const mkItems = arr => arr.map((t, i) => ({ id: "d" + i, t, done: false, o: i }));
   function lists() {
     if (!S.lists) S.lists = {};
-    for (const k of Object.keys(LISTS)) if (!Array.isArray(S.lists[k])) S.lists[k] = mkItems(LISTS[k].def());
+    for (const k of Object.keys(LISTS)) {
+      if (!Array.isArray(S.lists[k])) S.lists[k] = mkItems(LISTS[k].def());
+      S.lists[k].forEach((x, i) => { if (!Number.isFinite(x.o)) x.o = i; });
+    }
     return S.lists;
   }
   function listHtml(key) {
@@ -271,7 +275,7 @@
   function addListItem(key) {
     const inp = $("liNew"), t = inp && inp.value.trim();
     if (!t) return;
-    lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: t.slice(0, 120), done: false });
+    lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: t.slice(0, 120), done: false, o: Date.now() });
     save(); render(); const n = $("liNew"); if (n) n.focus();
   }
   document.addEventListener("change", e => {
@@ -287,11 +291,24 @@
     lists();
     return location.origin + location.pathname + "#s=" + enc({ v: 1, lists: S.lists, status: S.status, ov: S.ov, added: S.added });
   }
+  const inviteUrl = () => { const c = Sync.config(); return location.origin + location.pathname + "#j=" + enc({ u: c.url, c: c.code }); };
   async function shareState() {
-    const url = shareUrl(), text = "הרשימות והסימונים של הטיול לקפריסין 🇨🇾 (פתחי את הקישור באפליקציה):";
+    const inv = window.Sync && Sync.enabled();
+    const url = inv ? inviteUrl() : shareUrl(), text = inv ? "הצטרפי לטיול בקפריסין 🇨🇾 (פתחי את הקישור באפליקציה):" : "הרשימות והסימונים של הטיול לקפריסין 🇨🇾 (פתחי את הקישור באפליקציה):";
     if (navigator.share) { try { await navigator.share({ title: "טיול לקפריסין", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
     try { await navigator.clipboard.writeText(url); alert("הקישור הועתק. אפשר להדביק בוואטסאפ."); }
     catch (e) { prompt("העתיקו את הקישור:", url); }
+  }
+  async function joinFromLink() {
+    const m = location.hash.match(/^#j=(.+)$/); if (!m) return false;
+    let d; try { d = dec(m[1]); } catch (e) { d = null; }
+    history.replaceState(null, "", location.pathname);
+    if (!d) return true;
+    try {
+      const res = await Sync.start({ url: d.u, code: d.c }, () => confirm("להצטרף לסנכרון החי של הטיול? הרשימות והסימונים אצלך יוחלפו."));
+      if (res !== "cancel") { S.settings.sync = Sync.config(); saveQuiet(); render(); alert("הצטרפת! מעכשיו הכול מסתנכרן."); }
+    } catch (e) { alert("ההצטרפות נכשלה: " + e.message); }
+    return true;
   }
   function importShared() {
     const m = location.hash.match(/^#s=(.+)$/); if (!m) return;
@@ -300,7 +317,7 @@
     if (!d || d.v !== 1 || !confirm("התקבלו רשימות וסימונים משותפים. להחליף את מה שיש אצלך?")) return;
     const str = (v, n) => String(v == null ? "" : v).slice(0, n), ids = new Set(P.items.map(i => i.id));
     const out = { lists: {}, status: {}, ov: {}, added: [] };
-    for (const k of Object.keys(LISTS)) out.lists[k] = (Array.isArray(d.lists && d.lists[k]) ? d.lists[k] : []).slice(0, 200).map(x => ({ id: str(x && x.id, 30) || "x" + Math.random().toString(36).slice(2, 7), t: str(x && x.t, 120), done: !!(x && x.done) })).filter(x => x.t);
+    for (const k of Object.keys(LISTS)) out.lists[k] = (Array.isArray(d.lists && d.lists[k]) ? d.lists[k] : []).slice(0, 200).map(x => ({ id: str(x && x.id, 30) || "x" + Math.random().toString(36).slice(2, 7), t: str(x && x.t, 120), done: !!(x && x.done), o: Number.isFinite(x && x.o) ? x.o : 0 })).filter(x => x.t);
     (Array.isArray(d.added) ? d.added : []).slice(0, 50).forEach(x => {
       if (x && typeof x.title === "string" && String(x.id || "").startsWith("add-") && Number.isInteger(x.day) && x.day >= 1 && x.day <= P.days.length && Number.isFinite(x.start) && x.dur >= 15 && x.dur <= 480 && ["sight", "food", "rest", "shop", "travel"].includes(x.type)) {
         out.added.push({ id: str(x.id, 40), day: x.day, start: x.start, dur: x.dur, type: x.type, title: str(x.title, 120), notes: str(x.notes, 300) }); ids.add(x.id);
@@ -338,6 +355,23 @@
     location.href = location.pathname + "?fresh=" + Date.now();
   });
   $("stShare").addEventListener("click", shareState);
+  const syMsg = t => { $("syMsg").textContent = t; };
+  function fillSync() {
+    const c = S.settings.sync; $("syDb").value = c ? c.url : ""; $("syCode").value = c ? c.code : "";
+    syMsg(c ? "סנכרון פעיל." : "לא מחובר. ראו הוראות הקמה ב-README.");
+  }
+  $("btnSet").addEventListener("click", fillSync);
+  $("syGen").addEventListener("click", () => { $("syCode").value = Sync.genCode(); });
+  $("syStart").addEventListener("click", async () => {
+    syMsg("מתחבר…");
+    try {
+      const res = await Sync.start({ url: $("syDb").value.trim(), code: $("syCode").value.trim().toLowerCase() }, () => confirm("החדר כבר קיים. להצטרף ולהחליף את הרשימות והסימונים אצלך?"));
+      if (res === "cancel") { syMsg("בוטל."); return; }
+      S.settings.sync = Sync.config(); saveQuiet(); syMsg(res === "created" ? "נוצר סנכרון חדש ✅. לחצו 'הזמן את שרית'." : "הצטרפת לסנכרון ✅"); render();
+    } catch (e) { syMsg("שגיאה: " + e.message); }
+  });
+  $("syStop").addEventListener("click", () => { Sync.stop(); delete S.settings.sync; saveQuiet(); syMsg("הסנכרון הופסק. הנתונים נשארו אצלך."); });
+  $("syInvite").addEventListener("click", () => { if (!Sync.enabled()) { syMsg("קודם התחילו סנכרון."); return; } shareState(); });
   $("stReset").addEventListener("click", () => {
     if (!confirm("לאפס את כל הסימונים וההזזות?")) return;
     S.status = {}; S.ov = {}; S.added = []; save(); dismissed.clear(); $("dlgSet").close(); render();
@@ -358,6 +392,13 @@
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
   setInterval(() => { if (document.activeElement && document.activeElement.id === "liNew") return; render(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  Sync.init({
+    cfg: S.settings.sync, days: P.days.length,
+    get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added }; },
+    set: st => { S.lists = st.lists; S.status = st.status; S.ov = st.ov; S.added = st.added; saveQuiet(); if (!(document.activeElement && document.activeElement.id === "liNew")) render(); },
+    onStatus: t => { const el = $("syncSt"); if (el) el.textContent = t ? " · " + t : ""; }
+  });
   importShared();
+  joinFromLink().then(() => render());
   render();
 })();
