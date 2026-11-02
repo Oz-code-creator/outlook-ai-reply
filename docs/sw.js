@@ -1,4 +1,4 @@
-const V = "cyprus-v22", CFG = "cyprus-cfg";
+const V = "cyprus-v23", CFG = "cyprus-cfg";
 const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "badge-96.png"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== CFG).map(k => caches.delete(k)))).then(() => self.clients.claim())));

@@ -28,7 +28,7 @@
     const day = P.days[selDay - 1];
     const list = items.filter(i => i.day === selDay).sort((a, b) => a.start - b.start);
     const cur = n.day === selDay ? list.find(i => i.status === "pending" && i.start <= n.min && n.min < i.start + i.dur) : null;
-    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>${wxLine(day)}${bookWarn(day)}` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>");
+    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>${wxLine(day)}${bookWarn(day)}` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>") + `<div style="margin:6px 4px 14px"><button class="primary" data-addday="${day.n}">➕ הוסף פעילות</button></div>`;
     if (!n.day) $("list").insertAdjacentHTML("afterbegin", `<p class="muted">הטיול עוד לא התחיל (מצב צפייה). אפשר להפעיל מצב הדגמה בהגדרות.</p>`);
     renderPrompt();
     renderLoc();
@@ -39,12 +39,12 @@
     const bk = i.book ? `<button data-book="${i.id}" class="${booked ? "booked" : ""}">${booked ? "✅ הוזמן" : "☐ סמן כהוזמן"}</button>` : "";
     const nav = i.lat ? `<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}">🧭 נווט</a>` : "";
     const ta = (i.ta ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta)}">⭐ TripAdvisor</a>` : "") + (i.ta2 ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta2)}">⭐ To Piperi</a>` : "");
-    const moved = (S.ov[i.id] && (S.ov[i.id].day || S.ov[i.id].start)) ? `<span class="chip">הוזז</span>` : "";
+    const moved = (S.ov[i.id] && Object.keys(S.ov[i.id]).length) ? `<span class="chip">שונה</span>` : "";
     const added = String(i.id).startsWith("add-") ? `<span class="chip">נוסף</span>` : "";
     const st = i.status === "done" ? "✅" : i.status === "skipped" ? "⏭" : i.status === "dropped" ? "✖" : "";
     const acts = i.status === "pending"
-      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}${bk}`
-      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}${ta}${bk}`;
+      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`
+      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
       <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
   }
@@ -106,6 +106,7 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
+    if (t.dataset.addday) { openAdd(+t.dataset.addday); return; }
     if (t.dataset.book) { S.booked = S.booked || {}; if (S.booked[t.dataset.book]) delete S.booked[t.dataset.book]; else S.booked[t.dataset.book] = true; save(); render(); return; }
     if (t.dataset.rain) {
       const d = P.days[+t.dataset.rain - 1];
@@ -122,7 +123,7 @@
     else if (t.dataset.a === "skip") setStatus(id, "skipped");
     else if (t.dataset.a === "drop") setStatus(id, "dropped");
     else if (t.dataset.a === "undo") setStatus(id, null);
-    else if (t.dataset.a === "move") openMove(id);
+    else if (t.dataset.a === "edit") openEdit(id);
     else if (t.dataset.pa) {
       const a = t.dataset.pa; dismissed.add(t.dataset.key);
       const offered = () => { S.offered = S.offered || {}; S.offered[id] = 1; };
@@ -137,18 +138,70 @@
     }
   });
 
-  // הזזה ידנית
-  let movingId = null;
-  function openMove(id) {
-    const it = L.eff(P, S).find(x => x.id === id); movingId = id;
-    $("mvTitle").textContent = "הזזה: " + it.title;
-    $("mvDay").innerHTML = P.days.map(d => `<option value="${d.n}" ${d.n === it.day ? "selected" : ""}>${d.label}</option>`).join("");
-    $("mvTime").value = L.fmt(it.start);
-    $("dlgMove").showModal();
+  // עריכה ידנית: שם, יום, שעה, משך; הוספה ומחיקה
+  let editing = null;
+  const isAdded = id => String(id).startsWith("add-");
+  function mvCheck() {
+    const day = +$("mvDay").value, t = $("mvTime").value, dur = +$("mvDur").value;
+    $("mvWarn").textContent = "";
+    if (!t || !(dur >= 15)) return;
+    const s0 = L.toMin(t), me = editing && editing.id;
+    const clash = L.eff(P, S).find(o => o.id !== me && o.day === day && o.status !== "skipped" && o.status !== "dropped" && s0 < o.start + o.dur && o.start < s0 + dur);
+    if (clash) $("mvWarn").textContent = `⚠ חופף ל"${clash.title}" (${L.fmt(clash.start)}). אפשר לשמור בכל זאת.`;
   }
-  $("mvOk").addEventListener("click", () => {
-    if (!movingId || !$("mvTime").value) return;
-    L.applyOps(S, [{ op: "move", id: movingId, day: +$("mvDay").value, start: L.toMin($("mvTime").value) }]); save(); render();
+  function fillDays(sel) { $("mvDay").innerHTML = P.days.map(d => `<option value="${d.n}" ${d.n === sel ? "selected" : ""}>${d.label}</option>`).join(""); }
+  function openEdit(id) {
+    const it = L.eff(P, S).find(x => x.id === id); if (!it) return;
+    editing = { id }; const add = isAdded(id);
+    $("mvTitle").textContent = "עריכת פעילות";
+    $("mvName").value = it.title; fillDays(it.day); $("mvTime").value = L.fmt(it.start); $("mvDur").value = it.dur;
+    $("mvTypeRow").hidden = !add; if (add) $("mvType").value = it.type;
+    $("mvDel").hidden = false; $("mvDel").textContent = add ? "🗑 מחק" : "✖ הסר מהתוכנית";
+    $("mvReset").hidden = add || !(S.ov[id] && Object.keys(S.ov[id]).length);
+    mvCheck(); $("dlgMove").showModal();
+  }
+  function openAdd(day) {
+    const last = L.eff(P, S).filter(x => x.day === day && x.status !== "dropped" && x.status !== "skipped").sort((x, y) => (y.start + y.dur) - (x.start + x.dur))[0];
+    const start = last ? Math.min(last.start + last.dur + 15, 22 * 60) : 12 * 60;
+    editing = { add: true };
+    $("mvTitle").textContent = "פעילות חדשה";
+    $("mvName").value = ""; fillDays(day); $("mvTime").value = L.fmt(Math.ceil(start / 5) * 5); $("mvDur").value = 60;
+    $("mvTypeRow").hidden = false; $("mvType").value = "sight";
+    $("mvDel").hidden = true; $("mvReset").hidden = true; $("mvWarn").textContent = "";
+    $("dlgMove").showModal(); $("mvName").focus();
+  }
+  ["mvDay", "mvTime", "mvDur"].forEach(k => $(k).addEventListener("input", mvCheck));
+  $("mvOk").addEventListener("click", e => {
+    e.preventDefault();
+    const name = $("mvName").value.trim().slice(0, 120), day = +$("mvDay").value, t = $("mvTime").value, dur = Math.round(+$("mvDur").value);
+    if (!name || !t || !(dur >= 15 && dur <= 480)) { $("mvWarn").textContent = "נא למלא שם, שעה ומשך (15–480 דקות)."; return; }
+    const start = L.toMin(t);
+    if (editing && editing.add) {
+      S.added = S.added || [];
+      S.added.push({ id: "add-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), day, start, dur, type: $("mvType").value, title: name, notes: "" });
+    } else if (editing) {
+      const id = editing.id, ad = (S.added || []).find(x => x.id === id);
+      if (ad) Object.assign(ad, { day, start, dur, title: name, type: $("mvType").value });
+      else {
+        const base = P.items.find(x => x.id === id), o = {};
+        if (day !== base.day) o.day = day;
+        if (start !== L.toMin(base.start)) o.start = start;
+        if (dur !== base.dur) o.dur = dur;
+        if (name !== base.title) o.title = name;
+        if (Object.keys(o).length) S.ov[id] = o; else delete S.ov[id];
+      }
+    }
+    save(); $("dlgMove").close(); render();
+  });
+  $("mvReset").addEventListener("click", () => { if (editing && editing.id) { delete S.ov[editing.id]; save(); $("dlgMove").close(); render(); } });
+  $("mvDel").addEventListener("click", () => {
+    if (!editing || !editing.id) return;
+    const id = editing.id;
+    if (isAdded(id)) {
+      if (!confirm("למחוק את הפעילות?")) return;
+      S.added = (S.added || []).filter(x => x.id !== id); delete S.status[id]; delete S.ov[id]; if (S.booked) delete S.booked[id];
+    } else S.status[id] = "dropped";
+    save(); $("dlgMove").close(); render();
   });
 
   // ---- התאמת תוכנית ----

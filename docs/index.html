@@ -8,13 +8,13 @@
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css?v=22">
+<link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 22<span id="syncSt"></span></div>
+  <div class="ver">גרסה 23<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -27,10 +27,23 @@
 
 <dialog id="dlgMove">
   <form method="dialog">
-    <h3 id="mvTitle">הזזה</h3>
+    <h3 id="mvTitle">עריכת פעילות</h3>
+    <label>שם <input id="mvName" maxlength="120"></label>
     <label>יום <select id="mvDay"></select></label>
-    <label>שעה <input id="mvTime" type="time"></label>
-    <menu><button value="cancel">ביטול</button><button id="mvOk" value="ok" class="primary">הזז</button></menu>
+    <div class="row">
+      <label style="flex:1">שעה <input id="mvTime" type="time"></label>
+      <label style="flex:1">משך (דקות) <input id="mvDur" type="number" min="15" max="480" step="5"></label>
+    </div>
+    <label id="mvTypeRow">סוג
+      <select id="mvType"><option value="sight">אתר / פעילות</option><option value="food">אוכל</option><option value="shop">קניות</option><option value="rest">מנוחה</option><option value="travel">נסיעה</option></select>
+    </label>
+    <div id="mvWarn" class="muted" style="min-height:1.3em"></div>
+    <menu>
+      <button value="cancel">ביטול</button>
+      <button type="button" id="mvReset">↺ אפס שינויים</button>
+      <button type="button" id="mvDel" class="danger">מחק</button>
+      <button id="mvOk" value="ok" class="primary">שמור</button>
+    </menu>
   </form>
 </dialog>
 
@@ -84,10 +97,10 @@
   </form>
 </dialog>
 
-<script src="plan.js?v=22"></script>
-<script src="logic.js?v=22"></script>
-<script src="sync.js?v=22"></script>
-<script src="push.js?v=22"></script>
-<script src="app.js?v=22"></script>
+<script src="plan.js?v=23"></script>
+<script src="logic.js?v=23"></script>
+<script src="sync.js?v=23"></script>
+<script src="push.js?v=23"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>

@@ -43,6 +43,7 @@
       if (Number.isInteger(v.day) && v.day >= 1 && v.day <= days) o.day = v.day;
       if (Number.isFinite(v.start) && v.start >= 0 && v.start < 1440) o.start = v.start;
       if (Number.isFinite(v.dur) && v.dur >= 15 && v.dur <= 480) o.dur = v.dur;
+      if (typeof v.title === "string" && v.title.trim()) o.title = v.title.trim().slice(0, 120);
       if (Object.keys(o).length) ov[id] = o;
     });
     Object.entries(r.added || {}).forEach(([id, v]) => {

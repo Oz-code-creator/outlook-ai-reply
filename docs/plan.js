@@ -8,7 +8,7 @@ window.PLAN = {
     { n: 4, date: "2026-11-30", label: "שני 30/11", theme: "חזרה" }
   ],
   // חלון שימושי לכל יום (לשיבוץ מחדש)
-  windows: { 1: ["12:30", "22:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "09:45"] },
+  windows: { 1: ["12:30", "22:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "10:00"] },
   context: [
     "זוג, שתי בנות צעירות בבית — רוצים לקנות להן מתנות.",
     "מלון Royal Apollonia (חוף לימסול המזרחי, ~15 דקות מהעיר העתיקה).",
@@ -44,7 +44,6 @@ window.PLAN = {
     { id: "d3-dinner", book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d26223615-Reviews-Kai_Sushi_Bar_Limassol-Limassol_City_Limassol.html", day: 3, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Kai Sushi", notes: "קראון פלאזה, 18:00–23:00.", reserve: "הזמנה דרך המלון: +357 25 851515", lat: 34.688916, lng: 33.0711665 },
 
     { id: "d4-bf", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 4, start: "08:30", dur: 45, type: "food", fixed: true, title: "ארוחת בוקר", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d4-walk", day: 4, start: "09:15", dur: 30, type: "sight", title: "הליכה על החוף", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 400 },
     { id: "d4-checkout", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 4, start: "10:00", dur: 30, type: "rest", fixed: true, title: "צ׳ק-אאוט", notes: "עד 12:00.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d4-airport", day: 4, start: "10:30", dur: 60, type: "travel", fixed: true, title: "נסיעה לשדה לרנקה", notes: "~52 ק״מ, כ-45–60 דקות. צ׳ק-אין בשדה עד 11:40 (3 שעות לפני ההמראה). מתנות אחרונות בשדה.", lat: 34.8751, lng: 33.6249, radius: 1500 },
     { id: "d4-flight", day: 4, start: "14:40", dur: 60, type: "travel", fixed: true, title: "טיסה חזרה", notes: "המראה 14:40, נחיתה 15:40 (שעות עשויות להשתנות).", lat: 34.8751, lng: 33.6249, radius: 1500 }
