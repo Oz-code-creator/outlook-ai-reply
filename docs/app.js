@@ -7,7 +7,7 @@
   const save = () => { saveQuiet(); if (window.Sync) Sync.touch(); };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const dismissed = new Set();
-  let pos = null, watchId = null, selDay = null;
+  let pos = null, watchId = null, selDay = null, drag = null, undoSnap = null, toastTimer = null;
 
   // ---- זמן נוכחי (אמיתי או מדומה) ----
   function now() {
@@ -20,6 +20,7 @@
 
   // ---- רינדור ----
   function render() {
+    if (drag) return;
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
@@ -46,7 +47,7 @@
       ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`
       : `<button data-a="undo" data-id="${i.id}">↩ בטל</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
-      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
+      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div><div class="grip" data-grip="${i.id}" title="גרירה" aria-label="גרירה">⠿</div></article>`;
   }
 
   function renderLoc() {
@@ -137,6 +138,109 @@
       else if (a === "adapt") openAdapt(); else renderPrompt();
     }
   });
+
+
+  // ---- גרירה: שינוי סדר בתוך היום, או שחרור על לשונית של יום אחר ----
+  const r5 = m => Math.max(0, Math.min(23 * 60 + 45, Math.round(m / 5) * 5));
+  function placeItem(id, day, start) {
+    const ad = (S.added || []).find(x => x.id === id);
+    if (ad) { ad.day = day; ad.start = start; return; }
+    const base = P.items.find(x => x.id === id); if (!base) return;
+    const o = Object.assign({}, S.ov[id] || {});
+    if (day !== base.day) o.day = day; else delete o.day;
+    if (start !== L.toMin(base.start)) o.start = start; else delete o.start;
+    if (Object.keys(o).length) S.ov[id] = o; else delete S.ov[id];
+  }
+  const dayItems = day => L.eff(P, S).filter(x => x.day === day && x.status !== "dropped" && x.status !== "skipped").sort((x, y) => x.start - y.start);
+  // דוחפים קדימה פעילויות שנדחסו, עד פעילות נעולה
+  function reflow(day, id) {
+    const list = dayItems(day), i0 = list.findIndex(x => x.id === id);
+    const shifted = []; let blocked = null;
+    if (i0 < 0) return { shifted, blocked };
+    let cursor = list[i0].start + list[i0].dur + 15;
+    for (let k = i0 + 1; k < list.length; k++) {
+      const f = list[k];
+      if (f.start >= cursor) break;
+      if (f.fixed) { blocked = f; break; }
+      placeItem(f.id, day, r5(cursor)); shifted.push(f.title); cursor = r5(cursor) + f.dur + 15;
+    }
+    return { shifted, blocked };
+  }
+  function toast(msg, withUndo) {
+    const el = $("toast"); el.hidden = false;
+    el.innerHTML = `<span>${esc(msg)}</span>${withUndo ? '<button id="toastUndo">↩ בטל</button>' : ""}`;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; undoSnap = null; }, 8000);
+  }
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#toastUndo") || !undoSnap) return;
+    S.ov = undoSnap.ov; S.added = undoSnap.added; undoSnap = null; $("toast").hidden = true; save(); render();
+  });
+  function dropOnDay(id, n) {
+    const it = L.eff(P, S).find(x => x.id === id); if (!it || it.day === n) return false;
+    let slot = L.findSlot(P, S, it, null, n); let start;
+    if (slot && slot.day === n) start = slot.start;
+    else { const last = dayItems(n).pop(); start = last ? last.start + last.dur + 15 : 9 * 60; }
+    placeItem(id, n, r5(start)); selDay = n;
+    toast(`הועבר ל${P.days[n - 1].label} ב-${L.fmt(r5(start))}`, true); return true;
+  }
+  function dropInList(id, idx) {
+    const it = L.eff(P, S).find(x => x.id === id); if (!it) return false;
+    const others = [...document.querySelectorAll("#list .item")].map(c => c.querySelector("[data-grip]").dataset.grip).filter(x => x !== id).map(x => L.eff(P, S).find(y => y.id === x));
+    const before = [...document.querySelectorAll("#list .item")].map(c => c.querySelector("[data-grip]").dataset.grip);
+    if (before.indexOf(id) === idx) return false; // אותו מקום
+    const prev = others[idx - 1], next = others[idx];
+    const start = prev ? prev.start + prev.dur + 15 : next ? Math.max(6 * 60, next.start - it.dur - 15) : it.start;
+    placeItem(id, it.day, r5(start));
+    const { shifted, blocked } = reflow(it.day, id);
+    toast(`הועבר ל-${L.fmt(r5(start))}` + (shifted.length ? ` · הוזזו ${shifted.length} פעילויות` : "") + (blocked ? ` · ⚠ חופף ל"${blocked.title}" (נעולה)` : ""), true);
+    return true;
+  }
+  function dragTarget(x, y) {
+    const el = document.elementFromPoint(x, y), tab = el && el.closest("#tabs button[data-d]");
+    if (tab && /^\d+$/.test(tab.dataset.d)) return { tab };
+    const cards = [...document.querySelectorAll("#list .item:not(.dragging)")];
+    let idx = cards.length;
+    for (let k = 0; k < cards.length; k++) { const r = cards[k].getBoundingClientRect(); if (y < r.top + r.height / 2) { idx = k; break; } }
+    return { idx, cards };
+  }
+  function dragUpdate() {
+    if (!drag) return;
+    document.querySelectorAll("#tabs button.over").forEach(b => b.classList.remove("over"));
+    const t = dragTarget(drag.x, drag.y); drag.t = t;
+    if (t.tab) { t.tab.classList.add("over"); if (drag.line) drag.line.remove(); drag.line = null; return; }
+    if (!drag.line) { drag.line = document.createElement("div"); drag.line.className = "drop-line"; }
+    if (t.idx < t.cards.length) t.cards[t.idx].before(drag.line); else if (t.cards.length) t.cards[t.cards.length - 1].after(drag.line); else $("list").append(drag.line);
+  }
+  function dragLoop() {
+    if (!drag) return;
+    if (drag.y < 110) window.scrollBy(0, -14); else if (drag.y > innerHeight - 130) window.scrollBy(0, 14);
+    drag.ghost.style.top = (drag.y - drag.dy) + "px"; dragUpdate();
+    drag.raf = requestAnimationFrame(dragLoop);
+  }
+  document.addEventListener("pointerdown", e => {
+    const g = e.target.closest(".grip"); if (!g || typeof selDay !== "number" || drag) return;
+    const card = g.closest(".item"), r = card.getBoundingClientRect();
+    e.preventDefault(); try { g.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    const ghost = card.cloneNode(true); ghost.classList.add("ghost"); ghost.style.cssText = `width:${r.width}px;left:${r.left}px;top:${r.top}px`;
+    document.body.appendChild(ghost); card.classList.add("dragging");
+    drag = { id: g.dataset.grip, card, ghost, g, pid: e.pointerId, dy: e.clientY - r.top, x: e.clientX, y: e.clientY, line: null, t: null, raf: 0 };
+    drag.raf = requestAnimationFrame(dragLoop);
+  });
+  document.addEventListener("pointermove", e => { if (drag && e.pointerId === drag.pid) { drag.x = e.clientX; drag.y = e.clientY; } });
+  function dragEnd(e, cancel) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const d = drag; cancelAnimationFrame(d.raf); drag = null;
+    d.ghost.remove(); if (d.line) d.line.remove(); d.card.classList.remove("dragging");
+    document.querySelectorAll("#tabs button.over").forEach(b => b.classList.remove("over"));
+    if (!cancel && d.t) {
+      const snap = { ov: JSON.parse(JSON.stringify(S.ov || {})), added: JSON.parse(JSON.stringify(S.added || [])) };
+      const changed = d.t.tab ? dropOnDay(d.id, +d.t.tab.dataset.d) : dropInList(d.id, d.t.idx);
+      if (changed) { undoSnap = snap; save(); }
+    }
+    render();
+  }
+  document.addEventListener("pointerup", e => dragEnd(e, false));
+  document.addEventListener("pointercancel", e => dragEnd(e, true));
 
   // עריכה ידנית: שם, יום, שעה, משך; הוספה ומחיקה
   let editing = null;
