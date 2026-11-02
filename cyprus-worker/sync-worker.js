@@ -211,12 +211,18 @@ const CLAUDE_TOOL = {
 async function askClaude(env, room, message, when) {
   const st = room.status || {}, bk = room.booked || {}, now = nowCY(when || new Date());
   const items = effItems(room).map(i => { const b = planItem(i.id) || {}; return { id: i.id, day: i.day, start: fmt(i.start), dur: i.dur, type: i.type, title: i.title, fixed: !!i.fixed, status: st[i.id] || "pending", booked: !!bk[i.id], bookable: !!b.book, open: b.open, close: b.close, closedDays: b.closedDays }; });
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
+  const req = {
     method: "POST", headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
     body: JSON.stringify({ model: env.MODEL || "claude-sonnet-5-5", max_tokens: 1500, system: CLAUDE_SYSTEM, tools: [CLAUDE_TOOL], tool_choice: { type: "tool", name: "analyze_message" },
       messages: [{ role: "user", content: JSON.stringify({ message, now: { date: now.date, time: fmt(now.min) }, trip: { days: PLAN.days, windows: PLAN.windows, context: PLAN.context }, items }) }] })
-  });
-  if (!r.ok) throw new Error("claude " + r.status);
+  };
+  let r = await fetch("https://api.anthropic.com/v1/messages", req);
+  // תקלה זמנית (עומס/קצב): ניסיון נוסף אחד
+  if (r.status === 429 || r.status >= 500) { await new Promise(s => setTimeout(s, 1500)); r = await fetch("https://api.anthropic.com/v1/messages", req); }
+  if (!r.ok) {
+    let why = ""; try { const j = await r.json(); why = (j.error && j.error.message) || ""; } catch (e) {}
+    throw new Error("claude " + r.status + (why ? ": " + why.slice(0, 200) : ""));
+  }
   const d = await r.json(), tu = (d.content || []).find(b => b.type === "tool_use");
   if (!tu || !tu.input) throw new Error("claude: no tool output");
   return tu.input;
