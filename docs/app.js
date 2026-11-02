@@ -22,6 +22,8 @@
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
+    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button>`);
+    if (typeof selDay === "string") { $("list").innerHTML = listHtml(selDay); renderPrompt(); renderLoc(); return; }
     const day = P.days[selDay - 1];
     const list = items.filter(i => i.day === selDay).sort((a, b) => a.start - b.start);
     const cur = n.day === selDay ? list.find(i => i.status === "pending" && i.start <= n.min && n.min < i.start + i.dur) : null;
@@ -85,7 +87,11 @@
 
   document.addEventListener("click", e => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.d) { selDay = +t.dataset.d; render(); return; }
+    if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
+    if (t.dataset.lx) { const arr = lists()[t.dataset.lx], i = arr.findIndex(x => x.id === t.dataset.lid); if (i >= 0) { arr.splice(i, 1); save(); render(); } return; }
+    if (t.dataset.ladd) { addListItem(t.dataset.ladd); return; }
+    if (t.dataset.lreset) { if (confirm("להחזיר את הרשימה לברירת המחדל? פריטים שהוספתם יימחקו.")) { S.lists[t.dataset.lreset] = mkItems(LISTS[t.dataset.lreset].def()); save(); render(); } return; }
+    if (t.dataset.share) { shareState(); return; }
     const id = t.dataset.id;
     if (t.dataset.a === "done") setStatus(id, "done");
     else if (t.dataset.a === "skip") setStatus(id, "skipped");
@@ -246,6 +252,71 @@
   });
   $("btnAdapt").addEventListener("click", openAdapt);
 
+
+  // ---- רשימות: אריזה ומשימות ----
+  const LISTS = { pack: { title: "🎒 רשימת אריזה", def: () => P.packing }, todo: { title: "✅ משימות לפני הטיול", def: () => P.todos } };
+  const mkItems = arr => arr.map((t, i) => ({ id: "d" + i, t, done: false }));
+  function lists() {
+    if (!S.lists) S.lists = {};
+    for (const k of Object.keys(LISTS)) if (!Array.isArray(S.lists[k])) S.lists[k] = mkItems(LISTS[k].def());
+    return S.lists;
+  }
+  function listHtml(key) {
+    const arr = lists()[key], done = arr.filter(x => x.done).length;
+    return `<div class="theme">${LISTS[key].title} · ${done}/${arr.length}</div>
+      <div class="lst">${arr.map(x => `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
+      <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120"><button class="primary" data-ladd="${key}">הוסף</button></div>
+      <div class="acts" style="margin:10px 4px"><button data-share="1">📤 שלח לשרית</button><button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
+  }
+  function addListItem(key) {
+    const inp = $("liNew"), t = inp && inp.value.trim();
+    if (!t) return;
+    lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: t.slice(0, 120), done: false });
+    save(); render(); const n = $("liNew"); if (n) n.focus();
+  }
+  document.addEventListener("change", e => {
+    const c = e.target.closest("input[data-lk]"); if (!c) return;
+    const it = lists()[c.dataset.lk].find(x => x.id === c.dataset.lid); if (it) { it.done = c.checked; save(); render(); }
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "liNew") { e.preventDefault(); addListItem(e.target.dataset.key); } });
+
+  // ---- שיתוף עם שרית (קישור עם הרשימות והסימונים; בלי מפתח ה-API) ----
+  const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const dec = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
+  function shareUrl() {
+    lists();
+    return location.origin + location.pathname + "#s=" + enc({ v: 1, lists: S.lists, status: S.status, ov: S.ov, added: S.added });
+  }
+  async function shareState() {
+    const url = shareUrl(), text = "הרשימות והסימונים של הטיול לקפריסין 🇨🇾 (פתחי את הקישור באפליקציה):";
+    if (navigator.share) { try { await navigator.share({ title: "טיול לקפריסין", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    try { await navigator.clipboard.writeText(url); alert("הקישור הועתק. אפשר להדביק בוואטסאפ."); }
+    catch (e) { prompt("העתיקו את הקישור:", url); }
+  }
+  function importShared() {
+    const m = location.hash.match(/^#s=(.+)$/); if (!m) return;
+    let d; try { d = dec(m[1]); } catch (e) { history.replaceState(null, "", location.pathname); return; }
+    history.replaceState(null, "", location.pathname);
+    if (!d || d.v !== 1 || !confirm("התקבלו רשימות וסימונים משותפים. להחליף את מה שיש אצלך?")) return;
+    const str = (v, n) => String(v == null ? "" : v).slice(0, n), ids = new Set(P.items.map(i => i.id));
+    const out = { lists: {}, status: {}, ov: {}, added: [] };
+    for (const k of Object.keys(LISTS)) out.lists[k] = (Array.isArray(d.lists && d.lists[k]) ? d.lists[k] : []).slice(0, 200).map(x => ({ id: str(x && x.id, 30) || "x" + Math.random().toString(36).slice(2, 7), t: str(x && x.t, 120), done: !!(x && x.done) })).filter(x => x.t);
+    (Array.isArray(d.added) ? d.added : []).slice(0, 50).forEach(x => {
+      if (x && typeof x.title === "string" && String(x.id || "").startsWith("add-") && Number.isInteger(x.day) && x.day >= 1 && x.day <= P.days.length && Number.isFinite(x.start) && x.dur >= 15 && x.dur <= 480 && ["sight", "food", "rest", "shop", "travel"].includes(x.type)) {
+        out.added.push({ id: str(x.id, 40), day: x.day, start: x.start, dur: x.dur, type: x.type, title: str(x.title, 120), notes: str(x.notes, 300) }); ids.add(x.id);
+      }
+    });
+    Object.entries(d.status || {}).forEach(([k, v]) => { if (ids.has(k) && (v === "done" || v === "skipped")) out.status[k] = v; });
+    Object.entries(d.ov || {}).forEach(([k, v]) => {
+      if (!ids.has(k) || !v) return; const o = {};
+      if (Number.isInteger(v.day) && v.day >= 1 && v.day <= P.days.length) o.day = v.day;
+      if (Number.isFinite(v.start) && v.start >= 0 && v.start < 1440) o.start = v.start;
+      if (Number.isFinite(v.dur) && v.dur >= 15 && v.dur <= 480) o.dur = v.dur;
+      if (Object.keys(o).length) out.ov[k] = o;
+    });
+    Object.assign(S, out); save(); render();
+  }
+
   // ---- הגדרות ----
   $("stSimDay").innerHTML = P.days.map(d => `<option value="${d.n}">${d.label}</option>`).join("");
   $("btnSet").addEventListener("click", () => {
@@ -266,6 +337,7 @@
     } catch (e) { /* ignore */ }
     location.href = location.pathname + "?fresh=" + Date.now();
   });
+  $("stShare").addEventListener("click", shareState);
   $("stReset").addEventListener("click", () => {
     if (!confirm("לאפס את כל הסימונים וההזזות?")) return;
     S.status = {}; S.ov = {}; S.added = []; save(); dismissed.clear(); $("dlgSet").close(); render();
@@ -284,7 +356,8 @@
   });
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
-  setInterval(render, 30000);
+  setInterval(() => { if (document.activeElement && document.activeElement.id === "liNew") return; render(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  importShared();
   render();
 })();
