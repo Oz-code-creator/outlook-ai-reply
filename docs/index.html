@@ -8,13 +8,13 @@
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css?v=24">
+<link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 24<span id="syncSt"></span></div>
+  <div class="ver">גרסה 25<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -92,16 +92,23 @@
       <div class="acts"><button type="button" id="pnEnable" class="primary">הפעל התראות</button><button type="button" id="pnTest2">שלח בדיקת התראה</button><button type="button" id="pnOff">כבה</button></div>
       <div id="pnMsg" class="muted"></div>
     </details>
+    <details><summary>💬 חיבור קבוצת וואטסאפ</summary>
+      <p class="muted">הודעות שמגיעות לקבוצה מנותחות על ידי Claude, וכשיש השפעה על התוכנית מגיעה התראה עם ✅ אשר / ✖ דחה. כתובת קליטה:</p>
+      <input id="waUrl" readonly dir="ltr">
+      <div class="acts"><button type="button" id="waCopy">העתק כתובת</button><button type="button" id="waTest">שלח הודעת בדיקה</button></div>
+      <div id="waMsg" class="muted"></div>
+      <p class="muted">באנדרואיד (MacroDroid): טריגר "התראה התקבלה" מוואטסאפ עם כותרת שמכילה את שם הקבוצה ← פעולה HTTP POST לכתובת למעלה, Content-Type: application/json, גוף: <code dir="ltr">{"title":"{not_title}","text":"{not_text}"}</code></p>
+    </details>
     <button type="button" id="stRefresh">🔄 רענן גרסה (לא מוחק מפתח או סימונים)</button>
     <button type="button" id="stReset" class="danger">איפוס כל הסימונים וההזזות</button>
     <menu><button value="cancel">ביטול</button><button id="stOk" value="ok" class="primary">שמור</button></menu>
   </form>
 </dialog>
 
-<script src="plan.js?v=24"></script>
-<script src="logic.js?v=24"></script>
-<script src="sync.js?v=24"></script>
-<script src="push.js?v=24"></script>
-<script src="app.js?v=24"></script>
+<script src="plan.js?v=25"></script>
+<script src="logic.js?v=25"></script>
+<script src="sync.js?v=25"></script>
+<script src="push.js?v=25"></script>
+<script src="app.js?v=25"></script>
 </body>
 </html>

@@ -1,5 +1,11 @@
+# הגדרות הפריסה האוטומטית (ראו .github/workflows/deploy-worker.yml).
+# חיבור ה-KV (ROOMS) נוסף בזמן הפריסה: ה-workflow מוצא את ה-namespace בשם cyprus-rooms.
 name = "cyprus-trip-ai"
-main = "worker.js"
+main = "sync-worker.js"
 compatibility_date = "2026-01-01"
+
 [vars]
 MODEL = "claude-sonnet-5-5"
+
+[triggers]
+crons = ["*/5 * * * *"]

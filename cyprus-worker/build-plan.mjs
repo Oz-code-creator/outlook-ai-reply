@@ -4,8 +4,9 @@ globalThis.window = {};
 await import("../docs/plan.js");
 const P = window.PLAN;
 const compact = {
+  windows: P.windows, context: P.context,
   days: P.days.map(d => ({ n: d.n, date: d.date, label: d.label })),
-  items: P.items.map(i => ({ id: i.id, day: i.day, start: i.start, dur: i.dur, type: i.type, title: i.title, fixed: !!i.fixed, lat: i.lat, lng: i.lng }))
+  items: P.items.map(i => ({ id: i.id, day: i.day, start: i.start, dur: i.dur, type: i.type, title: i.title, fixed: !!i.fixed, book: !!i.book, open: i.open, close: i.close, closedDays: i.closedDays, daylight: !!i.daylight, lat: i.lat, lng: i.lng }))
 };
 const f = new URL("./sync-worker.js", import.meta.url);
 let src = fs.readFileSync(f, "utf8");

@@ -38,6 +38,16 @@ cd docs && python3 -m http.server 8000   # ואז http://localhost:8000
 - אם התוכנית ב-`docs/plan.js` משתנה: `node cyprus-worker/build-plan.mjs` ואז להדביק שוב את ה-Worker.
 - iPhone: התראות עובדות רק לאפליקציה שמותקנת על המסך הראשי (iOS 16.4 ומעלה).
 
+## קבוצת וואטסאפ → הצעות לתוכנית
+- ה-Worker מקבל הודעות ב-`POST /ingest/<קוד>` (גוף JSON: `{"title":"…","text":"…"}`), שולח אותן ל-Claude עם מצב התוכנית, ואם יש השפעה, שולח התראה "💬 הצעה מהקבוצה" עם ✅ אשר / ✖ דחה. אישור מחיל את השינוי בחדר (ומסתנכרן). ההצעה מופיעה גם כבאנר באפליקציה.
+- שום שינוי לא מוחל בלי אישור, חוץ מסימון "הוזמן" כשההודעה מאשרת בבירור הזמנה. פעולות לא תקינות נזרקות בשרת. הגבלת קצב: 30 הודעות בשעה, כפילויות נחסמות.
+- באנדרואיד: MacroDroid. טריגר "התראה התקבלה" מוואטסאפ (כותרת מכילה את שם הקבוצה) ← HTTP POST לכתובת מההגדרות ⚙️ ← 💬, גוף: `{"title":"{not_title}","text":"{not_text}"}`, Content-Type: application/json. מתקינים בשני הטלפונים כדי לכסות הודעות משני הכיוונים.
+- דורש סוד `ANTHROPIC_API_KEY` ב-Worker (נקבע אוטומטית מהפריסה, ראו למטה). ⚙️ ← 💬 ← "שלח הודעת בדיקה" בודק את כל השרשרת.
+
+## פריסה אוטומטית של ה-Worker
+- `.github/workflows/deploy-worker.yml` מפרסם את `cyprus-worker/` ל-Cloudflare בכל דחיפה לענף (או ידנית מ-Actions).
+- סודות ב-GitHub (Settings ← Secrets and variables ← Actions): `CLOUDFLARE_API_TOKEN` (תבנית Edit Cloudflare Workers), `CLOUDFLARE_ACCOUNT_ID`, ואופציונלי `ANTHROPIC_API_KEY` (נשמר ב-Cloudflare כסוד). ה-KV `cyprus-rooms` נמצא אוטומטית לפי שם, וה-Cron מוגדר ב-`wrangler.toml`.
+
 ## חיבור Claude – הדרך הפשוטה
 ב-⚙️ מדביקים מפתח API מ-console.anthropic.com. המפתח נשמר רק בדפדפן של הטלפון (לא בקוד ולא ב-GitHub) ונשלח ישירות ל-Anthropic. מומלץ לתת למפתח תאריך תפוגה ולמחוק אותו אחרי הטיול.
 
