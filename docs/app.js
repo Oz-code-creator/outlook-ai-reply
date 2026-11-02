@@ -195,25 +195,26 @@
     }
   };
   async function callClaude(key, body) {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    const send = payload => fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-      body: JSON.stringify({
-        model: "claude-sonnet-5-5", max_tokens: 4000,
-        system: SYSTEM + "\nהחזר את התשובה אך ורק דרך הכלי propose_changes.",
-        tools: [TOOL], tool_choice: { type: "tool", name: "propose_changes" },
-        messages: [{ role: "user", content: JSON.stringify(body) }]
-      })
+      body: JSON.stringify(payload)
     });
-    if (!r.ok) {
+    const base = { model: "claude-sonnet-5-5", max_tokens: 4000, messages: [{ role: "user", content: JSON.stringify(body) }] };
+    const apiErr = async r => {
       let msg = "";
       try { const j = await r.json(); msg = (j.error && j.error.message) || ""; } catch (e) { /* ignore */ }
-      throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : "") + (msg ? ": " + msg.slice(0, 220) : ""));
-    }
+      return new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : "") + (msg ? ": " + msg.slice(0, 220) : ""));
+    };
+    // ניסיון 1: כלי עם מבנה מוגדר
+    let r = await send(Object.assign({}, base, { system: SYSTEM + "\nהחזר את התשובה אך ורק דרך הכלי propose_changes.", tools: [TOOL], tool_choice: { type: "tool", name: "propose_changes" } }));
+    // גיבוי: אם הבקשה נדחתה (400) — טקסט רגיל
+    if (r.status === 400) r = await send(Object.assign({}, base, { system: SYSTEM + "\nאל תשתמש בגרשיים כפולים בתוך מחרוזות. החזר JSON תקין בלבד." }));
+    if (!r.ok) throw await apiErr(r);
     const d = await r.json(), blocks = d.content || [];
     const tu = blocks.find(b => b.type === "tool_use");
     if (tu && tu.input) return tu.input;
-    const text = blocks.map(b => b.text || "").join(""), m = text.match(/\{[\s\S]*\}/);
+    const text = blocks.map(b => b.text || "").join("").replace(/```(?:json)?/g, ""), m = text.match(/\{[\s\S]*\}/);
     try { return JSON.parse(m ? m[0] : text); }
     catch { throw new Error("תשובה לא תקינה (" + (d.stop_reason || "?") + "): " + text.slice(0, 80)); }
   }
