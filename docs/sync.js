@@ -36,7 +36,7 @@
     KEYS.forEach(k => { lists[k] = Object.entries((r.lists || {})[k] || {}).filter(([, v]) => v && typeof v.t === "string")
       .map(([id, v]) => ({ id, t: v.t.slice(0, 120), done: !!v.done, o: Number(v.o) || 0 })).sort((a, b) => a.o - b.o); });
     const st = {}, ov = {}, added = [], days = api.days;
-    Object.entries(r.status || {}).forEach(([id, v]) => { if (v === "done" || v === "skipped") st[id] = v; });
+    Object.entries(r.status || {}).forEach(([id, v]) => { if (v === "done" || v === "skipped" || v === "dropped") st[id] = v; });
     Object.entries(r.ov || {}).forEach(([id, v]) => {
       if (!v || typeof v !== "object") return; const o = {};
       if (Number.isInteger(v.day) && v.day >= 1 && v.day <= days) o.day = v.day;

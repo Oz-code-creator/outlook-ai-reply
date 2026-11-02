@@ -40,3 +40,5 @@ dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 
 .add{display:flex;gap:8px}.add input{flex:1;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px}
 
 .mic{font-size:18px;padding:6px 12px}.mic.rec{background:#fde8e8;border-color:var(--bad);animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.5}}
+
+.item.dropped{opacity:.4}.item.dropped h3{text-decoration:line-through}

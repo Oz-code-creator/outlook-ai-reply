@@ -1,9 +1,46 @@
-const V = "cyprus-v13", FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "app.js", "manifest.webmanifest", "icon.svg"];
+const V = "cyprus-v14", CFG = "cyprus-cfg";
+const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
-self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== CFG).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return;
   // רשת קודם (כדי לקבל עדכונים), ואם אין קליטה — מהמטמון
   e.respondWith(fetch(e.request, { cache: "no-cache" }).then(r => { const c = r.clone(); caches.open(V).then(x => x.put(e.request, c)); return r; })
     .catch(() => caches.match(e.request).then(r => r || caches.match("index.html"))));
+});
+
+// ---- התראות דחיפה: ההתראה נשלפת מהשרת (outbox) ואחרי לחיצה על כפתור התשובה נשלחת לחדר ----
+async function readCfg() {
+  try { const c = await caches.open(CFG), r = await c.match(new URL("cfg-store", self.registration.scope).href); return r ? await r.json() : null; }
+  catch (e) { return null; }
+}
+self.addEventListener("push", e => e.waitUntil((async () => {
+  const cfg = await readCfg();
+  let list = [];
+  if (cfg) { try { const r = await fetch(`${cfg.url}/outbox/${cfg.code}/${cfg.hash}`); if (r.ok) list = await r.json(); } catch (err) { /* ignore */ } }
+  if (!Array.isArray(list) || !list.length) list = [{ id: "generic", title: "טיול קפריסין", body: "יש עדכון באפליקציה", actions: [] }];
+  for (const n of list) {
+    await self.registration.showNotification(String(n.title || "טיול קפריסין"), {
+      body: String(n.body || ""), tag: String(n.id || "n"), lang: "he", dir: "rtl", requireInteraction: true,
+      data: { itemId: n.itemId || null }, actions: Array.isArray(n.actions) ? n.actions.slice(0, 3) : []
+    });
+  }
+})()));
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  const itemId = e.notification.data && e.notification.data.itemId, act = e.action;
+  const status = { done: "done", skip: "skipped", drop: "dropped" }[act];
+  e.waitUntil((async () => {
+    if (itemId && status) {
+      const cfg = await readCfg();
+      if (cfg) {
+        try { await fetch(`${cfg.url}/rooms/${cfg.code}.json`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ ["status/" + itemId]: status }) }); } catch (err) { /* ignore */ }
+        (await self.clients.matchAll({ type: "window" })).forEach(c => c.postMessage({ type: "status-changed" }));
+        return; // סימון בוצע: בלי לפתוח את האפליקציה. הצעת ההעברה אחרי "דילגנו" תוצג בפתיחה הבאה
+      }
+    }
+    const cs = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    if (cs.length) return cs[0].focus();
+    return self.clients.openWindow("./index.html");
+  })());
 });

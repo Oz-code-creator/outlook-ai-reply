@@ -39,9 +39,9 @@
     const ta = (i.ta ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta)}">⭐ TripAdvisor</a>` : "") + (i.ta2 ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta2)}">⭐ To Piperi</a>` : "");
     const moved = (S.ov[i.id] && (S.ov[i.id].day || S.ov[i.id].start)) ? `<span class="chip">הוזז</span>` : "";
     const added = String(i.id).startsWith("add-") ? `<span class="chip">נוסף</span>` : "";
-    const st = i.status === "done" ? "✅" : i.status === "skipped" ? "⏭" : "";
+    const st = i.status === "done" ? "✅" : i.status === "skipped" ? "⏭" : i.status === "dropped" ? "✖" : "";
     const acts = i.status === "pending"
-      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}`
+      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}`
       : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}${ta}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
       <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${esc(i.reserve)}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
@@ -57,9 +57,24 @@
     el.textContent = txt;
   }
 
+  // הצעה אחרי "דילגנו": אם הזמן של הפעילות עוד לא הגיע — מציעים יום אחר; אם כבר עבר — מהיום והלאה
+  function skipSlot(it) {
+    const n = now(), cur = n.day ? n : null;
+    const future = !cur || it.day > n.day || (it.day === n.day && it.start + it.dur > n.min);
+    return L.findSlot(P, S, it, cur, future ? it.day + 1 : 0);
+  }
   // ---- שאלות אקטיביות: הגעה / עבר הזמן ----
   function computePrompt() {
-    const n = now(); if (!n.day) return null;
+    const n = now(), cur = n.day ? n : null;
+    S.offered = S.offered || {};
+    const sk = L.eff(P, S).filter(i => i.status === "skipped" && !S.offered[i.id] && !dismissed.has("sk" + i.id)).sort((x, y) => x.day - y.day || x.start - y.start)[0];
+    if (sk) {
+      const slot = skipSlot(sk);
+      return slot
+        ? { key: "sk" + sk.id, id: sk.id, text: `דילגתם על "${sk.title}". להעביר ל${L.dayLabel(P, slot.day)} ב-${L.fmt(slot.start)}?`, acts: [["mv", "✅ כן, העבר"], ["drop", "✖ ויתרנו"], ["keep", "השאר כמדולג"]] }
+        : { key: "sk" + sk.id, id: sk.id, text: `דילגתם על "${sk.title}" ואין מקום פנוי בימים הבאים. לוותר עליה?`, acts: [["drop", "✖ ויתרנו"], ["keep", "השאר כמדולג"]] };
+    }
+    if (!n.day) return null;
     const pend = L.eff(P, S).filter(i => i.day === n.day && i.status === "pending").sort((a, b) => a.start - b.start);
     if (pos) for (const i of pend) {
       if (i.lat && L.dist(pos, i) <= (i.radius || 150) && Math.abs(n.min - i.start) <= 120 && !dismissed.has("arr" + i.id))
@@ -67,7 +82,7 @@
     }
     for (const i of pend) {
       if (i.start + i.dur + 20 < n.min && !dismissed.has("od" + i.id))
-        return { key: "od" + i.id, id: i.id, text: `הזמן של "${i.title}" עבר. הספקתם?`, acts: [["done", "✅ כן"], ["skip", "⏭ דילגנו"], ["adapt", "🤖 התאם לי"], ["later", "אחר כך"]] };
+        return { key: "od" + i.id, id: i.id, text: `הזמן של "${i.title}" עבר. הספקתם?`, acts: [["done", "✅ כן"], ["skip", "⏭ דילגנו"], ["drop", "✖ ויתרנו"], ["adapt", "🤖 התאם לי"], ["later", "אחר כך"]] };
     }
     return null;
   }
@@ -97,11 +112,19 @@
     const id = t.dataset.id;
     if (t.dataset.a === "done") setStatus(id, "done");
     else if (t.dataset.a === "skip") setStatus(id, "skipped");
+    else if (t.dataset.a === "drop") setStatus(id, "dropped");
     else if (t.dataset.a === "undo") setStatus(id, null);
     else if (t.dataset.a === "move") openMove(id);
     else if (t.dataset.pa) {
       const a = t.dataset.pa; dismissed.add(t.dataset.key);
+      const offered = () => { S.offered = S.offered || {}; S.offered[id] = 1; };
       if (a === "done") setStatus(id, "done"); else if (a === "skip") setStatus(id, "skipped");
+      else if (a === "drop") { offered(); setStatus(id, "dropped"); }
+      else if (a === "keep") { offered(); save(); render(); }
+      else if (a === "mv") {
+        const it = L.eff(P, S).find(x => x.id === id), slot = it && skipSlot(it);
+        offered(); if (slot) L.applyOps(S, [{ op: "move", id, day: slot.day, start: slot.start }]); save(); render();
+      }
       else if (a === "adapt") openAdapt(); else renderPrompt();
     }
   });
@@ -158,6 +181,7 @@
  {"op":"move","id":"<id קיים>","day":1-4,"start":"HH:MM"},
  {"op":"skip","id":"<id קיים>"},
  {"op":"add","item":{"day":1-4,"start":"HH:MM","dur":15-480,"type":"sight|food|rest|shop|travel","title":"...","notes":"..."}}]}]}`;
+  const STATUS_NOTE = "\nסטטוסים: pending, done (בוצע), skipped (דילגו, ייתכן שיועברו), dropped (ויתרו, אל תציע אותם שוב).";
   const TOOL = {
     name: "propose_changes",
     description: "החזרת הצעות התאמה לתוכנית הטיול",
@@ -215,9 +239,9 @@
       return new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : "") + (msg ? ": " + msg.slice(0, 220) : ""));
     };
     // ניסיון 1: כלי עם מבנה מוגדר
-    let r = await send(Object.assign({}, base, { system: SYSTEM + "\nהחזר את התשובה אך ורק דרך הכלי propose_changes.", tools: [TOOL], tool_choice: { type: "tool", name: "propose_changes" } }));
+    let r = await send(Object.assign({}, base, { system: SYSTEM + STATUS_NOTE + "\nהחזר את התשובה אך ורק דרך הכלי propose_changes.", tools: [TOOL], tool_choice: { type: "tool", name: "propose_changes" } }));
     // גיבוי: אם הבקשה נדחתה (400) — טקסט רגיל
-    if (r.status === 400) r = await send(Object.assign({}, base, { system: SYSTEM + "\nאל תשתמש בגרשיים כפולים בתוך מחרוזות. החזר JSON תקין בלבד." }));
+    if (r.status === 400) r = await send(Object.assign({}, base, { system: SYSTEM + STATUS_NOTE + "\nאל תשתמש בגרשיים כפולים בתוך מחרוזות. החזר JSON תקין בלבד." }));
     if (!r.ok) throw await apiErr(r);
     const d = await r.json(), blocks = d.content || [];
     const tu = blocks.find(b => b.type === "tool_use");
@@ -374,6 +398,12 @@
     syMsg(c ? "סנכרון פעיל." : "לא מחובר. ראו הוראות הקמה ב-README.");
   }
   $("btnSet").addEventListener("click", fillSync);
+  const pnMsg = t => { $("pnMsg").textContent = t; };
+  async function fillPush() { pnMsg("מצב: " + (window.Push ? await Push.state() : "לא נתמך")); }
+  $("btnSet").addEventListener("click", fillPush);
+  $("pnEnable").addEventListener("click", async () => { pnMsg("מפעיל…"); try { await Push.enable(); pnMsg("ההתראות הופעלו ✅ לחצו 'שלח התראת בדיקה'."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
+  $("pnTest").addEventListener("click", async () => { pnMsg("שולח…"); try { await Push.test(); pnMsg("נשלחה. אם לא הגיעה תוך דקה, ראו README."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
+  $("pnOff").addEventListener("click", async () => { try { await Push.disable(); pnMsg("כובו במכשיר הזה."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("syGen").addEventListener("click", () => { $("syCode").value = Sync.genCode(); });
   $("syStart").addEventListener("click", async () => {
     syMsg("מתחבר…");
@@ -403,6 +433,7 @@
   });
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.type === "status-changed" && window.Sync) Sync.refresh(); });
   setInterval(() => { if (rec || (document.activeElement && document.activeElement.id === "liNew")) return; render(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   Sync.init({

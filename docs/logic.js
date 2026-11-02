@@ -22,9 +22,9 @@
 
   const dayLabel = (P, d) => P.days[d - 1].label;
 
-  function findSlot(P, S, item, now) {
-    const others = eff(P, S).filter(i => i.id !== item.id && i.status !== "skipped");
-    for (let d = (now && now.day) || 1; d <= P.days.length; d++) {
+  function findSlot(P, S, item, now, minDay) {
+    const others = eff(P, S).filter(i => i.id !== item.id && i.status !== "skipped" && i.status !== "dropped");
+    for (let d = Math.max((now && now.day) || 1, minDay || 1); d <= P.days.length; d++) {
       if ((item.closedDays || []).includes(P.days[d - 1].date)) continue;
       if (d === item.day && !(now && now.day === d)) continue;
       const [w0, w1] = P.windows[d].map(toMin);
@@ -49,7 +49,7 @@
         if (op.dur) o.dur = op.dur;
         S.ov[op.id] = Object.assign(S.ov[op.id] || {}, o);
         if (S.status[op.id] === "skipped") delete S.status[op.id];
-      } else if (op.op === "skip") S.status[op.id] = "skipped";
+      } else if (op.op === "skip" || op.op === "drop") S.status[op.id] = "dropped";
       else if (op.op === "done") S.status[op.id] = "done";
       else if (op.op === "add") S.added.push(Object.assign({ id: "add-" + Date.now() + "-" + S.added.length }, op.item));
     });
