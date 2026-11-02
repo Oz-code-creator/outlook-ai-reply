@@ -30,5 +30,5 @@ dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 
 .prop{border:1px solid var(--line);border-radius:10px;padding:8px;margin:8px 0;font-size:14px}.prop button{margin-top:6px}
 .sum{background:#eef6fa;border-radius:10px;padding:8px;font-size:14px;margin:8px 0}
 
-.ver{position:absolute;top:8px;inset-inline-start:12px;font-size:10px;opacity:.6;color:#fff}
-header{position:sticky}
+
+.ver{font-size:11px;opacity:.7;margin-top:2px}
