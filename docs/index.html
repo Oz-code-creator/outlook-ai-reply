@@ -7,13 +7,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 12<span id="syncSt"></span></div>
+  <div class="ver">גרסה 13<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -46,7 +46,7 @@
     <label>בקשה חופשית ל-Claude
       <textarea id="adText" rows="3" placeholder="למשל: התעייפנו, רוצים משהו רגוע וקרוב עם נוף. או: יורד גשם."></textarea>
     </label>
-    <button type="button" id="adAI" class="primary">🤖 בקש הצעות מ-Claude</button>
+    <div class="acts"><button type="button" id="adMic" class="mic" aria-label="הקלטה קולית">🎤 הקלטה</button><button type="button" id="adAI" class="primary">🤖 בקש הצעות מ-Claude</button></div>
     <div id="adStatus" class="muted"></div>
     <div id="adAIList"></div>
     <menu><button value="close">סגור</button></menu>
@@ -79,9 +79,9 @@
   </form>
 </dialog>
 
-<script src="plan.js?v=12"></script>
-<script src="logic.js?v=12"></script>
-<script src="sync.js?v=12"></script>
-<script src="app.js?v=12"></script>
+<script src="plan.js?v=13"></script>
+<script src="logic.js?v=13"></script>
+<script src="sync.js?v=13"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

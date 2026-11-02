@@ -304,6 +304,21 @@
     r.onend = () => { rec = null; const b = $("liMic"); if (b) b.classList.remove("rec"); if (!got) hint(""); };
     try { r.start(); } catch (e) { rec = null; hint("לא ניתן להתחיל הקלטה."); }
   }
+  function dictateText(inputEl, btn) {
+    const msg = t => { $("adStatus").textContent = t; };
+    if (!SR) { msg("הדפדפן לא תומך בהקלטה קולית."); return; }
+    if (rec) { rec.stop(); return; }
+    const r = rec = new SR();
+    r.lang = "he-IL"; r.interimResults = false; r.maxAlternatives = 1; r.continuous = false;
+    btn.classList.add("rec"); msg("מקשיבים… אפשר לדבר חופשי.");
+    let got = false;
+    r.onresult = e => { got = true; const t = e.results[0][0].transcript.trim(); inputEl.value = (inputEl.value.trim() ? inputEl.value.trim() + " " : "") + t; msg("הוקלט. אפשר להוסיף עוד, או ללחוץ 'בקש הצעות'."); };
+    r.onerror = e => { got = true; msg(e.error === "not-allowed" || e.error === "service-not-allowed" ? "אין הרשאת מיקרופון. אשרו בהגדרות הדפדפן." : e.error === "no-speech" ? "לא שמעתי כלום. נסו שוב." : "ההקלטה נכשלה (" + e.error + "). צריך חיבור לאינטרנט."); };
+    r.onend = () => { rec = null; btn.classList.remove("rec"); if (!got) msg(""); };
+    try { r.start(); } catch (e) { rec = null; btn.classList.remove("rec"); msg("לא ניתן להתחיל הקלטה."); }
+  }
+  $("adMic").hidden = !SR;
+  $("adMic").addEventListener("click", () => dictateText($("adText"), $("adMic")));
   document.addEventListener("change", e => {
     const c = e.target.closest("input[data-lk]"); if (!c) return;
     const it = lists()[c.dataset.lk].find(x => x.id === c.dataset.lid); if (it) { it.done = c.checked; save(); render(); }
