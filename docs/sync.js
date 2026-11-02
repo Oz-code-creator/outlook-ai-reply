@@ -109,9 +109,6 @@
       }
     },
     enabled: () => !!cfg,
-    ingestUrl: () => (cfg ? `${cfg.url}/ingest/${cfg.code}` : ""),
-    async proposals() { if (!cfg) return []; const r = await fetch(`${cfg.url}/proposals/${cfg.code}`); if (!r.ok) throw new Error("HTTP " + r.status); const l = await r.json(); return Array.isArray(l) ? l : []; },
-    async decide(pid, action) { const r = await fetch(`${cfg.url}/proposals/${cfg.code}/${pid}/${action}`, { method: "POST" }); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); },
     config: () => cfg && Object.assign({}, cfg),
     touch() { if (!cfg) return; ver++; dirty = true; clearTimeout(deb); deb = setTimeout(cycle, 400); },
     refresh() { cycle(); },

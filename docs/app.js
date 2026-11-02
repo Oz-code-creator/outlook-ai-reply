@@ -7,7 +7,7 @@
   const save = () => { saveQuiet(); if (window.Sync) Sync.touch(); };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const dismissed = new Set();
-  let pos = null, watchId = null, selDay = null, drag = null, undoSnap = null, toastTimer = null, serverProps = [];
+  let pos = null, watchId = null, selDay = null, drag = null, undoSnap = null, toastTimer = null;
 
   // ---- זמן נוכחי (אמיתי או מדומה) ----
   function now() {
@@ -69,8 +69,6 @@
   // ---- שאלות אקטיביות: הגעה / עבר הזמן ----
   function computePrompt() {
     const n = now(), cur = n.day ? n : null;
-    const sp = serverProps.find(p => !dismissed.has("pp" + p.pid));
-    if (sp) return { key: "pp" + sp.pid, id: sp.pid, text: "💬 הצעה מהקבוצה: " + sp.text, acts: [["pap", "✅ אשר"], ["prj", "✖ דחה"]] };
     S.offered = S.offered || {};
     const sk = L.eff(P, S).filter(i => i.status === "skipped" && !S.offered[i.id] && !dismissed.has("sk" + i.id)).sort((x, y) => x.day - y.day || x.start - y.start)[0];
     if (sk) {
@@ -133,9 +131,6 @@
       if (a === "done") setStatus(id, "done"); else if (a === "skip") setStatus(id, "skipped");
       else if (a === "drop") { offered(); setStatus(id, "dropped"); }
       else if (a === "keep") { offered(); save(); render(); }
-      else if (a === "pap" || a === "prj") {
-        Sync.decide(id, a === "pap" ? "approve" : "reject").then(() => { serverProps = serverProps.filter(p => p.pid !== id); Sync.refresh(); render(); }).catch(() => { dismissed.delete("pp" + id); render(); });
-      }
       else if (a === "mv") {
         const it = L.eff(P, S).find(x => x.id === id), slot = it && skipSlot(it);
         offered(); if (slot) L.applyOps(S, [{ op: "move", id, day: slot.day, start: slot.start }]); save(); render();
@@ -450,10 +445,6 @@
 
 
 
-  async function loadProposals() {
-    if (!window.Sync || !Sync.enabled()) return;
-    try { const l = await Sync.proposals(); if (JSON.stringify(l.map(x => x.pid)) !== JSON.stringify(serverProps.map(x => x.pid))) { serverProps = l; render(); } } catch (e) { /* ignore */ }
-  }
   // ---- מזג אוויר (Open-Meteo, חינמי ובלי מפתח; זמין כ-16 יום מראש) ----
   const WK = "cyprus-weather";
   let W = null, wxNote = "";
@@ -622,18 +613,7 @@
     const c = S.settings.sync; $("syDb").value = c ? c.url : ""; $("syCode").value = c ? c.code : "";
     syMsg(c ? "סנכרון פעיל." : "לא מחובר. ראו הוראות הקמה ב-README.");
   }
-  $("btnSet").addEventListener("click", () => { fillSync(); $("waUrl").value = window.Sync && Sync.enabled() ? Sync.ingestUrl() : ""; $("waMsg").textContent = Sync.enabled() ? "" : "קודם מפעילים סנכרון חי."; });
-  $("waCopy").addEventListener("click", async () => { const u = $("waUrl").value; if (!u) return; try { await navigator.clipboard.writeText(u); $("waMsg").textContent = "הכתובת הועתקה."; } catch (e) { $("waUrl").select(); $("waMsg").textContent = "סמנו והעתיקו ידנית."; } });
-  $("waTest").addEventListener("click", async () => {
-    if (!Sync.enabled()) { $("waMsg").textContent = "קודם מפעילים סנכרון חי."; return; }
-    $("waMsg").textContent = "שולח…";
-    try {
-      const r = await fetch(Sync.ingestUrl(), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: "בדיקה", text: `בדיקה ${new Date().toLocaleTimeString("he-IL")}: ראיתי שטירת קולוסי סגורה בשבת, אולי כדאי להעביר.` }) });
-      const j = await r.json().catch(() => ({}));
-      $("waMsg").textContent = r.status === 503 ? "ה-Worker עדיין בלי מפתח Claude (ANTHROPIC_API_KEY)." : !r.ok ? "שגיאה: HTTP " + r.status + (j.error ? " " + j.error : "") : j.proposals ? "נוצרה הצעה ✅ תגיע התראה, והיא תופיע גם כאן." : j.ignored ? "הודעה כפולה, נסו שוב עוד כמה דקות." : "ההודעה נותחה, בלי הצעה.";
-      loadProposals();
-    } catch (e) { $("waMsg").textContent = "שגיאה: " + e.message; }
-  });
+  $("btnSet").addEventListener("click", () => { fillSync(); });
   const pnMsg = t => { $("pnMsg").textContent = t; };
   async function fillPush() { pnMsg("מצב: " + (window.Push ? await Push.state() : "לא נתמך")); }
   $("btnSet").addEventListener("click", fillPush);
@@ -669,9 +649,9 @@
   });
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
-  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.type === "status-changed" && window.Sync) { Sync.refresh(); loadProposals(); } });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.type === "status-changed" && window.Sync) { Sync.refresh(); } });
   setInterval(() => { if (rec || (document.activeElement && document.activeElement.id === "liNew")) return; render(); }, 30000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { render(); loadProposals(); } });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { render(); } });
   Sync.init({
     cfg: S.settings.sync, days: P.days.length,
     get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added, booked: S.booked || {} }; },
@@ -679,6 +659,6 @@
     onStatus: t => { const el = $("syncSt"); if (el) el.textContent = t ? " · " + t : ""; }
   });
   joinFromLink().then(() => render());
-  loadWeather(); loadProposals(); setInterval(loadProposals, 30000);
+  loadWeather();
   render();
 })();

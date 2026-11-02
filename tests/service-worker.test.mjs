@@ -56,13 +56,4 @@ e = t.ev({}); t.handlers.push(e); await e.done(); assert.equal(t.shown[0].o.data
 let opened = null; t.handlersOpen = null;
 e = t.ev({ action: "nav", notification: { close() {}, data: { itemId: null, url: "https://www.google.com/maps/dir/?api=1&destination=1,2" } } }); t.handlers.notificationclick(e); await e.done();
 assert.equal(t.opened(), 1); assert.equal(t.fetches.filter(f => f.init && f.init.method === "PATCH").length, 0); console.log("nav button → opens maps URL, writes nothing ✔");
-// הצעה מהקבוצה: אשר / דחה
-for (const [act, label] of [["approve", "✅ ההצעה הוחלה בתוכנית"], ["reject", "ההצעה נדחתה"]]) {
-  t = make({ cfg }); e = t.ev({ action: act, notification: { close() {}, data: { pid: "abc12345" } } }); t.handlers.notificationclick(e); await e.done();
-  const p = t.fetches.find(f => f.init && f.init.method === "POST"); assert.ok(p.u.endsWith(`/proposals/${cfg.code}/abc12345/${act}`)); assert.equal(t.shown[0].t, label); assert.equal(t.posted[0].type, "status-changed"); assert.equal(t.opened() + t.focused(), 0);
-}
-t = make({ cfg, failPost: true }); e = t.ev({ action: "approve", notification: { close() {}, data: { pid: "abc12345" } } }); t.handlers.notificationclick(e); await e.done(); assert.equal(t.shown[0].t, "לא הצלחתי לעדכן");
-t = make({ cfg, outbox: [{ id: "prx", pid: "abc12345", title: "💬 הצעה מהקבוצה", body: "x", actions: [{ action: "approve", title: "✅ אשר" }, { action: "reject", title: "✖ דחה" }] }], max: 2 }); e = t.ev({}); t.handlers.push(e); await e.done();
-assert.equal(t.shown[0].o.data.pid, "abc12345"); assert.equal(t.shown[0].o.actions.length, 2);
-console.log("proposal notification: approve/reject → POST, confirmation shown, failure handled ✔");
 console.log("ALL SW TESTS OK");
