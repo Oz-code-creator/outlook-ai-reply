@@ -8,13 +8,13 @@
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css?v=28">
+<link rel="stylesheet" href="styles.css?v=29">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 28<span id="syncSt"></span></div>
+  <div class="ver">גרסה 29<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -93,10 +93,10 @@
       <div id="pnMsg" class="muted"></div>
     </details>
     <details><summary>⏰ זמני התראות</summary>
-      <label>הודעת בוקר: שעה (08:00 כברירת מחדל)<input id="ntMorning" type="time" value="08:00"></label>
-      <label>"בעוד N דקות" לפני אתר/קניות: כמה דקות לפני (20)<input id="ntLead" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
-      <label>לפני מסעדה שהוזמנה: כמה דקות לפני (30)<input id="ntFood" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
-      <label>"הספקתם?": כמה דקות אחרי סוף הפעילות (10)<input id="ntAfter" type="number" min="0" max="120" step="5" inputmode="numeric"></label>
+      <label>באיזו שעה לשלוח את הודעת הבוקר<input id="ntMorning" type="time" value="08:00"></label>
+      <label>התראה לפני אתר או קניות: כמה דקות לפני<input id="ntLead" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
+      <label>התראה לפני מסעדה שהוזמנה: כמה דקות לפני<input id="ntFood" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
+      <label>שאלת "הספקתם?": כמה דקות אחרי שהפעילות נגמרת<input id="ntAfter" type="number" min="0" max="120" step="5" inputmode="numeric"></label>
       <div class="acts"><button type="button" id="ntDefault">חזרה לברירות מחדל</button></div>
       <div id="ntMsg" class="muted"></div>
     </details>
@@ -106,10 +106,10 @@
   </form>
 </dialog>
 
-<script src="plan.js?v=28"></script>
-<script src="logic.js?v=28"></script>
-<script src="sync.js?v=28"></script>
-<script src="push.js?v=28"></script>
-<script src="app.js?v=28"></script>
+<script src="plan.js?v=29"></script>
+<script src="logic.js?v=29"></script>
+<script src="sync.js?v=29"></script>
+<script src="push.js?v=29"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>
