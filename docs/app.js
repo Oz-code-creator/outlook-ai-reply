@@ -333,6 +333,16 @@
       if (!Array.isArray(S.lists[k])) S.lists[k] = mkItems(LISTS[k].def());
       S.lists[k].forEach((x, i) => { if (!Number.isFinite(x.o)) x.o = i; });
     }
+    S.migrated = S.migrated || {};
+    let changed = false;
+    (P.listMigrations || []).forEach(m => {
+      if (S.migrated[m.id] || !Array.isArray(S.lists[m.list])) return;
+      const arr = S.lists[m.list];
+      (m.remove || []).forEach(id => { const i = arr.findIndex(x => x.id === id); if (i >= 0) arr.splice(i, 1); });
+      (m.add || []).forEach((x, k) => { if (!arr.some(y => y.id === x.id)) arr.splice(Math.min(k, arr.length), 0, { id: x.id, t: x.t, done: false, o: -1000 + k }); });
+      S.migrated[m.id] = 1; changed = true;
+    });
+    if (changed) saveQuiet();
     return S.lists;
   }
   const linkify = s => s.replace(/(\+?\d[\d ]{6,}\d|\b112\b)/g, m => `<a href="tel:${m.replace(/\s/g, "")}">${m}</a>`);
