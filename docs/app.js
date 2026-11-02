@@ -403,6 +403,7 @@
   $("btnSet").addEventListener("click", fillPush);
   $("pnEnable").addEventListener("click", async () => { pnMsg("מפעיל…"); try { await Push.enable(); pnMsg("ההתראות הופעלו ✅ " + await Push.state() + ". לחצו 'שלח התראת בדיקה'."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("pnTest").addEventListener("click", async () => { pnMsg("שולח…"); try { await Push.test(); pnMsg("נשלחה. " + await Push.state() + ". אם לא הגיעה תוך דקה, ראו README."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
+  $("pnTest2").addEventListener("click", async () => { pnMsg("שולח…"); try { await Push.test(true); pnMsg("נשלחה התראה לדוגמה עם כפתורים. " + await Push.state()); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("pnOff").addEventListener("click", async () => { try { await Push.disable(); pnMsg("כובו במכשיר הזה."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("syGen").addEventListener("click", () => { $("syCode").value = Sync.genCode(); });
   $("syStart").addEventListener("click", async () => {

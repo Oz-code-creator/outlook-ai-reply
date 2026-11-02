@@ -1,5 +1,5 @@
-const V = "cyprus-v16", CFG = "cyprus-cfg";
-const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg"];
+const V = "cyprus-v17", CFG = "cyprus-cfg";
+const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "badge-96.png"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== CFG).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", e => {
@@ -10,6 +10,7 @@ self.addEventListener("fetch", e => {
 });
 
 // ---- התראות דחיפה: ההתראה נשלפת מהשרת (outbox) ואחרי לחיצה על כפתור התשובה נשלחת לחדר ----
+const iconOpts = () => ({ icon: new URL("icon-192.png", self.registration.scope).href, badge: new URL("badge-96.png", self.registration.scope).href });
 async function readCfg() {
   try { const c = await caches.open(CFG), r = await c.match(new URL("cfg-store", self.registration.scope).href); return r ? await r.json() : null; }
   catch (e) { return null; }
@@ -26,7 +27,7 @@ self.addEventListener("push", e => e.waitUntil((async () => {
     const actions = twoStep ? [full[0], { action: "later", title: "❌ לא הספקנו" }] : full.slice(0, max);
     await self.registration.showNotification(String(n.title || "טיול קפריסין"), {
       body: String(n.body || ""), tag: String(n.id || "n"), lang: "he", dir: "rtl", requireInteraction: true,
-      data: { itemId: n.itemId || null, name: n.name || null }, actions
+      data: { itemId: n.itemId || null, name: n.name || null }, actions, ...iconOpts()
     });
   }
 })()));
@@ -39,8 +40,12 @@ self.addEventListener("notificationclick", e => {
       const name = (e.notification.data && e.notification.data.name) || "הפעילות";
       return self.registration.showNotification("לא הספקתם: " + name, {
         body: "מה לעשות איתה?", tag: "fu-" + itemId, lang: "he", dir: "rtl", requireInteraction: true,
-        data: { itemId, name }, actions: [{ action: "skip", title: "↪ הצע העברה" }, { action: "drop", title: "✖ ויתרנו" }]
+        data: { itemId, name }, actions: [{ action: "skip", title: "↪ הצע העברה" }, { action: "drop", title: "✖ ויתרנו" }], ...iconOpts()
       });
+    }
+    if (itemId === "__test__" && status) { // בדיקה: לא כותבים כלום לחדר
+      const label = { done: "✅ הספקנו", skipped: "⏭ דילגנו / ↪ הצע העברה", dropped: "✖ ויתרנו" }[status];
+      return self.registration.showNotification("בדיקה: נבחר " + label, { body: "הכפתורים עובדים. שום דבר לא שונה בתוכנית.", tag: "test-result", lang: "he", dir: "rtl", ...iconOpts() });
     }
     if (itemId && status) {
       const cfg = await readCfg();

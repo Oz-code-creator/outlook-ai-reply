@@ -127,7 +127,7 @@ export default {
     const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: Object.assign({ "content-type": "application/json", "cache-control": "no-store" }, cors) });
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
     if (!env.ROOMS) return json({ error: "KV binding ROOMS missing" }, 500);
-    const path = new URL(req.url).pathname;
+    const reqUrl = new URL(req.url), path = reqUrl.pathname;
     let m;
 
     if (path === "/vapid" && req.method === "GET") return json({ pub: (await getVapid(env)).pub });
@@ -178,7 +178,11 @@ export default {
     if ((m = path.match(new RegExp(`^/test/(${CODE})$`))) && req.method === "POST") {
       const subs = await listSubs(env, m[1]);
       if (!subs.length) return json({ error: "no devices registered" }, 404);
-      await notify(env, m[1], subs, { id: "t" + Date.now(), title: "בדיקה ✅", body: "ההתראות עובדות. כך הן ייראו בטיול.", actions: [] });
+      const withButtons = reqUrl.searchParams.get("buttons") === "1";
+      await notify(env, m[1], subs, withButtons
+        ? { id: "t" + Date.now(), itemId: "__test__", name: "פעילות לדוגמה", title: "הספקתם? פעילות לדוגמה", body: "זו בדיקה: לחיצה על כפתור לא משנה כלום בתוכנית.",
+            actions: [{ action: "done", title: "✅ הספקנו" }, { action: "skip", title: "⏭ דילגנו" }, { action: "drop", title: "✖ ויתרנו" }] }
+        : { id: "t" + Date.now(), title: "בדיקה ✅", body: "ההתראות עובדות. כך הן ייראו בטיול.", actions: [] });
       return json({ sent: subs.length });
     }
     return new Response("not found", { status: 404, headers: cors });
