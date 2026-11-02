@@ -44,3 +44,5 @@ dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 
 .item.dropped{opacity:.4}.item.dropped h3{text-decoration:line-through}
 
 .wx{margin:0 4px 10px;font-size:15px}.wx button{font-size:12px;padding:3px 8px;margin-inline-start:6px}.li .tx{flex:1;font-size:15px;line-height:1.5}.li a{color:var(--pri);font-weight:600}
+
+.bk-warn{margin:0 4px 10px;padding:8px 10px;border-radius:10px;background:#fff7e6;border:1px solid #f0c36d;font-size:14px}button.booked{background:#e6f4ea;border-color:var(--ok);color:var(--ok)}

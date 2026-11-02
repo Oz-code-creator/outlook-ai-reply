@@ -93,8 +93,8 @@ function effItems(room) {
   });
 }
 const fmt = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
-// תזכורת "צריך לצאת": אתרים וקניות, ארוחות ערב עם הזמנה, ונסיעה לשדה (לא ארוחות רגילות)
-const remindable = i => NOTIFY_TYPES.includes(i.type) || (i.type === "food" && i.fixed && !/-bf$/.test(i.id)) || i.id === "d4-airport";
+// תזכורת "צריך לצאת": אתרים וקניות, מסעדות שסומנו "הוזמן", ונסיעה לשדה
+const remindable = (i, booked) => NOTIFY_TYPES.includes(i.type) || (i.type === "food" && !!booked[i.id]) || i.id === "d4-airport";
 const leadOf = i => (i.type === "food" ? 30 : 20);
 
 async function tick(env, when) {
@@ -123,7 +123,7 @@ async function tick(env, when) {
       }
     }
     // 2) "צריך לצאת": 20 דק' לפני (30 לארוחת ערב עם הזמנה)
-    for (const i of items.filter(x => x.day === day.n && remindable(x) && !status[x.id]).sort((a, b) => a.start - b.start)) {
+    for (const i of items.filter(x => x.day === day.n && remindable(x, room.booked || {}) && !status[x.id]).sort((a, b) => a.start - b.start)) {
       const k = "pre:" + i.id;
       if (notified[k] || !(min >= i.start - leadOf(i) && min < i.start)) continue;
       notified[k] = Date.now();

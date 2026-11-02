@@ -23,12 +23,13 @@
     Object.entries(st.status || {}).forEach(([id, v]) => { m[`status/${id}`] = v; });
     Object.entries(st.ov || {}).forEach(([id, v]) => { m[`ov/${id}`] = clone(v); });
     (st.added || []).forEach(it => { m[`added/${it.id}`] = clone(it); });
+    Object.keys(st.booked || {}).forEach(id => { if (st.booked[id]) m[`booked/${id}`] = true; });
     return m;
   }
   function flatRemote(r) {
     const m = {}; if (!r) return m;
     KEYS.forEach(k => Object.entries((r.lists || {})[k] || {}).forEach(([id, v]) => { m[`lists/${k}/${id}`] = v; }));
-    ["status", "ov", "added"].forEach(s => Object.entries(r[s] || {}).forEach(([id, v]) => { m[`${s}/${id}`] = v; }));
+    ["status", "ov", "added", "booked"].forEach(s => Object.entries(r[s] || {}).forEach(([id, v]) => { m[`${s}/${id}`] = v; }));
     return m;
   }
   function unflat(r) {
@@ -50,7 +51,8 @@
         added.push({ id, day: v.day, start: v.start, dur: v.dur, type: v.type, title: v.title.slice(0, 120), notes: String(v.notes || "").slice(0, 300) });
     });
     added.sort((a, b) => (a.id < b.id ? -1 : 1));
-    return { lists, status: st, ov, added };
+    const booked = {}; Object.entries(r.booked || {}).forEach(([id, v]) => { if (v === true) booked[id] = true; });
+    return { lists, status: st, ov, added, booked };
   }
 
   const url = () => `${cfg.url}/rooms/${cfg.code}.json`;

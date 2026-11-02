@@ -28,23 +28,25 @@
     const day = P.days[selDay - 1];
     const list = items.filter(i => i.day === selDay).sort((a, b) => a.start - b.start);
     const cur = n.day === selDay ? list.find(i => i.status === "pending" && i.start <= n.min && n.min < i.start + i.dur) : null;
-    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>${wxLine(day)}` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>");
+    $("list").innerHTML = `<div class="theme">${esc(day.theme)}</div>${wxLine(day)}${bookWarn(day)}` + (list.map(i => card(i, i === cur)).join("") || "<p class='muted'>אין פעילויות ביום הזה.</p>");
     if (!n.day) $("list").insertAdjacentHTML("afterbegin", `<p class="muted">הטיול עוד לא התחיל (מצב צפייה). אפשר להפעיל מצב הדגמה בהגדרות.</p>`);
     renderPrompt();
     renderLoc();
   }
 
   function card(i, isNow) {
+    const booked = !!(S.booked || {})[i.id];
+    const bk = i.book ? `<button data-book="${i.id}" class="${booked ? "booked" : ""}">${booked ? "✅ הוזמן" : "☐ סמן כהוזמן"}</button>` : "";
     const nav = i.lat ? `<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}">🧭 נווט</a>` : "";
     const ta = (i.ta ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta)}">⭐ TripAdvisor</a>` : "") + (i.ta2 ? `<a class="btn" target="_blank" rel="noopener" href="${esc(i.ta2)}">⭐ To Piperi</a>` : "");
     const moved = (S.ov[i.id] && (S.ov[i.id].day || S.ov[i.id].start)) ? `<span class="chip">הוזז</span>` : "";
     const added = String(i.id).startsWith("add-") ? `<span class="chip">נוסף</span>` : "";
     const st = i.status === "done" ? "✅" : i.status === "skipped" ? "⏭" : i.status === "dropped" ? "✖" : "";
     const acts = i.status === "pending"
-      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}`
-      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}${ta}`;
+      ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button>${i.fixed ? "" : `<button data-a="move" data-id="${i.id}">↪ הזז</button>`}${nav}${ta}${bk}`
+      : `<button data-a="undo" data-id="${i.id}">↩ בטל</button>${nav}${ta}${bk}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
-      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${esc(i.reserve)}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
+      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div></article>`;
   }
 
   function renderLoc() {
@@ -104,6 +106,7 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
+    if (t.dataset.book) { S.booked = S.booked || {}; if (S.booked[t.dataset.book]) delete S.booked[t.dataset.book]; else S.booked[t.dataset.book] = true; save(); render(); return; }
     if (t.dataset.rain) {
       const d = P.days[+t.dataset.rain - 1];
       openAdapt(); $("adText").value = `צפוי גשם ב${d.label}. הצע חלופות מתוך: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים והספא במלון, ושמור על ההזמנות.`;
@@ -296,6 +299,10 @@
     const code = (d.weather_code || d.weathercode || [])[i];
     return { icon: wxIcon(code), max: Math.round(d.temperature_2m_max[i]), min: Math.round(d.temperature_2m_min[i]), pp: (d.precipitation_probability_max || [])[i], sum: (d.precipitation_sum || [])[i] };
   }
+  function bookWarn(day) {
+    const miss = L.eff(P, S).filter(i => i.day === day.n && i.book && i.status === "pending" && !(S.booked || {})[i.id]).sort((x, y) => x.start - y.start);
+    return miss.length ? `<div class="bk-warn">⚠ עדיין לא הוזמן: ${miss.map(i => esc(i.title.split(" – ").pop())).join(" · ")}</div>` : "";
+  }
   const rainy = w => !!w && ((w.pp || 0) >= 50 || (w.sum || 0) >= 2);
   function wxLine(day) {
     const w = wxFor(day.date);
@@ -480,8 +487,8 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   Sync.init({
     cfg: S.settings.sync, days: P.days.length,
-    get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added }; },
-    set: st => { S.lists = st.lists; S.status = st.status; S.ov = st.ov; S.added = st.added; saveQuiet(); if (!(document.activeElement && document.activeElement.id === "liNew")) render(); },
+    get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added, booked: S.booked || {} }; },
+    set: st => { S.lists = st.lists; S.status = st.status; S.ov = st.ov; S.added = st.added; S.booked = st.booked || {}; saveQuiet(); if (!(document.activeElement && document.activeElement.id === "liNew")) render(); },
     onStatus: t => { const el = $("syncSt"); if (el) el.textContent = t ? " · " + t : ""; }
   });
   joinFromLink().then(() => render());
