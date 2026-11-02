@@ -633,7 +633,6 @@
   async function fillPush() { pnMsg("מצב: " + (window.Push ? await Push.state() : "לא נתמך")); }
   $("btnSet").addEventListener("click", fillPush);
   $("pnEnable").addEventListener("click", async () => { pnMsg("מפעיל…"); try { await Push.enable(); pnMsg("ההתראות הופעלו ✅ " + await Push.state() + ". לחצו 'שלח בדיקת התראה'."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
-  $("pnTest2").addEventListener("click", async () => { pnMsg("שולח…"); try { await Push.test(true); pnMsg("נשלחה בדיקת התראה. " + await Push.state()); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("pnOff").addEventListener("click", async () => { try { await Push.disable(); pnMsg("כובו במכשיר הזה."); } catch (e) { pnMsg("שגיאה: " + e.message); } });
   $("syGen").addEventListener("click", () => { $("syCode").value = Sync.genCode(); });
   $("syStart").addEventListener("click", async () => {

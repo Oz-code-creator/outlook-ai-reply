@@ -27,12 +27,6 @@ window.Push = (function () {
     if (cfg) { try { await fetch(`${cfg.url}/subs/${cfg.code}/${cfg.hash}`, { method: "DELETE" }); } catch (e) { /* ignore */ } }
     await cache.delete(key);
   }
-  async function test(withButtons) {
-    const c = need(), r = await fetch(`${c.url}/test/${c.code}${withButtons ? "?buttons=1" : ""}`, { method: "POST" });
-    if (r.status === 404) throw new Error("אין מכשיר רשום. הפעילו התראות קודם.");
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return (await r.json()).sent;
-  }
   async function state() {
     if (!supported()) return "לא נתמך בדפדפן הזה";
     try {
@@ -41,5 +35,5 @@ window.Push = (function () {
       return sub && cfg ? "פעיל במכשיר הזה ✅ (כפתורים בהתראה: " + (Notification.maxActions || "לא ידוע") + ")" : "כבוי";
     } catch (e) { return "כבוי"; }
   }
-  return { supported, enable, disable, test, state };
+  return { supported, enable, disable, state };
 })();

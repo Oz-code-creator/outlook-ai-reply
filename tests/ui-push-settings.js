@@ -15,7 +15,6 @@ await p.click("#pnEnable");await p.waitForTimeout(800);console.log("enable msg:"
 console.log("subscribe calls:",JSON.stringify(await p.evaluate(()=>window.__calls)));
 const cfg=await p.evaluate(async()=>{const c=await caches.open("cyprus-cfg");const r=await c.match(new URL("cfg-store",location.origin+"/").href);return r?await r.json():null});
 console.log("cfg cached keys:",cfg&&Object.keys(cfg).join(","),"| hash ok:",cfg&&/^[a-f0-9]{16}$/.test(cfg.hash));
-await p.click("#pnTest2");await p.waitForTimeout(800);console.log("test2 msg:",await p.textContent("#pnMsg"));
 const ob=await p.evaluate(async(c)=>{const r=await fetch(`${c.url}/outbox/${c.code}/${c.hash}`);return r.json()},cfg);
 console.log("outbox on server:",ob.map(x=>x.title+"["+(x.actions||[]).length+"]").join("|"));
 console.log("state:",await p.evaluate(()=>Push.state()));
