@@ -90,6 +90,7 @@
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
     if (t.dataset.lx) { const arr = lists()[t.dataset.lx], i = arr.findIndex(x => x.id === t.dataset.lid); if (i >= 0) { arr.splice(i, 1); save(); render(); } return; }
+    if (t.dataset.mic) { dictate(t.dataset.mic); return; }
     if (t.dataset.ladd) { addListItem(t.dataset.ladd); return; }
     if (t.dataset.lreset) { if (confirm("להחזיר את הרשימה לברירת המחדל? פריטים שהוספתם יימחקו.")) { S.lists[t.dataset.lreset] = mkItems(LISTS[t.dataset.lreset].def()); save(); render(); } return; }
     if (t.dataset.share) { shareState(); return; }
@@ -269,7 +270,8 @@
     const arr = lists()[key], done = arr.filter(x => x.done).length;
     return `<div class="theme">${LISTS[key].title} · ${done}/${arr.length}</div>
       <div class="lst">${arr.map(x => `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
-      <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120"><button class="primary" data-ladd="${key}">הוסף</button></div>
+      <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120">${SR ? `<button class="mic" id="liMic" data-mic="${key}" aria-label="הקלטה קולית">🎤</button>` : ""}<button class="primary" data-ladd="${key}">הוסף</button></div>
+      <div id="liHint" class="muted" style="margin:6px 4px"></div>
       <div class="acts" style="margin:10px 4px">${window.Sync && Sync.enabled() ? '<button data-share="1">📤 הזמן את שרית</button>' : ""}<button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
   }
   function addListItem(key) {
@@ -277,6 +279,30 @@
     if (!t) return;
     lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: t.slice(0, 120), done: false, o: Date.now() });
     save(); render(); const n = $("liNew"); if (n) n.focus();
+  }
+
+  // ---- הקלטה קולית להוספת פריטים ----
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  const hint = t => { const h = $("liHint"); if (h) h.textContent = t; };
+  function addSpoken(key, txt) {
+    const parts = txt.split(/\s*(?:,|،|\sוגם\s|\sואחר כך\s)\s*/).map(s => s.trim()).filter(Boolean).slice(0, 10);
+    if (!parts.length) { hint("לא שמעתי פריט. נסו שוב."); return; }
+    parts.forEach((t, i) => lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5) + i, t: t.slice(0, 120), done: false, o: Date.now() + i }));
+    save(); render(); hint("נוסף: " + parts.join(" · "));
+  }
+  function dictate(key) {
+    if (!SR) { hint("הדפדפן לא תומך בהקלטה קולית."); return; }
+    if (rec) { rec.stop(); return; }
+    const r = rec = new SR();
+    r.lang = "he-IL"; r.interimResults = false; r.maxAlternatives = 1; r.continuous = false;
+    const btn = $("liMic"); if (btn) btn.classList.add("rec");
+    hint("מקשיבים… אמרו פריט, או כמה פריטים עם \"וגם\" ביניהם.");
+    let got = false;
+    r.onresult = e => { got = true; addSpoken(key, e.results[0][0].transcript.trim()); };
+    r.onerror = e => { got = true; hint(e.error === "not-allowed" || e.error === "service-not-allowed" ? "אין הרשאת מיקרופון. אשרו בהגדרות הדפדפן." : e.error === "no-speech" ? "לא שמעתי כלום. נסו שוב." : "ההקלטה נכשלה (" + e.error + "). צריך חיבור לאינטרנט."); };
+    r.onend = () => { rec = null; const b = $("liMic"); if (b) b.classList.remove("rec"); if (!got) hint(""); };
+    try { r.start(); } catch (e) { rec = null; hint("לא ניתן להתחיל הקלטה."); }
   }
   document.addEventListener("change", e => {
     const c = e.target.closest("input[data-lk]"); if (!c) return;
@@ -362,7 +388,7 @@
   });
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
-  setInterval(() => { if (document.activeElement && document.activeElement.id === "liNew") return; render(); }, 30000);
+  setInterval(() => { if (rec || (document.activeElement && document.activeElement.id === "liNew")) return; render(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   Sync.init({
     cfg: S.settings.sync, days: P.days.length,
