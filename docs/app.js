@@ -205,7 +205,11 @@
         messages: [{ role: "user", content: JSON.stringify(body) }]
       })
     });
-    if (!r.ok) throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : r.status === 400 ? " – ייתכן שאין קרדיט בחשבון" : r.status === 429 ? " – יותר מדי בקשות" : ""));
+    if (!r.ok) {
+      let msg = "";
+      try { const j = await r.json(); msg = (j.error && j.error.message) || ""; } catch (e) { /* ignore */ }
+      throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : "") + (msg ? ": " + msg.slice(0, 220) : ""));
+    }
     const d = await r.json(), blocks = d.content || [];
     const tu = blocks.find(b => b.type === "tool_use");
     if (tu && tu.input) return tu.input;
