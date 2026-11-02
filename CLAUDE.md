@@ -15,7 +15,7 @@
 - ענף עבודה: `claude/cyprus-trip-app-ji9hwm` (לא `main`). לדחוף אליו תמיד.
 - האתר: GitHub Pages מהענף הזה, תיקיית `/docs`: https://oz-code-creator.github.io/outlook-ai-reply/
 - **הריפו והאתר ציבוריים.** אסור לשים בקוד: מספרי הזמנה, שוברים, כרטיסי טיסה, טוקנים, מפתחות, או קוד חדר הסנכרון. מידע כזה המשתמש מוסיף ידנית בטאב ℹ️ באפליקציה (נשמר בחדר פרטי).
-- **אחרי כל שינוי באפליקציה להעלות גרסה** בשלושה מקומות: `docs/index.html` (`?v=N` בקבצי ה-JS/CSS ותווית "גרסה N"), ו-`docs/sw.js` (`cyprus-vN`). גרסה נוכחית: **30**.
+- **אחרי כל שינוי באפליקציה להעלות גרסה** בשלושה מקומות: `docs/index.html` (`?v=N` בקבצי ה-JS/CSS ותווית "גרסה N"), ו-`docs/sw.js` (`cyprus-vN`). גרסה נוכחית: **31**.
 - אחרי שינוי ב-`docs/plan.js` להריץ `node cyprus-worker/build-plan.mjs` (מטמיע עותק של התוכנית ב-Worker), ואז לפרוס את ה-Worker.
 - פריסת ה-Worker (`cyprus-trip-ai` ב-Cloudflare): נכתב workflow אוטומטי `.github/workflows/deploy-worker.yml` (רץ בדחיפה לענף על שינוי ב-`cyprus-worker/`). **הוא עדיין לא עבד**, כי חסרים סודות GitHub (ראו "פתוח"). עד אז הפריסה ידנית: המשתמש מדביק את `cyprus-worker/sync-worker.js` ב-Cloudflare ולוחץ Deploy. הגרסה שפרוסה כרגע בענן היא של גרסה 23 (בלי נקודת הקליטה של וואטסאפ).
 
