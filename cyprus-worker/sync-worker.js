@@ -17,7 +17,7 @@ const BAD = new Set(["__proto__", "constructor", "prototype"]);
 const SEG = /^[A-Za-z0-9_-]{1,60}$/;
 const CODE = "[a-z0-9]{10,40}";
 const PUSH_HOSTS = /^https:\/\/(fcm\.googleapis\.com|updates\.push\.services\.mozilla\.com|[a-z0-9.-]+\.push\.apple\.com|[a-z0-9.-]+\.notify\.windows\.com)\//;
-const NOTIFY_TYPES = ["sight", "food", "shop"];
+const NOTIFY_TYPES = ["sight", "shop"]; // בלי מסעדות
 const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const enc = new TextEncoder();
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -112,7 +112,7 @@ async function tick(env, when) {
     notified[due.id] = Date.now();
     await env.ROOMS.put("notified:" + code, JSON.stringify(notified), { expirationTtl: 7 * 86400 });
     await notify(env, code, await listSubs(env, code), {
-      id: "n" + Date.now(), itemId: due.id, title: "הספקתם? " + due.title, body: "עברו כמה דקות מהזמן המתוכנן. מה קרה?",
+      id: "n" + Date.now(), itemId: due.id, name: due.title, title: "הספקתם? " + due.title, body: "עברו כמה דקות מהזמן המתוכנן. מה קרה?",
       actions: [{ action: "done", title: "✅ הספקנו" }, { action: "skip", title: "⏭ דילגנו" }, { action: "drop", title: "✖ ויתרנו" }]
     });
     sent++;

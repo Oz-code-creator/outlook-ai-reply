@@ -1,4 +1,4 @@
-const V = "cyprus-v14", CFG = "cyprus-cfg";
+const V = "cyprus-v15", CFG = "cyprus-cfg";
 const FILES = ["./", "index.html", "styles.css", "plan.js", "logic.js", "sync.js", "push.js", "app.js", "manifest.webmanifest", "icon.svg"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== CFG).map(k => caches.delete(k)))).then(() => self.clients.claim())));
@@ -19,10 +19,14 @@ self.addEventListener("push", e => e.waitUntil((async () => {
   let list = [];
   if (cfg) { try { const r = await fetch(`${cfg.url}/outbox/${cfg.code}/${cfg.hash}`); if (r.ok) list = await r.json(); } catch (err) { /* ignore */ } }
   if (!Array.isArray(list) || !list.length) list = [{ id: "generic", title: "טיול קפריסין", body: "יש עדכון באפליקציה", actions: [] }];
+  const max = (typeof Notification !== "undefined" && Notification.maxActions) || 2;
   for (const n of list) {
+    const full = Array.isArray(n.actions) ? n.actions.slice(0, 3) : [];
+    const twoStep = !!n.itemId && full.length > max; // המכשיר מציג פחות כפתורים: "לא הספקנו" פותח התראת המשך
+    const actions = twoStep ? [full[0], { action: "later", title: "❌ לא הספקנו" }] : full.slice(0, max);
     await self.registration.showNotification(String(n.title || "טיול קפריסין"), {
       body: String(n.body || ""), tag: String(n.id || "n"), lang: "he", dir: "rtl", requireInteraction: true,
-      data: { itemId: n.itemId || null }, actions: Array.isArray(n.actions) ? n.actions.slice(0, 3) : []
+      data: { itemId: n.itemId || null, name: n.name || null }, actions
     });
   }
 })()));
@@ -31,6 +35,13 @@ self.addEventListener("notificationclick", e => {
   const itemId = e.notification.data && e.notification.data.itemId, act = e.action;
   const status = { done: "done", skip: "skipped", drop: "dropped" }[act];
   e.waitUntil((async () => {
+    if (itemId && act === "later") { // התראת המשך: מה לעשות עם מה שלא הספקנו
+      const name = (e.notification.data && e.notification.data.name) || "הפעילות";
+      return self.registration.showNotification("לא הספקתם: " + name, {
+        body: "מה לעשות איתה?", tag: "fu-" + itemId, lang: "he", dir: "rtl", requireInteraction: true,
+        data: { itemId, name }, actions: [{ action: "skip", title: "↪ הצע העברה" }, { action: "drop", title: "✖ ויתרנו" }]
+      });
+    }
     if (itemId && status) {
       const cfg = await readCfg();
       if (cfg) {

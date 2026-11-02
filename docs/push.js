@@ -38,7 +38,7 @@ window.Push = (function () {
     try {
       const { reg } = await cfgCache(), sub = await reg.pushManager.getSubscription(), cfg = await readCfg();
       if (Notification.permission === "denied") return "חסום בהגדרות הדפדפן";
-      return sub && cfg ? "פעיל במכשיר הזה ✅" : "כבוי";
+      return sub && cfg ? "פעיל במכשיר הזה ✅ (כפתורים בהתראה: " + (Notification.maxActions || "?") + ")" : "כבוי";
     } catch (e) { return "כבוי"; }
   }
   return { supported, enable, disable, test, state };
