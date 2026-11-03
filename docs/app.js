@@ -516,7 +516,7 @@
       const arr = P.alternatives.filter(a => a.kind === k); if (!arr.length) return "";
       return `<div class="theme">${label}</div>` + arr.map(a => `<div class="gstop"><h3>${esc(a.name)}</h3><p>${esc(a.about)}</p>
         <p class="afit"><b>איפה אפשר להכניס:</b> ${esc(a.fit)}</p>${a.check ? `<p class="warn">⚠ ${esc(a.check)}</p>` : ""}${a.phone ? `<p>${linkify(esc("טלפון: " + a.phone))}</p>` : ""}
-        <div class="gp">${a.mapq ? `<a href="${map(a.mapq)}" target="_blank" rel="noopener">🧭 מפה</a>` : ""}${a.ta ? `<a href="${esc(a.ta)}" target="_blank" rel="noopener">TripAdvisor</a>` : ""}<button type="button" data-altadd="${esc(a.id)}">➕ הוסף ללוח</button></div></div>`).join("");
+        <div class="gp">${typeof a.lat === "number" ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${a.lat},${a.lng}" target="_blank" rel="noopener">🧭 נווט</a>` : a.mapq ? `<a href="${map(a.mapq)}" target="_blank" rel="noopener">🧭 מפה</a>` : ""}${a.ta ? `<a href="${esc(a.ta)}" target="_blank" rel="noopener">TripAdvisor</a>` : ""}<button type="button" data-altadd="${esc(a.id)}">➕ הוסף ללוח</button></div></div>`).join("");
     }).join("");
   }
   // טאב מסלול (לקריאה בלבד): תחנות עם כפתורי מפה

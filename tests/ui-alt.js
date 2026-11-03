@@ -8,6 +8,7 @@ console.log("cards:",(await p.$$(".gstop")).length,"(expect 2)");
 console.log("food group heading:",(await p.textContent("#list")).includes("מסעדות"),"| no empty sights group:",!(await p.textContent("#list")).includes("אתרים"));
 console.log("each has fit line:",(await p.$$(".afit")).length===2,"| fit mentions Mazema:",(await p.textContent("#list")).includes("Mazema"));
 console.log("phone tel links:",(await p.$$eval(".gstop a[href^='tel:']",a=>a.map(x=>x.getAttribute("href")))).join(","));
+console.log("nav links with coordinates:",(await p.$$eval(".gp a",a=>a.map(x=>x.href).filter(h=>h.includes("/maps/dir/?api=1&destination=")))).length,"(expect 2)");
 console.log("garden check warning:",(await p.textContent("#list")).includes("לוודא שזו המסעדה"));
 // הוסף ללוח
 await p.click("button[data-altadd='alt-oldnb']");
@@ -25,4 +26,8 @@ await p.click("#tabs button[data-d='2']");
 const t2=await p.$$eval(".item h3",h=>h.map(x=>x.textContent));
 const iK=t2.findIndex(t=>t.includes("קולוסי")),iC=t2.findIndex(t=>t.includes("Commandaria")),iR=t2.findIndex(t=>t.includes("קוריון"));
 console.log("day 2 order kolossi<commandaria<kourion:",iK>=0&&iK<iC&&iC<iR);
+await p.click("#tabs button[data-d='3']");
+console.log("day 3 olive farm has nav:",await p.$$eval(".item",els=>els.filter(e=>e.textContent.includes("Terra Oliva")&&e.querySelector("a.btn")).length));
+await p.click("#tabs button[data-d='2']");
+console.log("day 2 wine museum has nav:",await p.$$eval(".item",els=>els.filter(e=>e.textContent.includes("מוזיאון היין")&&e.querySelector("a.btn")).length));
 console.log("errors:",JSON.stringify(errs));await b.close();})();
