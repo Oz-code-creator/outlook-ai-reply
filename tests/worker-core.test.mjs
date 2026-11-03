@@ -23,7 +23,7 @@ assert.match(reg.hash, /^[a-f0-9]{16}$/); console.log("subscribe ok, hash", reg.
 // מחוץ לטיול
 assert.equal(await worker._tick(env, at("2026-11-10T10:00:00Z")), 0);
 // ארוחת בוקר לא מתריעה
-assert.equal(await worker._tick(env, at("2026-11-28T07:45:00Z")), 1); // הודעת בוקר בלבד
+assert.equal(await worker._tick(env, at("2026-11-28T07:30:00Z")), 1); // הודעת בוקר בלבד (קולוסי: יציאה 10:05, תזכורת מ-09:45)
 { const o = await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json(); assert.equal(o.length, 1); assert.ok(o[0].title.startsWith("בוקר טוב")); assert.ok(!o[0].body.includes("ארוחת בוקר")); }
 // קולוסי (10:30 + 45 דק') → מ-11:25 בשעון קפריסין = 09:25Z
 assert.equal(await worker._tick(env, at("2026-11-28T09:30:00Z")), 2); // "הספקתם? קולוסי" + "בעוד 15 דק׳: קוריון" (קוריון מתחילה 11:45)
@@ -36,7 +36,7 @@ assert.ok(await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pub, Bu
 console.log("push sent + VAPID signature verifies");
 // outbox
 const ob = await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json();
-assert.equal(ob.length, 2); const k0 = ob.find(x => x.itemId === "d2-kolossi"); assert.ok(k0); assert.equal(k0.actions.length, 3); assert.ok(ob.some(x => /^בעוד 15 דק׳: קוריון/.test(x.title))); console.log("outbox:", k0.title);
+assert.equal(ob.length, 2); const k0 = ob.find(x => x.itemId === "d2-kolossi"); assert.ok(k0); assert.equal(k0.actions.length, 3); assert.ok(ob.some(x => /^צריך לצאת בעוד 10 דק׳: קוריון/.test(x.title))); console.log("outbox:", k0.title);
 assert.equal((await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json()).length, 0);
 // אין כפילות
 assert.equal(await worker._tick(env, at("2026-11-28T09:35:00Z")), 0);

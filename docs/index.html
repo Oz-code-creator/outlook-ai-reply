@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>קפריסין – עוז ושרית</title>
+<title>טיול לקפריסין</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0e5a7a">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css?v=44">
+<link rel="stylesheet" href="styles.css?v=45">
 </head>
 <body>
 <header>
   <h1>🇨🇾 לימסול <bdi dir="ltr">27–30.11</bdi></h1>
   <div id="loc" class="loc">מיקום כבוי</div>
-  <div class="ver">גרסה 44<span id="syncSt"></span></div>
+  <div class="ver">גרסה 45<span id="syncSt"></span></div>
 </header>
 <div id="prompt" class="prompt" hidden></div>
 <nav id="tabs"></nav>
@@ -94,22 +94,24 @@
     </details>
     <details><summary>⏰ זמני התראות</summary>
       <label>באיזו שעה לשלוח את הודעת הבוקר<input id="ntMorning" type="time" value="08:00"></label>
-      <label>התראה לפני אתר או קניות: כמה דקות לפני<input id="ntLead" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
-      <label>התראה לפני מסעדה שהוזמנה: כמה דקות לפני<input id="ntFood" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
+      <label>התראה לפני אתר או קניות: כמה דקות לפני שצריך לצאת<input id="ntLead" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
+      <label>התראה לפני מסעדה שהוזמנה: כמה דקות לפני שצריך לצאת<input id="ntFood" type="number" min="5" max="120" step="5" inputmode="numeric"></label>
       <label>שאלת "הספקתם?": כמה דקות אחרי שהפעילות נגמרת<input id="ntAfter" type="number" min="0" max="120" step="5" inputmode="numeric"></label>
       <div class="acts"><button type="button" id="ntDefault">חזרה לברירות מחדל</button></div>
       <div id="ntMsg" class="muted"></div>
     </details>
+    <button type="button" id="stPrint">🖨 הדפס / שמור כ-PDF (התוכנית הסופית)</button>
     <button type="button" id="stRefresh">🔄 רענן גרסה (לא מוחק מפתח או סימונים)</button>
     <button type="button" id="stReset" class="danger">איפוס כל הסימונים וההזזות</button>
     <menu><button value="cancel">ביטול</button><button id="stOk" value="ok" class="primary">שמור</button></menu>
   </form>
 </dialog>
 
-<script src="plan.js?v=44"></script>
-<script src="logic.js?v=44"></script>
-<script src="sync.js?v=44"></script>
-<script src="push.js?v=44"></script>
-<script src="app.js?v=44"></script>
+<script src="plan.js?v=45"></script>
+<script src="logic.js?v=45"></script>
+<script src="sync.js?v=45"></script>
+<script src="push.js?v=45"></script>
+<script src="app.js?v=45"></script>
+<div id="printRoot"></div>
 </body>
 </html>

@@ -37,6 +37,11 @@
     renderLoc();
   }
 
+  // זמן נסיעה/הליכה מהמקום הקודם (הערכה). אחרי הזזת הפעילות הוא כבר לא מדויק, ולכן לא מוצג
+  function tripLine(i) {
+    const o = S.ov[i.id]; if (!i.trip || (o && (o.start !== undefined || o.day !== undefined))) return "";
+    return `<p class="trip">${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " מ" + esc(i.trip[2]) : ""} <small>(הערכה)</small></p>`;
+  }
   function card(i, isNow) {
     const booked = !!(S.booked || {})[i.id];
     const bk = i.book ? `<button data-book="${i.id}" class="${booked ? "booked" : ""}">${booked ? "✅ הוזמן" : "☐ סמן כהוזמן"}</button>` : "";
@@ -49,7 +54,7 @@
       ? `<button data-a="done" data-id="${i.id}">✅ בוצע</button><button data-a="skip" data-id="${i.id}">⏭ דילגנו</button><button data-a="drop" data-id="${i.id}">✖ ויתרנו</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`
       : `<button data-a="undo" data-id="${i.id}">↩ בטל</button><button data-a="edit" data-id="${i.id}">✎ ערוך</button>${nav}${ta}${bk}`;
     return `<article class="item ${i.type} ${i.status} ${isNow ? "now" : ""}"><div class="time">${L.fmt(i.start)}<small>${i.dur} ד׳</small></div>
-      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div><div class="grip" data-grip="${i.id}" title="גרירה" aria-label="גרירה">⠿</div></article>`;
+      <div class="body"><h3>${st} ${esc(i.title)}${i.fixed ? " 🔒" : ""}${moved}${added}</h3>${tripLine(i)}${i.notes ? `<p>${esc(i.notes)}</p>` : ""}${i.reserve ? `<p class="warn">⚠ ${linkify(esc(i.reserve))}</p>` : ""}<div class="acts">${acts}</div></div><div class="grip" data-grip="${i.id}" title="גרירה" aria-label="גרירה">⠿</div></article>`;
   }
 
   function renderLoc() {
@@ -532,7 +537,7 @@
       <div class="lst">${arr.map(x => rowHtml(key, x)).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
       <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120">${SR ? `<button class="mic" id="liMic" data-mic="${key}" aria-label="הקלטה קולית">🎤</button>` : ""}<button class="primary" data-ladd="${key}">הוסף</button></div>
       <div id="liHint" class="muted" style="margin:6px 4px"></div>
-      <div class="acts" style="margin:10px 4px">${window.Sync && Sync.enabled() ? '<button data-share="1">📤 הזמן את שרית</button>' : ""}<button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
+      <div class="acts" style="margin:10px 4px">${window.Sync && Sync.enabled() ? '<button data-share="1">📤 הזמן את בן/בת הזוג</button>' : ""}<button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
   }
   function addListItem(key) {
     const inp = $("liNew"), t = inp && inp.value.trim();
@@ -585,7 +590,7 @@
   });
   document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "liNew") { e.preventDefault(); addListItem(e.target.dataset.key); } });
 
-  // ---- שיתוף עם שרית (קישור עם הרשימות והסימונים; בלי מפתח ה-API) ----
+  // ---- שיתוף עם בן/בת הזוג (קישור עם הרשימות והסימונים; בלי מפתח ה-API) ----
   const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   const dec = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
   const inviteUrl = () => { const c = Sync.config(); return location.origin + location.pathname + "#j=" + enc({ u: c.url, c: c.code }); };
@@ -660,7 +665,7 @@
     try {
       const res = await Sync.start({ url: $("syDb").value.trim(), code: $("syCode").value.trim().toLowerCase() }, () => confirm("החדר כבר קיים. להצטרף ולהחליף את הרשימות והסימונים אצלך?"));
       if (res === "cancel") { syMsg("בוטל."); return; }
-      S.settings.sync = Sync.config(); saveQuiet(); syMsg(res === "created" ? "נוצר סנכרון חדש ✅. לחצו 'הזמן את שרית'." : "הצטרפת לסנכרון ✅"); render();
+      S.settings.sync = Sync.config(); saveQuiet(); syMsg(res === "created" ? "נוצר סנכרון חדש ✅. לחצו 'הזמן את בן/בת הזוג'." : "הצטרפת לסנכרון ✅"); render();
     } catch (e) { syMsg("שגיאה: " + e.message); }
   });
   $("syStop").addEventListener("click", () => { Sync.stop(); delete S.settings.sync; saveQuiet(); syMsg("הסנכרון הופסק. הנתונים נשארו אצלך."); });
@@ -686,6 +691,25 @@
   if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.type === "status-changed" && window.Sync) { Sync.refresh(); } });
   setInterval(() => { if (rec || (document.activeElement && document.activeElement.id === "liNew")) return; render(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { render(); } });
+  // ---- הדפסה / שמירה כ-PDF של התוכנית הסופית (כולל השינויים, ההזמנות והרשימות שלכם) ----
+  function printHtml() {
+    const fx = t => esc(t).replace(/(\+?\d[\d ]{6,}\d)/g, '<bdi dir="ltr">$1</bdi>'); // מספרי טלפון בכיוון נכון בתוך טקסט בעברית
+    const items = L.eff(P, S).filter(i => i.status !== "dropped"), bk = S.booked || {};
+    const days = P.days.map(d => `<section class="pday"><h2>${esc(d.label)} · ${esc(d.theme)}</h2><table>` + items.filter(i => i.day === d.n).sort((a, b) => a.start - b.start).map(i => {
+      const o = S.ov[i.id], tl = (i.trip && !(o && (o.start !== undefined || o.day !== undefined))) ? `${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " מ" + i.trip[2] : ""} (הערכה)` : "";
+      return `<tr><td class="pt" dir="ltr">${L.fmt(i.start)}–${L.fmt(i.start + i.dur)}</td><td><b>${esc(i.title)}</b>${i.book ? (bk[i.id] ? " ✅ הוזמן" : " ☐ להזמין") : ""}${i.status === "done" ? " ✅" : i.status === "skipped" ? " (דולג)" : ""}${tl ? `<div class="pn">${esc(tl)}</div>` : ""}${i.notes ? `<div class="pn">${fx(i.notes)}</div>` : ""}${i.reserve ? `<div class="pn">⚠ ${fx(i.reserve)}</div>` : ""}</td></tr>`;
+    }).join("") + "</table></section>").join("");
+    const lst = (key, title, onlyOpen) => {
+      const arr = lists()[key].filter(x => !(onlyOpen && x.done));
+      return arr.length ? `<section class="pday"><h2>${title}</h2><ul>${arr.map(x => `<li>${LISTS[key].plain ? "" : (x.done ? "☑ " : "☐ ")}${fx(x.t)}</li>`).join("")}</ul></section>` : "";
+    };
+    const g = P.guide ? `<section class="pday"><h2>${esc(P.guide.title)}</h2><ol>${P.guide.stops.map(s => `<li><b>${esc(s.name)}:</b> ${fx(s.text)}</li>`).join("")}</ol></section>` : "";
+    const alts = (P.alternatives || []).length ? `<section class="pday"><h2>💡 אלטרנטיבות</h2><ul>${P.alternatives.map(a => `<li><b>${esc(a.name)}:</b> ${fx(a.fit)}${a.phone ? " · טלפון " + fx(a.phone) : ""}</li>`).join("")}</ul></section>` : "";
+    const first = P.days[0].label.split(" ")[1], last = P.days[P.days.length - 1].label.split(" ")[1];
+    return `<h1>טיול לקפריסין · <span dir="ltr">${esc(first)}–${esc(last)}</span></h1>${days}${lst("info", "ℹ️ מידע שימושי")}${g}${alts}${lst("todo", "✅ משימות פתוחות", true)}${lst("pack", "🎒 רשימת אריזה")}`;
+  }
+  $("stPrint").addEventListener("click", () => { $("printRoot").innerHTML = printHtml(); $("dlgSet").close(); setTimeout(() => window.print(), 200); });
+  window.addEventListener("afterprint", () => { $("printRoot").innerHTML = ""; });
   Sync.init({
     cfg: S.settings.sync, days: P.days.length,
     get: () => { lists(); return { lists: S.lists, status: S.status, ov: S.ov, added: S.added, booked: S.booked || {}, notif: S.notif || {} }; },

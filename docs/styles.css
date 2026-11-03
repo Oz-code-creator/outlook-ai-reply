@@ -61,3 +61,19 @@ nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
 .afit{background:#eef6fa;border-radius:8px;padding:6px 8px}
 .gp button{font-size:13px;border:1px solid var(--pri);border-radius:14px;padding:3px 10px;background:#fff;color:var(--pri)}
 .gp{display:flex;flex-wrap:wrap;gap:6px}.gp a{font-size:13px;border:1px solid var(--line);border-radius:14px;padding:3px 10px;text-decoration:none;background:#f4f7f9}
+.trip{color:var(--mut);font-size:13px;margin:2px 0}
+#printRoot{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  body>*:not(#printRoot){display:none!important}
+  dialog{display:none!important}
+  #printRoot{display:block;direction:rtl;color:#000;background:#fff;font-size:11.5pt}
+  #printRoot h1{font-size:18pt;margin:0 0 8pt}
+  #printRoot h2{font-size:13pt;border-bottom:1px solid #444;margin:10pt 0 4pt}
+  .pday{margin:0 0 10pt;page-break-inside:avoid}
+  #printRoot table{width:100%;border-collapse:collapse}
+  #printRoot td{padding:3pt 4pt;border-bottom:1px solid #ccc;vertical-align:top}
+  #printRoot .pt{white-space:nowrap;width:82pt;text-align:right}
+  #printRoot .pn{font-size:10pt;color:#333}
+  #printRoot li{margin:2pt 0}
+}
