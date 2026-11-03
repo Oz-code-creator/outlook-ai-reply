@@ -31,7 +31,7 @@ window.PLAN = {
 
     { id: "d2-bf", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 2, start: "08:30", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d2-kolossi", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d313647-Reviews-Kolossi_Castle-Limassol_City_Limassol.html", day: 2, start: "10:30", dur: 45, type: "sight", daylight: true, open: "08:30", close: "17:00", title: "טירת קולוסי", notes: "שעות חורף 8:30–17:00. אפשר לוותר כדי להשאיר זמן לספא.", lat: 34.6644, lng: 32.9306 },
-    { id: "d2-commandaria", day: 2, start: "11:15", dur: 30, type: "shop", open: "10:00", close: "17:00", title: "טעימת Commandaria במוזיאון היין (ארימי)", notes: "The Cyprus Wine Museum, 42 Pafou, ארימי: כ-3 דקות נסיעה מקולוסי, ובדרך לקוריון. טעימות מודרכות של כמה סגנונות Commandaria (יין הקינוח העתיק שנולד באזור קולוסי). כניסה כ-4–5 יורו, וחבילה עם טעימה כ-10 יורו (לפי אתרי תיירות). אפשר לקנות בקבוק.", reserve: "שעות לפי מקורות שונים: 9:00–17:00 או 10:00–17:00. לוודא בטלפון +357 25 873808 או ב-cypruswinemuseum.com" },
+    { id: "d2-commandaria", ta: "https://www.tripadvisor.com/Attraction_Review-g1916966-d1759181-Reviews-Cyprus_Wine_Museum-Erimi_Limassol.html", day: 2, start: "11:15", dur: 30, type: "shop", open: "10:00", close: "17:00", title: "טעימת Commandaria במוזיאון היין (ארימי)", notes: "The Cyprus Wine Museum, 42 Pafou, ארימי: כ-3 דקות נסיעה מקולוסי, ובדרך לקוריון. טעימות מודרכות של כמה סגנונות Commandaria (יין הקינוח העתיק שנולד באזור קולוסי). כניסה כ-4–5 יורו, וחבילה עם טעימה כ-10 יורו (לפי אתרי תיירות). אפשר לקנות בקבוק.", reserve: "שעות לפי מקורות שונים: 9:00–17:00 או 10:00–17:00. לוודא בטלפון +357 25 873808 או ב-cypruswinemuseum.com" },
     { id: "d2-kourion", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527735-Reviews-Kourion-Limassol_City_Limassol.html", day: 2, start: "11:45", dur: 120, type: "sight", daylight: true, close: "17:00", title: "קוריון העתיקה", notes: "אמפיתיאטרון ופסיפסים.", reserve: "לאשר טלפונית שהאתר פתוח: +357 25 934250", lat: 34.6641, lng: 32.8856 },
     { id: "d2-lunch", ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2221890-Reviews-Chris_Blue_Beach-Limassol_City_Limassol.html", day: 2, start: "13:45", dur: 90, type: "food", title: "צהריים – Chris Blue Beach", notes: "חוף קוריון, פתוחה 8:30–22:30.", lat: 34.6658863, lng: 32.8771663 },
     { id: "d2-spa", book: true, ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 2, start: "16:00", dur: 120, type: "rest", soft: true, title: "ספא או מנוחה במלון", notes: "ספא פתוח 9:00–20:00. כדאי טיפול זוגי עם ג׳קוזי.", reserve: "לשריין טיפול זוגי מראש", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -148,13 +148,13 @@ window.PLAN.guide = {
 // kind: food | sight. fit: איפה אפשר להכניס. phone/ta/mapq אופציונליים. addTitle/addType/addDur ממלאים את חלון ההוספה.
 window.PLAN.alternatives = [
   { id: "alt-oldnb", kind: "food", name: "The Old Neighbourhood Fish Tavern",
-    about: "טברנת דגים קטנה בעיר העתיקה, ליד טירת לימסול. לפי הטיפ: אווירה רומנטית ושקטה יותר מרחוב סריפולו התוסס, עם מבחר רחב של יינות קפריסאיים. ביקורת אחת מציינת שהיא יקרה.",
+    about: "טברנת דגים קטנה, Agkyras 14, ליד טירת לימסול. לפי הטיפ: אווירה רומנטית ושקטה יותר מרחוב סריפולו התוסס, עם מבחר רחב של יינות קפריסאיים. ב-TripAdvisor: 4.4 מ-50 ביקורות, מצוינת על דגים טריים. כמה ביקורות מציינות שהיא יקרה. כדאי להזמין מראש, כי היא קטנה.",
     fit: "במקום ארוחת ערב ב-Mazema (שישי 20:00) או ב-Kai Sushi (ראשון 20:00)",
-    phone: "25376082", mapq: "The Old Neighbourhood Fish Tavern Limassol",
+    phone: "25376082", mapq: "The Old Neighbourhood Fish Tavern Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d5062041-Reviews-The_Old_Neighborhood_Taverna-Limassol_City_Limassol.html",
     addTitle: "ארוחת ערב – The Old Neighbourhood Fish Tavern", addType: "food", addDur: 90, addNotes: "טלפון: 25376082. לבדוק שעות פתיחה והזמנה" },
   { id: "alt-garden", kind: "food", name: "The Garden",
-    about: "מסעדה באזור המלון, בשדרה Georgiou A 48, Potamos Germasogeia (Azure Residence). מטבח מגוון: תאילנדי, יפני, צרפתי, איטלקי וים תיכוני. דירוג 4.2 מ-537 ביקורות, והביקורות מעורבות.",
+    about: "מסעדה באזור המלון, Vasileos Georgiou 48A, Germasogeia, עם גינה. לפי TripAdvisor: מטבח איטלקי ויפני, 4.2 מ-542 ביקורות, אווירה 4.6. פתוחה עד חצות. כמה ביקורות מציינות שירות איטי לפעמים.",
     fit: "גיבוי לכל ארוחת ערב קרובה למלון, למשל אם אין כוח לצאת רחוק (ראשון אחרי יום לפקארה)",
-    phone: "25101212", mapq: "The Garden Restaurant Georgiou A 48 Germasogeia Limassol", check: "לוודא שזו המסעדה שהמליצו עליה",
+    phone: "25101212", mapq: "The Garden Restaurant Vasileos Georgiou 48A Germasogeia Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g3359582-d3540323-Reviews-The_Garden_Restaurant-Germasogeia_Limassol.html", check: "לוודא שזו המסעדה שהמליצו עליה",
     addTitle: "ארוחת ערב – The Garden", addType: "food", addDur: 90, addNotes: "טלפון: 25101212. לבדוק שעות פתיחה והזמנה" }
 ];
