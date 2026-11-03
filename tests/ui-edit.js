@@ -27,7 +27,7 @@ await A.click("#btnSet");await A.fill("#syDb","http://localhost:8767");await A.c
 const B=await mk();B.on("dialog",d=>d.accept());await B.goto(inv);await B.waitForTimeout(1500);await B.click("#tabs button[data-d='2']");
 console.log("B sees edited fixed:",(await B.textContent(card("MEZE Taverna")+" .time")).replace(/\s+/g," ").trim(),"| B sees added:",await B.isVisible(card("קפה בחוף")));
 // A משנה שם לפריט תוכנית ומוחק את הפעילות שנוספה
-await A.click(card("אגיו אנדראו – קניות")+" button[data-a='edit']");await A.fill("#mvName","קניות במרכז");await A.click("#mvOk");
+await A.click(card("טעימת Commandaria")+" button[data-a='edit']");await A.fill("#mvName","קניות במרכז");await A.click("#mvOk");
 await A.click(card("קפה בחוף")+" button[data-a='edit']");await A.click("#mvDel");
 await wait(7000);
 console.log("B sees renamed:",await B.isVisible(card("קניות במרכז")),"| B added gone:",!(await B.isVisible(card("קפה בחוף"))).valueOf());

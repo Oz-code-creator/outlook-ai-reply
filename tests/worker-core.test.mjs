@@ -44,7 +44,7 @@ assert.equal(await worker._tick(env, at("2026-11-28T09:35:00Z")), 0);
 await call("PATCH", `/rooms/${CODE}.json`, { init: true, "status/d2-kourion": "done", "status/d2-commandaria": "done" });
 assert.equal(await worker._tick(env, at("2026-11-28T11:45:00Z")), 0); console.log("done items not notified");
 // הזזה דרך ov: אגיו אנדראו (קניות) הועבר ל-14:00 → מתריע אחרי 15:10
-await call("PATCH", `/rooms/${CODE}.json`, { "ov/d2-shop": { day: 2, start: 840, dur: 60 } });
+await call("PATCH", `/rooms/${CODE}.json`, { "ov/d1-shop": { day: 2, start: 840, dur: 60 } });
 assert.equal(await worker._tick(env, at("2026-11-28T13:05:00Z")), 0); // 15:05 מקומי
 assert.equal(await worker._tick(env, at("2026-11-28T13:20:00Z")), 1); console.log("moved item uses overridden time");
 // 410 → מנוי נמחק
@@ -63,7 +63,7 @@ console.log("test endpoint ok (mozilla endpoint allowed)");
 // מסעדות לא מתריעות: צהריים Chris Blue (13:45+90) → 15:25 מקומי
 store.delete("notified:" + CODE);
 const reg3 = await (await call("POST", `/subs/${CODE}`, { sub: { endpoint: "https://fcm.googleapis.com/fcm/send/again" } })).json();
-await call("PATCH", `/rooms/${CODE}.json`, { "status/d2-shop": "done", "status/d2-kolossi": "done" });
+await call("PATCH", `/rooms/${CODE}.json`, { "status/d1-shop": "done", "status/d2-kolossi": "done" });
 assert.equal(await worker._tick(env, at("2026-11-28T13:30:00Z")), 0); console.log("food not notified ✔");
 const tb = await call("POST", `/test/${CODE}?buttons=1`); assert.equal(tb.status, 200);
 const obb = (await (await call("GET", `/outbox/${CODE}/${reg2.hash}`)).json()).pop();

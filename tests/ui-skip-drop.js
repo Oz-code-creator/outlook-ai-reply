@@ -11,10 +11,10 @@ console.log("after mv prompt hidden:",await p.isHidden("#prompt"),"| kolossi sti
 await p.click("#tabs button[data-d='3']");console.log("kolossi on day3:",(await p.textContent("#list")).includes("קולוסי"),"moved chip:",(await p.textContent("#list")).includes("הוזז"));
 // ויתרנו
 await p.click("#tabs button[data-d='2']");
-await p.click(".item:has-text('קוריון') button[data-a='drop']");
+await p.click(".item:has-text('קוריון העתיקה') button[data-a='drop']");
 console.log("dropped count:",(await p.$$(".item.dropped")).length,"prompt hidden:",await p.isHidden("#prompt"));
 // דילגנו -> השאר כמדולג
-await p.click(".item:has-text('אגיו אנדראו – קניות') button[data-a='skip']");
+await p.click(".item:has-text('Commandaria') button[data-a='skip']");
 console.log("prompt2:",(await p.textContent("#prompt")).replace(/\s+/g," ").slice(0,70));
 await p.click("#prompt button[data-pa='keep']");
 console.log("skipped count:",(await p.$$(".item.skipped")).length,"prompt hidden:",await p.isHidden("#prompt"));
