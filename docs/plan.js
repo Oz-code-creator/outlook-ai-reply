@@ -154,8 +154,8 @@ window.PLAN.alternatives = [
     phone: "25376082", lat: 34.673822, lng: 33.041595, mapq: "The Old Neighbourhood Fish Tavern Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d5062041-Reviews-The_Old_Neighborhood_Taverna-Limassol_City_Limassol.html",
     addTitle: "ארוחת ערב – The Old Neighbourhood Fish Tavern", addType: "food", addDur: 90, addNotes: "טלפון: 25376082. לבדוק שעות פתיחה והזמנה" },
   { id: "alt-garden", kind: "food", name: "The Garden",
-    about: "מסעדה באזור המלון, Vasileos Georgiou 48A, Germasogeia, עם גינה. לפי TripAdvisor: מטבח איטלקי ויפני, 4.2 מ-542 ביקורות, אווירה 4.6. פתוחה עד חצות. כמה ביקורות מציינות שירות איטי לפעמים.",
-    fit: "גיבוי לכל ארוחת ערב קרובה למלון, למשל אם אין כוח לצאת רחוק (ראשון אחרי יום לפקארה)",
+    about: "מסעדה וקוקטייל בר עם גינה ירוקה ואווירה נעימה, Vasileos Georgiou 48A, Germasogeia. כ-700 מטר מהמלון, בערך 10 דקות הליכה. לפי TripAdvisor: מטבח איטלקי ויפני, 4.2 מ-542 ביקורות, אווירה 4.6, פתוחה עד חצות. ביקורות מציינות יין וקוקטיילים, ושירות איטי לפעמים. המחירים בינוניים-גבוהים, והאוכל פחות קפריסאי ויותר בינלאומי.",
+    fit: "קוקטייל ליד המלון בערב עייף, למשל בראשון אחרי יום לפקארה, בלי לנסוע לעיר העתיקה",
     phone: "25101212", lat: 34.694611, lng: 33.088639, mapq: "The Garden Restaurant Vasileos Georgiou 48A Germasogeia Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g3359582-d3540323-Reviews-The_Garden_Restaurant-Germasogeia_Limassol.html", check: "לוודא שזו המסעדה שהמליצו עליה",
-    addTitle: "ארוחת ערב – The Garden", addType: "food", addDur: 90, addNotes: "טלפון: 25101212. לבדוק שעות פתיחה והזמנה" }
+    addTitle: "קוקטייל ב-The Garden (ליד המלון)", addType: "food", addDur: 60, addNotes: "טלפון: 25101212. פתוחה עד חצות. כ-10 דקות הליכה מהמלון" }
 ];
