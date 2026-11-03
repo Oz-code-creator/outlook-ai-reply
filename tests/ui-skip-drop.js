@@ -1,7 +1,7 @@
 const { chromium } = require("playwright");
 (async()=>{const b=await chromium.launch();const errs=[];const p=await (await b.newContext({viewport:{width:390,height:800}})).newPage();p.on("pageerror",e=>errs.push(e.message));
 await p.goto("http://localhost:8766/index.html");
-await p.evaluate(()=>localStorage.setItem("cyprus-trip-v1",JSON.stringify({settings:{sim:true,simDay:2,simTime:"08:00"}})));await p.reload();
+await p.evaluate(()=>localStorage.setItem("cyprus-trip-v1",JSON.stringify({status:{"d3-olive":"dropped","d3-view":"dropped"},settings:{sim:true,simDay:2,simTime:"08:00"}})));await p.reload();
 await p.click("#tabs button[data-d='2']");
 // דילגנו על קולוסי
 await p.click(".item:has-text('טירת קולוסי') button[data-a='skip']");

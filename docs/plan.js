@@ -38,9 +38,11 @@ window.PLAN = {
     { id: "d2-dinner", book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2369481-Reviews-Meze_Taverna_Restaurant-Limassol_City_Limassol.html", day: 2, start: "19:30", dur: 100, type: "food", fixed: true, closedDays: ["2026-11-29"], title: "ארוחת ערב – MEZE Taverna", notes: "אגיו אנדראו 209. פתוחה עד 22:00, סגורה בראשון.", reserve: "חובה להזמין: +357 25 367333", lat: 34.6764937, lng: 33.0475766 },
 
     { id: "d3-bf", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 3, start: "08:45", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d3-lefkara", ta: "https://www.tripadvisor.com/Tourism-g1900120-Pano_Lefkara_Larnaka_District-Vacations.html", day: 3, start: "11:00", dur: 135, type: "shop", daylight: true, title: "פאנו לפקארה – תחרה, כסף ומתנות", notes: "מוזיאון הפולקלור, כנסיית Timios Stavros, דוכני כפר חג המולד. כשעה לקניות לבנות. לבוש חם (650 מ׳). מסלול מלא עם עוד תחנות בדרך: בטאב 🗺.", lat: 34.8666, lng: 33.3028, radius: 600 },
+    { id: "d3-lefkara", ta: "https://www.tripadvisor.com/Tourism-g1900120-Pano_Lefkara_Larnaka_District-Vacations.html", day: 3, start: "11:00", dur: 135, type: "shop", daylight: true, title: "פאנו לפקארה – תחרה, כסף ומתנות", notes: "מוזיאון הפולקלור, כנסיית Timios Stavros, דוכני כפר חג המולד. כשעה לקניות לבנות. לבוש חם (650 מ׳). הדרך בתוך הכפר: בטאב 🗺.", lat: 34.8666, lng: 33.3028, radius: 600 },
     { id: "d3-lunch", book: true, ta2: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d33049687-Reviews-To_Piperi_Tavern-Pano_Lefkara_Larnaka_District.html", ta: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d27781720-Reviews-Iason_Tavern-Pano_Lefkara_Larnaka_District.html", day: 3, start: "13:15", dur: 90, type: "food", open: "12:00", close: "18:30", title: "צהריים – Iason Tavern (גיבוי: To Piperi)", notes: "ראשון 12:00–18:30. To Piperi: 11:30–17:00.", reserve: "אולי להזמין: +357 99 668930", lat: 34.8672, lng: 33.3033, radius: 400 },
-    { id: "d3-rest", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 3, start: "16:30", dur: 160, type: "rest", soft: true, title: "מנוחה במלון", notes: "לחזור לפני החשכה.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d3-olive", day: 3, start: "14:50", dur: 30, type: "sight", title: "חוות הזיתים האורגנית Terra Oliva", notes: "ביקור קצר בחווה הסמוכה לכפר לפקארה (olivaterra.eu).", reserve: "שעות פתיחה לא ידועות: לבדוק באתר לפני" },
+    { id: "d3-view", day: 3, start: "15:30", dur: 30, type: "sight", daylight: true, title: "נקודת תצפית", notes: "נוסעים עוד כ-6 ק״מ מחוות הזיתים לכיוון הכפר Vavatsinia (פחות מ-10 דקות לפי המפה), עד שרואים סככת תצפית מצד ימין. שביל עפר קצר מהכביש הראשי מוביל למצפור." },
+    { id: "d3-rest", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 3, start: "17:00", dur: 130, type: "rest", soft: true, title: "מנוחה במלון", notes: "לחזור לפני החשכה.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d3-dinner", book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d26223615-Reviews-Kai_Sushi_Bar_Limassol-Limassol_City_Limassol.html", day: 3, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Kai Sushi", notes: "קראון פלאזה, 18:00–23:00.", reserve: "הזמנה דרך המלון: +357 25 851515", lat: 34.688916, lng: 33.0711665 },
 
     { id: "d4-bf", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 4, start: "08:30", dur: 45, type: "food", fixed: true, title: "ארוחת בוקר", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -123,22 +125,17 @@ window.PLAN.listMigrations = [
   ] }
 ];
 
-// מסלול מפורט ליום לפקארה (טאב 🗺, לקריאה בלבד). places: מקומות שנפתחים במפות לפי שם החיפוש.
+// טאב 🗺 (לקריאה בלבד): הדרך בתוך הכפר פאנו לפקארה. places: מקומות שנפתחים במפות לפי שם החיפוש.
 window.PLAN.guide = {
-  title: "🗺 מסלול מפורט ליום לפקארה",
-  intro: "מתוך מדריך שנשלח. אפשר לקחת רק חלק מהתחנות. בלו״ז של היום יש צהריים בפאנו לפקארה ב-13:15 ומנוחה במלון ב-16:30. כדי לשלב עוד תחנות צריך לצאת מוקדם יותר או לוותר על חלק.",
+  title: "🗺 הדרך בתוך פאנו לפקארה",
   stops: [
-    { name: "Choirokoitia (בוקר)", text: "חוות Loula's Farm: גבינות אנארי וחלומי מחלב עיזים וצאן. אפשר ארוחת בוקר קפריסאית ולראות איך מכינים גבינות. לתאם ביקור מראש בטלפון או ב-SMS: 99639388 (אין לה וואטסאפ). עוד מקום בכפר: הגלריה של האמן Petros Nikolaou, סלי קש אותנטיים כמו שעושים כאן מאות שנים. חייבים לתאם הגעה מראש.",
-      places: [["Loula's Farm", "Loula's Farm Choirokoitia Cyprus"], ["גלריית Petros Nikolaou", "Petros Nikolaou Choirokoitia Cyprus"]] },
-    { name: "Vavla", text: "עולים בכביש E-133 לכפר הקטן. עוצרים לסיבוב קצר ולכמה תמונות: יש שלוש סמטאות אבן יפות. בדרך, בין Vavla ל-Kato Drys, יש יקב קטן בשם Christoudia, פתוח כל בוקר.",
-      places: [["Vavla", "Vavla village Cyprus"], ["יקב Christoudia", "Christoudia winery Cyprus"]] },
-    { name: "Kato Drys", text: "חונים ברחוב הראשי מצד שמאל והולכים ברגל. מלון בוטיק Arhontiko Frangos, ומולו מוזיאון קטן, Bee & Embroidery Museum (דבש ורקמה). בכפר גם חנות Jar Jams Preserves, עם בראנץ' כפרי. חייבים להזמין מראש. מתאים אם לא אכלתם ארוחת בוקר.",
-      places: [["Kato Drys", "Kato Drys village Cyprus"], ["מוזיאון הדבש והרקמה", "Bee and Embroidery Museum Kato Drys"], ["Jar Jams Preserves", "Jar Jams Preserves Kato Drys"]] },
-    { name: "Pano Lefkara", text: "חונים בכניסה לכפר (ליד המשטרה) והולכים למרכז. חנות Rouvis Lace and Silver, ובית הקפה Neo Kafe בפינה. שם פונים ימינה ועולים בסמטה, ואחרי Hotel Lazaro פונים שמאלה למוזיאון המקומי הקטן (עבודות יד של תחרה וכסף). אחר כך גלריית MOLA Culture Factory, יורדים בסמטאות האבן עד כנסיית הצלב הקדוש, וחוזרים דרך חנויות התחרה. אפשר לעצור גם ב-Lefkara Handicraft Centre.",
-      places: [["Rouvis Lace and Silver", "Rouvis Lace and Silver Pano Lefkara"], ["Neo Kafe", "Neo Kafe Pano Lefkara"], ["MOLA Culture Factory", "MOLA Culture Factory Pano Lefkara"], ["Lefkara Handicraft Centre", "Lefkara Handicraft Centre"]] },
-    { name: "אחרי לפקארה", text: "חוות הזיתים האורגנית Terra Oliva (ביקור קצר). משם עוד כ-6 ק״מ לכיוון הכפר Vavatsinia, לנקודת תצפית: סככת תצפית מצד ימין, ושביל עפר קצר מהכביש הראשי. ארוחת צהריים מאוחרת: המסעדה Marias.",
-      places: [["Terra Oliva", "Terra Oliva Organic Olive Farm Cyprus"], ["מסעדת Marias", "Marias restaurant Pano Lefkara"]] },
-    { name: "Zygi (סיום)", text: "מרינה לשיטוט קל וכוס בירה, או ארוחת צהריים מאוחרת של דגים. טברנות מומלצות: Old Zygi, To Archipelagos, Hercules, Karoli Sea.",
-      places: [["מרינת Zygi", "Zygi Marina Cyprus"], ["Old Zygi", "Old Zygi Fish Tavern"], ["To Archipelagos", "To Archipelagos Fish Tavern Zygi"], ["Hercules", "Hercules Fish Tavern Zygi"], ["Karoli Sea", "Karoli Sea Zygi"]] }
+    { name: "כניסה לכפר", text: "חונים בכניסה לכפר (ליד המשטרה) והולכים ברגל למרכז." },
+    { name: "הרחוב הראשי", text: "חנות Rouvis Lace and Silver, ובפינה בית הקפה Neo Kafe (מבנה צהבהב).",
+      places: [["Rouvis Lace and Silver", "Rouvis Lace and Silver Pano Lefkara"], ["Neo Kafe", "Neo Kafe Pano Lefkara"]] },
+    { name: "המוזיאון המקומי", text: "בפינת Neo Kafe פונים ימינה ועולים בסמטה. אחרי Hotel Lazaro פונים שמאלה למוזיאון הקטן, עם עבודות יד של תחרה וכסף שיצרו בנות ובני הכפר." },
+    { name: "גלריית MOLA", text: "משם לגלריית האמנות MOLA Culture Factory.",
+      places: [["MOLA Culture Factory", "MOLA Culture Factory Pano Lefkara"]] },
+    { name: "הסמטאות עד הכנסייה", text: "יורדים בסמטאות האבן, ובתחתית ממשיכים בשיטוט עד כנסיית הצלב הקדוש. חוזרים דרך חנויות התחרה, ואפשר לעצור גם ב-Lefkara Handicraft Centre.",
+      places: [["Lefkara Handicraft Centre", "Lefkara Handicraft Centre"]] }
   ]
 };

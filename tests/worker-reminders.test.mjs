@@ -53,6 +53,7 @@ await worker._tick(env, at("2026-11-29T11:30:00Z")); // 13:30: לפקארה נג
 assert.equal((await out2()).length, 0);
 await worker._tick(env, at("2026-11-29T11:46:00Z")); // 13:46
 o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^הספקתם\? פאנו לפקארה/); console.log("custom after 30 min ✔");
+await call("PATCH", `/rooms/${CODE2}.json`, { "status/d3-olive": "done", "status/d3-view": "done" }); // חוות הזיתים והתצפית כבר סומנו, כדי לא להפריע לבדיקה
 // ערכים לא תקינים: חסומים לטווח (ארוחה בערב 20:00, foodLead=9999 → 120)
 await call("PATCH", `/rooms/${CODE2}.json`, { "notif/foodLead": 9999, "notif/lead": "abc", "booked/d3-dinner": true });
 await worker._tick(env, at("2026-11-29T15:55:00Z")); // 17:55: לפני 18:00 (120 לפני 20:00)

@@ -54,7 +54,6 @@ dialog menu{display:flex;gap:8px;justify-content:flex-end;padding:0;margin:12px 
 nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
 #toast{position:fixed;bottom:84px;inset-inline:10px;background:#17262e;color:#fff;padding:10px 14px;border-radius:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;z-index:60;font-size:14px}
 #toast[hidden]{display:none}#toast button{background:#fff;color:#17262e}
-.gnote{margin:0 4px 10px;padding:8px 10px;border-radius:10px;background:#eef6fa;border:1px solid var(--line);font-size:14px;line-height:1.5}
 .gstop{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
 .gstop h3{margin:0 0 6px;font-size:17px;display:flex;align-items:center;gap:8px}.gn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--pri);color:#fff;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
 .gstop p{margin:0 0 8px;font-size:15px;line-height:1.55}.gstop a{color:var(--pri);font-weight:600}
