@@ -18,7 +18,7 @@
 - ענף עבודה: `claude/cyprus-trip-app-ji9hwm` (לא `main`). לדחוף אליו תמיד.
 - האתר: GitHub Pages מהענף הזה, תיקיית `/docs`: https://oz-code-creator.github.io/outlook-ai-reply/
 - **הריפו והאתר ציבוריים.** אסור לשים בקוד: מספרי הזמנה, שוברים, כרטיסי טיסה ומספרי טיסה, טלפונים של המלון וחברת התעופה, שמות הנוסעים, פרטי משפחה (למשל מי נשאר בבית), טוקנים, מפתחות, או קוד חדר הסנכרון. מידע כזה המשתמש מוסיף ידנית בטאב ℹ️ באפליקציה (נשמר בחדר פרטי). התאריכים והמסלול עצמם גלויים באתר, וקואורדינטות המלון בקוד. היסטוריית הגרסאות ב-Git עדיין מכילה פרטים ישנים שהוסרו (הוסרו בגרסה 45).
-- **אחרי כל שינוי באפליקציה להעלות גרסה** בשלושה מקומות: `docs/index.html` (`?v=N` בקבצי ה-JS/CSS ותווית "גרסה N"), ו-`docs/sw.js` (`cyprus-vN`). גרסה נוכחית: **45**.
+- **אחרי כל שינוי באפליקציה להעלות גרסה** בשלושה מקומות: `docs/index.html` (`?v=N` בקבצי ה-JS/CSS ותווית "גרסה N"), ו-`docs/sw.js` (`cyprus-vN`). גרסה נוכחית: **46**.
 - אחרי שינוי ב-`docs/plan.js` להריץ `node cyprus-worker/build-plan.mjs` (מטמיע עותק של התוכנית ב-Worker).
 - **ה-Worker (`cyprus-trip-ai` ב-Cloudflare) פרוס ועובד, ונפרס אוטומטית** ב-`.github/workflows/deploy-worker.yml` בכל דחיפה לענף שמשנה את `cyprus-worker/` (הסודות `CLOUDFLARE_API_TOKEN` ו-`CLOUDFLARE_ACCOUNT_ID` מוגדרים ב-GitHub). אפשר גם להריץ ידנית מ-Actions ← Deploy Worker.
 
@@ -28,7 +28,7 @@
   - `logic.js`: לוגיקה טהורה: `eff` (תוכנית אפקטיבית), `findSlot`, `localProposals`, `shiftProposal`, `validateProposals`, `applyOps`.
   - `app.js`: כל הממשק (כולל הדפסה). `sync.js`: סנכרון חי. `push.js`: הרשמה להתראות. `sw.js`: cache, התראות ולחיצות על כפתורים.
 - `cyprus-worker/sync-worker.js`: Worker יחיד: סנכרון חדרים והתראות דחיפה. `build-plan.mjs` מטמיע את התוכנית. `wrangler.toml` להגדרות הפריסה.
-- `tests/`: 20 בדיקות אוטומטיות, `./tests/run-all.sh` (כ-3 דקות; דורש node, python3 ו-playwright גלובלי). **להריץ לפני כל דחיפה.**
+- `tests/`: 21 בדיקות אוטומטיות, `./tests/run-all.sh` (כ-3 דקות; דורש node, python3 ו-playwright גלובלי). **להריץ לפני כל דחיפה.**
 
 ## מודל נתונים וסנכרון
 - מצב מקומי ב-localStorage (`cyprus-trip-v1`): `status{id: done|skipped|dropped}`, `ov{id: {day,start,dur,title}}` (שכבת שינויים מעל התוכנית), `added[]` (פעילויות שנוספו, id מתחיל ב-`add-`), `booked{id:true}`, `notif{morning,lead,foodLead,after}`, `lists{pack,todo,info:[{id,t,done,o}]}`, `settings{apiKey, sim*, sync{url,code}}`, `offered`, `migrated`.
@@ -56,7 +56,7 @@
 - כבודה: באחד הכרטיסים אין תיק יד ואין כבודה לבטן; לברר מול חברת התעופה. יציאה לשדה ביום שני ב-10:30 (להיות בשדה עד 11:40). עם רכב שכור להוסיף 15–30 דק׳ להחזרה.
 - להוסיף ידנית בטאב ℹ️ את פרטי ההזמנות (טיסות, שובר מלון, רכב), כתובת וטלפון של המלון. להדפיס 2 עותקים של כרטיסי הטיסה.
 - **26/11 (יום לפני הטיסה): להדפיס את התוכנית הסופית** (⚙️ ← 🖨 הדפס / שמור כ-PDF). זו משימה ברשימת ✅ וגם תזכורת מתוזמנת לסשן.
-- לכבות מצב הדגמה בשני הטלפונים לפני הטיול (אין באנר שמזהיר כשהוא פעיל).
+- לכבות מצב הדגמה בשני הטלפונים לפני הטיול (כשהוא פעיל מופיע באנר אדום בראש המסך).
 - קואורדינטות חסרות לנקודת התצפית (אין כפתור ניווט). לשלוח כמספרים.
 - אחרי הטיול: למחוק את מפתחות ה-API ב-Console. **סוד ישן שאפשר למחוק עכשיו** (לא בשימוש): `ANTHROPIC_API_KEY` ב-GitHub Secrets וב-Cloudflare (Worker `cyprus-trip-ai` ← Settings ← Variables and Secrets), ואת המפתח `worker` ב-console.anthropic.com. אני לא מוחק סודות בלי בקשה מפורשת.
 

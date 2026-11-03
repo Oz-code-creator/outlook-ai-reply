@@ -21,6 +21,7 @@
   // ---- רינדור ----
   function render() {
     if (drag) return;
+    $("simBanner").hidden = !(S.settings && S.settings.sim); // באנר אדום: מצב הדגמה פעיל
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
@@ -708,6 +709,7 @@
     const first = P.days[0].label.split(" ")[1], last = P.days[P.days.length - 1].label.split(" ")[1];
     return `<h1>טיול לקפריסין · <span dir="ltr">${esc(first)}–${esc(last)}</span></h1>${days}${lst("info", "ℹ️ מידע שימושי")}${g}${alts}${lst("todo", "✅ משימות פתוחות", true)}${lst("pack", "🎒 רשימת אריזה")}`;
   }
+  $("simBanner").addEventListener("click", () => $("btnSet").click());
   $("stPrint").addEventListener("click", () => { $("printRoot").innerHTML = printHtml(); $("dlgSet").close(); setTimeout(() => window.print(), 200); });
   window.addEventListener("afterprint", () => { $("printRoot").innerHTML = ""; });
   Sync.init({
