@@ -128,8 +128,10 @@ window.PLAN.listMigrations = [
 // טאב 🗺 (לקריאה בלבד): הדרך בתוך הכפר פאנו לפקארה. places: מקומות שנפתחים במפות לפי שם החיפוש.
 window.PLAN.guide = {
   title: "🗺 הדרך בתוך פאנו לפקארה",
+  links: [["🚶 המסלול ברגל בגוגל מפות (כולל תמונה של החנייה)", "https://www.google.com/maps/d/viewer?mid=19LTVg8HXpBJkUVPbzYdKvGzETE0YEnY&ll=34.86572910184462%2C33.30560476771263&z=15"]],
   stops: [
-    { name: "כניסה לכפר", text: "חונים בכניסה לכפר (ליד המשטרה) והולכים ברגל למרכז." },
+    { name: "כניסה לכפר", text: "חונים בכניסה לכפר (ליד המשטרה) והולכים ברגל למרכז.",
+      links: [["🅿️ החנייה", "https://maps.app.goo.gl/X1mTNXGMt9N4bfyY6"]] },
     { name: "הרחוב הראשי", text: "חנות Rouvis Lace and Silver, ובפינה בית הקפה Neo Kafe (מבנה צהבהב).",
       places: [["Rouvis Lace and Silver", "Rouvis Lace and Silver Pano Lefkara"], ["Neo Kafe", "Neo Kafe Pano Lefkara"]] },
     { name: "המוזיאון המקומי", text: "בפינת Neo Kafe פונים ימינה ועולים בסמטה. אחרי Hotel Lazaro פונים שמאלה למוזיאון הקטן, עם עבודות יד של תחרה וכסף שיצרו בנות ובני הכפר." },

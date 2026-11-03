@@ -510,8 +510,9 @@
   // טאב מסלול (לקריאה בלבד): תחנות עם כפתורי מפה
   function guideHtml() {
     const g = P.guide, map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
-    return `<div class="theme">${esc(g.title)}</div>` + g.stops.map((s, i) =>
-      `<div class="gstop"><h3><span class="gn">${i + 1}</span>${esc(s.name)}</h3><p>${linkify(esc(s.text))}</p><div class="gp">${(s.places || []).map(p => `<a href="${map(p[1])}" target="_blank" rel="noopener">🧭 ${esc(p[0])}</a>`).join("")}</div></div>`).join("");
+    const ln = l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`;
+    return `<div class="theme">${esc(g.title)}</div>` + ((g.links || []).length ? `<div class="gp gtop">${g.links.map(ln).join("")}</div>` : "") + g.stops.map((s, i) =>
+      `<div class="gstop"><h3><span class="gn">${i + 1}</span>${esc(s.name)}</h3><p>${linkify(esc(s.text))}</p><div class="gp">${(s.links || []).map(ln).join("")}${(s.places || []).map(p => `<a href="${map(p[1])}" target="_blank" rel="noopener">🧭 ${esc(p[0])}</a>`).join("")}</div></div>`).join("");
   }
   function listHtml(key) {
     const arr = lists()[key], done = arr.filter(x => x.done).length;
