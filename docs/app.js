@@ -39,9 +39,10 @@
   }
 
   // זמן נסיעה/הליכה מהמקום הקודם (הערכה). אחרי הזזת הפעילות הוא כבר לא מדויק, ולכן לא מוצג
+  const mFrom = t => (/^[A-Za-z]/.test(t) ? "מ-" : "מ") + t; // "מ-Mostra Meze" / "מהמלון"
   function tripLine(i) {
     const o = S.ov[i.id]; if (!i.trip || (o && (o.start !== undefined || o.day !== undefined))) return "";
-    return `<p class="trip">${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " מ" + esc(i.trip[2]) : ""} <small>(הערכה)</small></p>`;
+    return `<p class="trip">${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " " + mFrom(i.trip[2]) : ""} <small>(הערכה)</small></p>`;
   }
   function card(i, isNow) {
     const booked = !!(S.booked || {})[i.id];
@@ -697,7 +698,7 @@
     const fx = t => esc(t).replace(/(\+?\d[\d ]{6,}\d)/g, '<bdi dir="ltr">$1</bdi>'); // מספרי טלפון בכיוון נכון בתוך טקסט בעברית
     const items = L.eff(P, S).filter(i => i.status !== "dropped"), bk = S.booked || {};
     const days = P.days.map(d => `<section class="pday"><h2>${esc(d.label)} · ${esc(d.theme)}</h2><table>` + items.filter(i => i.day === d.n).sort((a, b) => a.start - b.start).map(i => {
-      const o = S.ov[i.id], tl = (i.trip && !(o && (o.start !== undefined || o.day !== undefined))) ? `${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " מ" + i.trip[2] : ""} (הערכה)` : "";
+      const o = S.ov[i.id], tl = (i.trip && !(o && (o.start !== undefined || o.day !== undefined))) ? `${i.trip[1] === "walk" ? "🚶 הליכה" : "🚗 נסיעה"} כ-${i.trip[0]} דק׳${i.trip[2] ? " " + mFrom(i.trip[2]) : ""} (הערכה)` : "";
       return `<tr><td class="pt" dir="ltr">${L.fmt(i.start)}–${L.fmt(i.start + i.dur)}</td><td><b>${esc(i.title)}</b>${i.book ? (bk[i.id] ? " ✅ הוזמן" : " ☐ להזמין") : ""}${i.status === "done" ? " ✅" : i.status === "skipped" ? " (דולג)" : ""}${tl ? `<div class="pn">${esc(tl)}</div>` : ""}${i.notes ? `<div class="pn">${fx(i.notes)}</div>` : ""}${i.reserve ? `<div class="pn">⚠ ${fx(i.reserve)}</div>` : ""}</td></tr>`;
     }).join("") + "</table></section>").join("");
     const lst = (key, title, onlyOpen) => {

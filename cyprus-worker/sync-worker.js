@@ -140,7 +140,7 @@ async function tick(env, when) {
       notified[k] = Date.now();
       const n = tr.min
         ? { id: "p" + Date.now() + out.length, title: leave - min > 0 ? `צריך לצאת בעוד ${leave - min} דק׳: ${i.title}` : `צריך לצאת עכשיו: ${i.title}`,
-            body: `${tr.mode === "walk" ? "הליכה" : "נסיעה"} כ-${tr.min} דק׳${tr.from ? " מ" + tr.from : ""} (הערכה). הגעה מתוכננת ב-${fmt(i.start)}.`, actions: [] }
+            body: `${tr.mode === "walk" ? "הליכה" : "נסיעה"} כ-${tr.min} דק׳${tr.from ? " " + (/^[A-Za-z]/.test(tr.from) ? "מ-" : "מ") + tr.from : ""} (הערכה). הגעה מתוכננת ב-${fmt(i.start)}.`, actions: [] }
         : { id: "p" + Date.now() + out.length, title: `בעוד ${i.start - min} דק׳: ${i.title}`, body: "מתי יוצאים? בדקו זמן נסיעה.", actions: [] };
       if (typeof i.lat === "number" && typeof i.lng === "number") { n.actions = [{ action: "nav", title: "🧭 נווט" }]; n.url = `https://www.google.com/maps/dir/?api=1&destination=${i.lat},${i.lng}`; }
       out.push(n);

@@ -66,6 +66,7 @@ nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
 @media print{
   @page{size:A4;margin:12mm}
   body>*:not(#printRoot){display:none!important}
+  html,body{background:#fff!important}
   dialog{display:none!important}
   #printRoot{display:block;direction:rtl;color:#000;background:#fff;font-size:11.5pt}
   #printRoot h1{font-size:18pt;margin:0 0 8pt}
