@@ -8,7 +8,7 @@ window.PLAN = {
     { n: 4, date: "2026-11-30", label: "שני 30/11", theme: "חזרה" }
   ],
   // חלון שימושי לכל יום (לשיבוץ מחדש)
-  windows: { 1: ["12:30", "22:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "10:00"] },
+  windows: { 1: ["12:30", "23:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "10:00"] },
   context: [
     "זוג, שתי בנות צעירות בבית — רוצים לקנות להן מתנות.",
     "מלון Royal Apollonia (חוף לימסול המזרחי, ~15 דקות מהעיר העתיקה).",
@@ -27,7 +27,8 @@ window.PLAN = {
     { id: "d1-molos", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527737-Reviews-Promenade-Limassol_City_Limassol.html", day: 1, start: "15:15", dur: 60, type: "sight", daylight: true, title: "טיילת מולוס", notes: "הליכה על הטיילת.", lat: 34.6743, lng: 33.0475 },
     { id: "d1-rest", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 1, start: "16:30", dur: 120, type: "rest", soft: true, title: "מנוחה ומקלחת במלון", notes: "הפסקת התרעננות לפני הערב.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d1-port", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d6960498-Reviews-Limassol_Marina-Limassol_City_Limassol.html", day: 1, start: "18:30", dur: 90, type: "sight", title: "הנמל הישן ופארק חג המולד", notes: "אורות, דוכנים, יין חם. פעיל מ-21/11.", lat: 34.6704, lng: 33.0443 },
-    { id: "d1-dinner", book: true, ta: "https://www.tripadvisor.com/Search?q=Mazema%20Limassol", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "לוודא הזמנת שולחן ל-20:00 ושהמסעדה פתוחה", lat: 34.673984, lng: 33.039054 },
+    { id: "d1-dinner", book: true, ta: "https://www.tripadvisor.com/Search?q=Mazema%20Limassol", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "לוודא הזמנת שולחן ל-20:00 ושהמסעדה פתוחה. אינסטגרם: כנראה @mazemaproject (לא אומת)", lat: 34.673984, lng: 33.039054 },
+    { id: "d1-night", day: 1, start: "21:45", dur: 60, type: "food", title: "בילוי בסריפולו: דרינק או קוקטייל", notes: "רחוב וכיכר סריפולו: מדרחוב עם ברים, פאבים ובתי קפה, הכי תוסס בשישי בערב. בברים בכיכר: Salut (Saripolou 71-73), (in)Theory (קוקטייל בר, Saripolou 53), Blue Apple (פתוח 17:00–02:00).", lat: 34.6754273, lng: 33.0431423, radius: 300 },
 
     { id: "d2-bf", ta: "https://www.tripadvisor.com/Hotel_Review-g3359582-d243531-Reviews-Royal_Apollonia-Germasogeia_Limassol.html", day: 2, start: "08:30", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d2-kolossi", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d313647-Reviews-Kolossi_Castle-Limassol_City_Limassol.html", day: 2, start: "10:30", dur: 45, type: "sight", daylight: true, open: "08:30", close: "17:00", title: "טירת קולוסי", notes: "שעות חורף 8:30–17:00. אפשר לוותר כדי להשאיר זמן לספא.", lat: 34.6644, lng: 32.9306 },
