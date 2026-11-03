@@ -5,7 +5,7 @@ let S = { status: {}, ov: {}, added: [] };
 // שבת 17:00: לא הספקנו קולוסי+קוריון
 let now = { day: 2, min: L.toMin("17:00") };
 let ps = L.localProposals(P, S, now); console.log(ps.map(p => p.text));
-assert(ps.length === 3);
+assert(ps.length === 4); // קולוסי, Commandaria, קוריון, צהריים
 // קולוסי/קוריון נסגרים ב-17:00 ולכן בראשון בבוקר? יום 3 חלון 10:00 — לפקארה תופסת 11:00-13:15
 ps.forEach(p => L.applyOps(S, p.ops));
 // בדיקת אי-חפיפה בכל יום

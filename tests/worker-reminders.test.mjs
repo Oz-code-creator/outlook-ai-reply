@@ -32,7 +32,7 @@ assert.equal(await worker._tick(env, at("2026-11-30T08:28:00Z")), 1); o = await 
 await call("PATCH", `/rooms/${CODE}.json`, { init: true, "status/d2-kolossi": "done" });
 assert.equal(await worker._tick(env, at("2026-11-28T08:15:00Z")), 0); console.log("done item: no reminder ✔");
 // שם שהוחלף באפליקציה (ov.title) משמש בהתראה, וגם שעה שהוזזה
-await call("PATCH", `/rooms/${CODE}.json`, { "ov/d2-kourion": { title: "קוריון (שם חדש)", start: 15 * 60, day: 2 }, "booked/d2-dinner": true });
+await call("PATCH", `/rooms/${CODE}.json`, { "ov/d2-kourion": { title: "קוריון (שם חדש)", start: 15 * 60, day: 2 }, "booked/d2-dinner": true, "status/d2-commandaria": "done" }); // Commandaria סומנה, כדי שלא תפריע
 assert.equal(await worker._tick(env, at("2026-11-28T12:45:00Z")), 1); o = await out(); // 14:45 מקומי, 15 דק' לפני 15:00
 assert.ok(o.some(x => x.title.includes("קוריון (שם חדש)"))); console.log("overridden title and time used in notification ✔");
 

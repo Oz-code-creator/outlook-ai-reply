@@ -24,7 +24,8 @@
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
-    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>${P.guide ? `<button data-d="guide" class="${selDay === "guide" ? "sel" : ""}">🗺<small>לפקארה</small></button>` : ""}`);
+    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>${P.guide ? `<button data-d="guide" class="${selDay === "guide" ? "sel" : ""}">🗺<small>לפקארה</small></button>` : ""}${(P.alternatives || []).length ? `<button data-d="alt" class="${selDay === "alt" ? "sel" : ""}">💡<small>אלטרנטיבות</small></button>` : ""}`);
+    if (selDay === "alt" && (P.alternatives || []).length) { $("list").innerHTML = altHtml(); renderPrompt(); renderLoc(); return; }
     if (selDay === "guide" && P.guide) { $("list").innerHTML = guideHtml(); renderPrompt(); renderLoc(); return; }
     if (typeof selDay === "string") { $("list").innerHTML = listHtml(selDay); renderPrompt(); renderLoc(); return; }
     const day = P.days[selDay - 1];
@@ -109,6 +110,7 @@
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.d) { selDay = /^\d+$/.test(t.dataset.d) ? +t.dataset.d : t.dataset.d; render(); return; }
     if (t.dataset.addday) { openAdd(+t.dataset.addday); return; }
+    if (t.dataset.altadd) { const a = (P.alternatives || []).find(x => x.id === t.dataset.altadd); if (a) openAdd(1, { name: a.addTitle || a.name, type: a.addType, dur: a.addDur, notes: a.addNotes }); return; }
     if (t.dataset.book) { S.booked = S.booked || {}; if (S.booked[t.dataset.book]) delete S.booked[t.dataset.book]; else S.booked[t.dataset.book] = true; save(); render(); return; }
     if (t.dataset.rain) {
       const d = P.days[+t.dataset.rain - 1];
@@ -265,13 +267,13 @@
     $("mvReset").hidden = add || !(S.ov[id] && Object.keys(S.ov[id]).length);
     mvCheck(); $("dlgMove").showModal();
   }
-  function openAdd(day) {
+  function openAdd(day, pre) {
     const last = L.eff(P, S).filter(x => x.day === day && x.status !== "dropped" && x.status !== "skipped").sort((x, y) => (y.start + y.dur) - (x.start + x.dur))[0];
     const start = last ? Math.min(last.start + last.dur + 15, 22 * 60) : 12 * 60;
-    editing = { add: true };
+    editing = { add: true, notes: pre && pre.notes || "" };
     $("mvTitle").textContent = "פעילות חדשה";
-    $("mvName").value = ""; fillDays(day); $("mvTime").value = L.fmt(Math.ceil(start / 5) * 5); $("mvDur").value = 60;
-    $("mvTypeRow").hidden = false; $("mvType").value = "sight";
+    $("mvName").value = pre ? pre.name : ""; fillDays(day); $("mvTime").value = L.fmt(Math.ceil(start / 5) * 5); $("mvDur").value = pre && pre.dur || 60;
+    $("mvTypeRow").hidden = false; $("mvType").value = pre && pre.type || "sight";
     $("mvDel").hidden = true; $("mvReset").hidden = true; $("mvWarn").textContent = "";
     $("dlgMove").showModal(); $("mvName").focus();
   }
@@ -283,7 +285,7 @@
     const start = L.toMin(t);
     if (editing && editing.add) {
       S.added = S.added || [];
-      S.added.push({ id: "add-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), day, start, dur, type: $("mvType").value, title: name, notes: "" });
+      S.added.push({ id: "add-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), day, start, dur, type: $("mvType").value, title: name, notes: editing.notes || "" });
     } else if (editing) {
       const id = editing.id, ad = (S.added || []).find(x => x.id === id);
       if (ad) Object.assign(ad, { day, start, dur, title: name, type: $("mvType").value });
@@ -507,6 +509,16 @@
   const rowHtml = (key, x) => LISTS[key].plain
     ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
     : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
+  // טאב אלטרנטיבות (לקריאה בלבד): כרטיס לכל מקום, עם "איפה אפשר להכניס" וכפתור הוספה ללוח
+  function altHtml() {
+    const map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q), groups = [["food", "🍽 מסעדות"], ["sight", "📍 אתרים"]];
+    return `<div class="theme">💡 מקומות שלא נכנסו לתוכנית ויכולים לשמש חלופה</div>` + groups.map(([k, label]) => {
+      const arr = P.alternatives.filter(a => a.kind === k); if (!arr.length) return "";
+      return `<div class="theme">${label}</div>` + arr.map(a => `<div class="gstop"><h3>${esc(a.name)}</h3><p>${esc(a.about)}</p>
+        <p class="afit"><b>איפה אפשר להכניס:</b> ${esc(a.fit)}</p>${a.check ? `<p class="warn">⚠ ${esc(a.check)}</p>` : ""}${a.phone ? `<p>${linkify(esc("טלפון: " + a.phone))}</p>` : ""}
+        <div class="gp">${a.mapq ? `<a href="${map(a.mapq)}" target="_blank" rel="noopener">🧭 מפה</a>` : ""}${a.ta ? `<a href="${esc(a.ta)}" target="_blank" rel="noopener">TripAdvisor</a>` : ""}<button type="button" data-altadd="${esc(a.id)}">➕ הוסף ללוח</button></div></div>`).join("");
+    }).join("");
+  }
   // טאב מסלול (לקריאה בלבד): תחנות עם כפתורי מפה
   function guideHtml() {
     const g = P.guide, map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);

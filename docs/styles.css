@@ -58,4 +58,6 @@ nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
 .gstop h3{margin:0 0 6px;font-size:17px;display:flex;align-items:center;gap:8px}.gn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--pri);color:#fff;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
 .gstop p{margin:0 0 8px;font-size:15px;line-height:1.55}.gstop a{color:var(--pri);font-weight:600}
 .gtop{margin:0 4px 10px}.gtop a{font-size:15px;padding:6px 12px}
+.afit{background:#eef6fa;border-radius:8px;padding:6px 8px}
+.gp button{font-size:13px;border:1px solid var(--pri);border-radius:14px;padding:3px 10px;background:#fff;color:var(--pri)}
 .gp{display:flex;flex-wrap:wrap;gap:6px}.gp a{font-size:13px;border:1px solid var(--line);border-radius:14px;padding:3px 10px;text-decoration:none;background:#f4f7f9}

@@ -26,8 +26,8 @@ assert.equal(await worker._tick(env, at("2026-11-10T10:00:00Z")), 0);
 assert.equal(await worker._tick(env, at("2026-11-28T07:45:00Z")), 1); // הודעת בוקר בלבד
 { const o = await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json(); assert.equal(o.length, 1); assert.ok(o[0].title.startsWith("בוקר טוב")); assert.ok(!o[0].body.includes("ארוחת בוקר")); }
 // קולוסי (10:30 + 45 דק') → מ-11:25 בשעון קפריסין = 09:25Z
-assert.equal(await worker._tick(env, at("2026-11-28T09:30:00Z")), 1);
-assert.equal(pushes.length, 2); // בוקר + הספקתם
+assert.equal(await worker._tick(env, at("2026-11-28T09:30:00Z")), 2); // "הספקתם? קולוסי" + "בעוד 15 דק׳: קוריון" (קוריון מתחילה 11:45)
+assert.equal(pushes.length, 3); // בוקר + הספקתם + קוריון
 const auth = pushes[pushes.length - 1].h.Authorization; assert.match(auth, /^vapid t=[\w-]+\.[\w-]+\.[\w-]+, k=/);
 const [jwt, k] = auth.slice(8).split(", k="); const [h, c, s] = jwt.split(".");
 const claims = JSON.parse(Buffer.from(c, "base64url")); assert.equal(claims.aud, "https://fcm.googleapis.com"); assert.ok(claims.exp > Date.now() / 1000);
@@ -36,12 +36,12 @@ assert.ok(await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pub, Bu
 console.log("push sent + VAPID signature verifies");
 // outbox
 const ob = await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json();
-assert.equal(ob.length, 1); assert.equal(ob[0].itemId, "d2-kolossi"); assert.equal(ob[0].actions.length, 3); console.log("outbox:", ob[0].title);
+assert.equal(ob.length, 2); const k0 = ob.find(x => x.itemId === "d2-kolossi"); assert.ok(k0); assert.equal(k0.actions.length, 3); assert.ok(ob.some(x => /^בעוד 15 דק׳: קוריון/.test(x.title))); console.log("outbox:", k0.title);
 assert.equal((await (await call("GET", `/outbox/${CODE}/${reg.hash}`)).json()).length, 0);
 // אין כפילות
 assert.equal(await worker._tick(env, at("2026-11-28T09:35:00Z")), 0);
 // סימון בוצע דרך סנכרון → אין התראה על קוריון
-await call("PATCH", `/rooms/${CODE}.json`, { init: true, "status/d2-kourion": "done" });
+await call("PATCH", `/rooms/${CODE}.json`, { init: true, "status/d2-kourion": "done", "status/d2-commandaria": "done" });
 assert.equal(await worker._tick(env, at("2026-11-28T11:45:00Z")), 0); console.log("done items not notified");
 // הזזה דרך ov: אגיו אנדראו (קניות) הועבר ל-14:00 → מתריע אחרי 15:10
 await call("PATCH", `/rooms/${CODE}.json`, { "ov/d2-shop": { day: 2, start: 840, dur: 60 } });
