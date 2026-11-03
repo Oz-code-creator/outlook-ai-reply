@@ -1,0 +1,15 @@
+const { chromium } = require("playwright");
+(async()=>{const b=await chromium.launch();const errs=[];
+const c=await b.newContext({viewport:{width:390,height:800}});const p=await c.newPage();p.on("pageerror",e=>errs.push(e.message));
+await p.goto("http://localhost:8766/index.html");
+console.log("guide tab present:",(await p.$$("#tabs button[data-d='guide']")).length);
+await p.click("#tabs button[data-d='guide']");
+console.log("title:",(await p.textContent(".theme")).trim());
+console.log("stops:",(await p.$$(".gstop")).length,"(expect 6)");
+const hrefs=await p.$$eval(".gp a",a=>a.map(x=>x.href));
+console.log("map links:",hrefs.length,"| all google maps:",hrefs.every(h=>h.startsWith("https://www.google.com/maps/search/?api=1&query=")));
+console.log("phone is tel link:",(await p.$$eval(".gstop a[href^='tel:']",a=>a.map(x=>x.getAttribute("href")))).join(","));
+console.log("tab selected:",await p.$eval("#tabs button[data-d='guide']",e=>e.classList.contains("sel")));
+await p.click("#tabs button[data-d='2']");
+console.log("back to day 2 shows items:",(await p.$$(".item")).length>0);
+console.log("errors:",JSON.stringify(errs));await b.close();})();

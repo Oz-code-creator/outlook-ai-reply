@@ -24,7 +24,8 @@
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
-    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>`);
+    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>${P.guide ? `<button data-d="guide" class="${selDay === "guide" ? "sel" : ""}">🗺<small>לפקארה</small></button>` : ""}`);
+    if (selDay === "guide" && P.guide) { $("list").innerHTML = guideHtml(); renderPrompt(); renderLoc(); return; }
     if (typeof selDay === "string") { $("list").innerHTML = listHtml(selDay); renderPrompt(); renderLoc(); return; }
     const day = P.days[selDay - 1];
     const list = items.filter(i => i.day === selDay).sort((a, b) => a.start - b.start);
@@ -506,6 +507,12 @@
   const rowHtml = (key, x) => LISTS[key].plain
     ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
     : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
+  // טאב מסלול (לקריאה בלבד): תחנות עם כפתורי מפה
+  function guideHtml() {
+    const g = P.guide, map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+    return `<div class="theme">${esc(g.title)}</div><div class="gnote">${esc(g.intro)}</div>` + g.stops.map((s, i) =>
+      `<div class="gstop"><h3><span class="gn">${i + 1}</span>${esc(s.name)}</h3><p>${linkify(esc(s.text))}</p><div class="gp">${(s.places || []).map(p => `<a href="${map(p[1])}" target="_blank" rel="noopener">🧭 ${esc(p[0])}</a>`).join("")}</div></div>`).join("");
+  }
   function listHtml(key) {
     const arr = lists()[key], done = arr.filter(x => x.done).length;
     return `<div class="theme">${LISTS[key].title}${LISTS[key].plain ? "" : " · " + done + "/" + arr.length}</div>
