@@ -121,7 +121,8 @@ async function tick(env, when) {
   let sent = 0;
   for (const code of codes) {
     const room = (await env.ROOMS.get("room:" + code, { type: "json" })) || {};
-    const notified = (await env.ROOMS.get("notified:" + code, { type: "json" })) || {};
+    if (room.app === "parking") continue; // חדר של אפליקציית "מי חונה?": לא שייך לטיול, בלי התראות טיול
+    const notified =(await env.ROOMS.get("notified:" + code, { type: "json" })) || {};
     const status = room.status || {}, items = effItems(room), out = [], cf = notifCfg(room);
 
     // 1) הודעת בוקר עם תוכנית היום (מהשעה שנקבעה ועד שעתיים אחריה, פעם ביום; ברירת מחדל 08:00)
@@ -216,6 +217,16 @@ export default {
       const list = (await env.ROOMS.get(k, { type: "json" })) || [];
       if (list.length) await env.ROOMS.delete(k);
       return json(list);
+    }
+    // התראה כללית לשאר המכשירים בחדר (משמש את אפליקציית "מי חונה?"). from = ה-hash של המכשיר השולח, והוא לא מקבל את ההתראה.
+    if ((m = path.match(new RegExp(`^/notify/(${CODE})$`))) && req.method === "POST") {
+      let b; try { b = await req.json(); } catch (e) { return json({ error: "bad json" }, 400); }
+      if (!b || typeof b.title !== "string" || !b.title.trim() || b.title.length > 100 || (b.body !== undefined && (typeof b.body !== "string" || b.body.length > 200))) return json({ error: "bad notification" }, 400);
+      const from = typeof b.from === "string" && /^[a-f0-9]{16}$/.test(b.from) ? b.from : null;
+      const subs = (await listSubs(env, m[1])).filter(x => x.hash !== from);
+      if (!subs.length) return json({ sent: 0 });
+      await notify(env, m[1], subs, { id: "x" + Date.now(), title: b.title.trim(), body: String(b.body || ""), actions: [] });
+      return json({ sent: subs.length });
     }
     if ((m = path.match(new RegExp(`^/test/(${CODE})$`))) && req.method === "POST") {
       const subs = await listSubs(env, m[1]);
