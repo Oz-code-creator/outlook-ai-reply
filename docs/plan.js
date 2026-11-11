@@ -8,23 +8,24 @@ window.PLAN = {
     { n: 4, date: "2026-11-30", label: "שני 30/11", theme: "חזרה" }
   ],
   // חלון שימושי לכל יום (לשיבוץ מחדש)
-  windows: { 1: ["12:30", "23:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "10:00"] },
+  windows: { 1: ["12:30", "23:00"], 2: ["09:45", "22:00"], 3: ["10:00", "22:00"], 4: ["08:00", "11:00"] },
   context: [
     "זוג, רוצים לקנות מתנות הביתה.",
     "מלון בחוף לימסול המזרחי (~15 דקות מהעיר העתיקה).",
     "מזג אוויר: ~22°C ביום, ~17°C בלילה, שקיעה ~16:30–16:45. הים קריר.",
     "העדפות: יציאה בכל ערב, הפסקת התרעננות בחדר אחה״צ, ארוחות מסורתיות עם קצת גיוון, מחיר לא משנה.",
     "לפקארה ביום ראשון (לא בשבת). MEZE Taverna סגורה בראשון.",
-    "טיסה חזרה 30/11 ב-14:40 מלרנקה; יציאה לשדה 10:30, להיות בשדה עד 11:40.",
+    "טיסה חזרה 30/11 ב-14:05 מלרנקה; יציאה מהמלון ב-9:45, החזרת הרכב בשדה עד 11:00 וצ׳ק-אין עד 11:05.",
     "תכנית גשם: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים, הספא במלון.",
-    "נהיגה בצד שמאל. שוכרים רכב."
+    "נהיגה בצד שמאל. שוכרים רכב: איסוף בשישי 11:30 בשדה לרנקה, החזרה בשני 11:00 באותו שדה."
   ],
   // type: sight | food | rest | shop | travel   fixed: לא זזים אוטומטית (הזמנות/טיסות)
   items: [
-    { id: "d1-hotel", day: 1, start: "12:00", dur: 30, type: "rest", fixed: true, title: "הגעה למלון", notes: "משאירים מזוודות, מבקשים כניסה מוקדמת וחדר שקט עם נוף לים.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d1-lunch", trip: [15, "drive", "המלון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d23873437-Reviews-Mostra_Meze_Tavern-Limassol_City_Limassol.html", day: 1, start: "13:00", dur: 75, type: "food", title: "ארוחת צהריים – Mostra Meze", notes: "מזה קפריסאית, סריפולו 41 (העיר העתיקה).", reserve: "לוודא שעות פתיחה לצהריים בשישי (ב-TripAdvisor מופיע שפתוחה בעיקר בערב)", lat: 34.6754273, lng: 33.0431423 },
-    { id: "d1-castle", trip: [5, "walk", "Mostra Meze"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527729-Reviews-Limassol_Castle-Limassol_City_Limassol.html", day: 1, start: "14:15", dur: 60, type: "sight", daylight: true, close: "17:00", title: "טירת לימסול והמוזיאון הימי-ביניימי", notes: "נסגרת ב-17:00. קרובה לסריפולו ולאגיו אנדראו.", lat: 34.6727, lng: 33.0431 },
-    { id: "d1-rest", trip: [15, "drive", "הקניות"], day: 1, start: "16:30", dur: 120, type: "rest", soft: true, title: "מנוחה ומקלחת במלון", notes: "הפסקת התרעננות לפני הערב.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d1-car", day: 1, start: "11:30", dur: 90, type: "travel", fixed: true, title: "איסוף רכב בשדה לרנקה ונסיעה למלון", notes: "משרד Europcar בשדה, איסוף ב-11:30 (הרכב נשמר עד שעה אחרי). הטיסה נוחתת בערך 11:15 (הערכה). להביא: רישיון נהיגה ישראלי ובינלאומי, תעודת זהות, וכרטיס אשראי של הנהג (Visa או Mastercard בלבד). נהיגה בצד שמאל.", lat: 34.8751, lng: 33.6249, radius: 1500 },
+    { id: "d1-hotel", day: 1, start: "13:00", dur: 15, type: "rest", fixed: true, title: "הגעה למלון", notes: "משאירים מזוודות, מבקשים כניסה מוקדמת וחדר שקט עם נוף לים.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d1-lunch", trip: [15, "drive", "המלון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d23873437-Reviews-Mostra_Meze_Tavern-Limassol_City_Limassol.html", day: 1, start: "13:30", dur: 75, type: "food", title: "ארוחת צהריים – Mostra Meze", notes: "מזה קפריסאית, סריפולו 41 (העיר העתיקה).", reserve: "לוודא שעות פתיחה לצהריים בשישי (ב-TripAdvisor מופיע שפתוחה בעיקר בערב)", lat: 34.6754273, lng: 33.0431423 },
+    { id: "d1-castle", trip: [5, "walk", "המסעדה"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527729-Reviews-Limassol_Castle-Limassol_City_Limassol.html", day: 1, start: "14:45", dur: 45, type: "sight", daylight: true, close: "17:00", title: "טירת לימסול והמוזיאון הימי-ביניימי", notes: "נסגרת ב-17:00. קרובה לסריפולו ולאגיו אנדראו.", lat: 34.6727, lng: 33.0431 },
+    { id: "d1-rest", trip: [15, "drive", "הקניות"], day: 1, start: "16:45", dur: 105, type: "rest", soft: true, title: "מנוחה ומקלחת במלון", notes: "הפסקת התרעננות לפני הערב.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d1-port", trip: [15, "drive", "המלון"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d6960498-Reviews-Limassol_Marina-Limassol_City_Limassol.html", day: 1, start: "19:00", dur: 60, type: "sight", title: "הנמל הישן, טיילת מולוס ופארק חג המולד", notes: "אורות, דוכנים, יין חם. פעיל מ-21/11. טיילת מולוס צמודה לנמל: אפשר לשלב אותה בהליכה.", lat: 34.6704, lng: 33.0443 },
     { id: "d1-dinner", trip: [10, "walk", "הנמל"], book: true, ta: "https://www.tripadvisor.com/Search?q=Mazema%20Limassol", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "לוודא הזמנת שולחן ל-20:00 ושהמסעדה פתוחה. אינסטגרם: כנראה @mazemaproject (לא אומת)", lat: 34.673984, lng: 33.039054 },
     { id: "d1-night", trip: [5, "walk", "Mazema"], day: 1, start: "21:45", dur: 60, type: "food", title: "בילוי בסריפולו: דרינק או קוקטייל", notes: "רחוב וכיכר סריפולו: מדרחוב עם ברים, פאבים ובתי קפה, הכי תוסס בשישי בערב. בברים בכיכר: Salut (Saripolou 71-73), (in)Theory (קוקטייל בר, Saripolou 53), Blue Apple (פתוח 17:00–02:00).", lat: 34.6754273, lng: 33.0431423, radius: 300 },
@@ -35,7 +36,7 @@ window.PLAN = {
     { id: "d2-kourion", trip: [5, "drive", "מוזיאון היין"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527735-Reviews-Kourion-Limassol_City_Limassol.html", day: 2, start: "11:45", dur: 120, type: "sight", daylight: true, close: "17:00", title: "קוריון העתיקה", notes: "אמפיתיאטרון ופסיפסים.", reserve: "לאשר טלפונית שהאתר פתוח: +357 25 934250", lat: 34.6641, lng: 32.8856 },
     { id: "d2-lunch", trip: [5, "drive", "קוריון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2221890-Reviews-Chris_Blue_Beach-Limassol_City_Limassol.html", day: 2, start: "13:45", dur: 90, type: "food", title: "צהריים – Chris Blue Beach", notes: "חוף קוריון, פתוחה 8:30–22:30.", lat: 34.6658863, lng: 32.8771663 },
     { id: "d2-spa", trip: [35, "drive", "חוף קוריון"], book: true, day: 2, start: "16:30", dur: 120, type: "rest", soft: true, title: "ספא או מנוחה במלון", notes: "ספא פתוח 9:00–20:00. כדאי טיפול זוגי עם ג׳קוזי.", reserve: "לשריין טיפול זוגי מראש", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d1-shop", trip: [10, "walk", "הטירה"], ta: "https://www.tripadvisor.com/Search?q=Agiou%20Andreou%20Limassol", day: 1, start: "15:15", dur: 60, type: "shop", title: "אגיו אנדראו – קניות ומתנות", notes: "העיר העתיקה, ליד הטירה. שעה למתנות. בשבת החנויות נסגרות מוקדם (בערך 19:00, לא אומת), ולכן קונים כאן.", lat: 34.6764937, lng: 33.0475766 },
+    { id: "d1-shop", trip: [10, "walk", "הטירה"], ta: "https://www.tripadvisor.com/Search?q=Agiou%20Andreou%20Limassol", day: 1, start: "15:30", dur: 60, type: "shop", title: "אגיו אנדראו – קניות ומתנות", notes: "העיר העתיקה, ליד הטירה. שעה למתנות. בשבת החנויות נסגרות מוקדם (בערך 19:00, לא אומת), ולכן קונים כאן.", lat: 34.6764937, lng: 33.0475766 },
     { id: "d2-dinner", trip: [15, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2369481-Reviews-Meze_Taverna_Restaurant-Limassol_City_Limassol.html", day: 2, start: "19:30", dur: 100, type: "food", fixed: true, closedDays: ["2026-11-29"], title: "ארוחת ערב – MEZE Taverna", notes: "אגיו אנדראו 209. פתוחה עד 22:00, סגורה בראשון.", reserve: "חובה להזמין: +357 25 367333", lat: 34.6764937, lng: 33.0475766 },
 
     { id: "d3-bf", day: 3, start: "08:45", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -47,9 +48,9 @@ window.PLAN = {
     { id: "d3-dinner", trip: [10, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d26223615-Reviews-Kai_Sushi_Bar_Limassol-Limassol_City_Limassol.html", day: 3, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Kai Sushi", notes: "קראון פלאזה, 18:00–23:00.", reserve: "הזמנה דרך המלון: +357 25 851515", lat: 34.688916, lng: 33.0711665 },
 
     { id: "d4-bf", day: 4, start: "08:30", dur: 45, type: "food", fixed: true, title: "ארוחת בוקר", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d4-checkout", day: 4, start: "10:00", dur: 30, type: "rest", fixed: true, title: "צ׳ק-אאוט", notes: "עד 12:00.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d4-airport", day: 4, start: "10:30", dur: 60, type: "travel", fixed: true, title: "נסיעה לשדה לרנקה", notes: "~52 ק״מ, כ-45–60 דקות. צ׳ק-אין בשדה עד 11:40 (3 שעות לפני ההמראה). מתנות אחרונות בשדה. רכב שכור: להחזיר בשדה, ולהוסיף 15–30 דק׳ להחזרה לפני הצ׳ק-אין.", lat: 34.8751, lng: 33.6249, radius: 1500 },
-    { id: "d4-flight", day: 4, start: "14:40", dur: 60, type: "travel", fixed: true, title: "טיסה חזרה", notes: "המראה 14:40, נחיתה 15:40 (שעות עשויות להשתנות).", lat: 34.8751, lng: 33.6249, radius: 1500 }
+    { id: "d4-checkout", day: 4, start: "09:15", dur: 30, type: "rest", fixed: true, title: "צ׳ק-אאוט", notes: "מותר עד 12:00, אבל יוצאים ב-9:45 כדי להחזיר את הרכב ב-11:00.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d4-airport", day: 4, start: "09:45", dur: 75, type: "travel", fixed: true, title: "נסיעה לשדה לרנקה והחזרת הרכב", notes: "~52 ק״מ, כ-45–60 דקות. להחזיר את הרכב בשדה לרנקה עד 11:00 (לפי השובר). צ׳ק-אין עד 11:05 (3 שעות לפני ההמראה ב-14:05). מתנות אחרונות בשדה.", lat: 34.8751, lng: 33.6249, radius: 1500 },
+    { id: "d4-flight", day: 4, start: "14:05", dur: 60, type: "travel", fixed: true, title: "טיסה חזרה", notes: "המראה 14:05 מלרנקה לטרמינל 3 בתל אביב (שעות עשויות להשתנות). לפי הכרטיסים: בלי כבודה לבטן, רק תיק יד.", lat: 34.8751, lng: 33.6249, radius: 1500 }
   ]
 };
 
@@ -88,8 +89,8 @@ window.PLAN.todos = [
   "אחרי הטיול: למחוק את מפתח ה-API ב-Console"
 ];
 window.PLAN.info = [
-  "טיסה הלוך: שישי 27/11 בשעה 9:00",
-  "טיסה חזור: שני 30/11, המראה 14:40 מלרנקה, נחיתה 15:40 (השעות עשויות להשתנות)",
+  "טיסה הלוך: שישי 27/11 בשעה 10:00",
+  "טיסה חזור: שני 30/11, המראה 14:05 מלרנקה (השעות עשויות להשתנות)",
   "מלון: חוף לימסול המזרחי. שם, כתובת וטלפון: להוסיף כאן",
   "צ׳ק-אין מ-14:00 · צ׳ק-אאוט עד 12:00",
   "הסעה מהמלון לשדה ביום שני: שעה להוסיף",
@@ -136,6 +137,17 @@ window.PLAN.listMigrations = [
   ] },
   { id: "m8", list: "todo", remove: ["d5"], add: [
     { id: "m8-a", t: "להזמין טיפול ספא זוגי לשבת ~16:30 (עם ג׳קוזי)" }
+  ] },
+  { id: "m9", list: "info", remove: ["m2-a", "m2-b", "m2-c"], add: [
+    { id: "m9-a", t: "✈️ הלוך: שישי 27/11, המראה 10:00 מתל אביב (טרמינל 1) ללרנקה. להיות בשדה עד 7:00. מספר טיסה: להוסיף כאן" },
+    { id: "m9-b", t: "✈️ חזור: שני 30/11, המראה 14:05 מלרנקה לתל אביב (טרמינל 3). מספר טיסה: להוסיף כאן" },
+    { id: "m9-c", t: "צ׳ק-אין בשדה לפחות 3 שעות לפני ההמראה: בחזור עד 11:05. להביא 2 עותקים מודפסים של כרטיסי הטיסה. בלי ארוחה בטיסות" },
+    { id: "m9-d", t: "רכב שכור: איסוף שישי 27/11 ב-11:30 והחזרה שני 30/11 ב-11:00, בשדה לרנקה. שובר, אישור וטלפון הסניף: להוסיף כאן" }
+  ] },
+  { id: "m9t", list: "todo", remove: ["m3-a", "m7-b"], add: [
+    { id: "m9t-a", t: "ביום שני: יציאה מהמלון ב-9:45, החזרת הרכב בשדה לרנקה עד 11:00 וצ׳ק-אין עד 11:05" },
+    { id: "m9t-b", t: "ביום שישי: טיסה ב-10:00 מטרמינל 1 בבן-גוריון, להגיע עד 7:00. איסוף הרכב בלרנקה ב-11:30" },
+    { id: "m9t-c", t: "לאיסוף הרכב: רישיון ישראלי + בינלאומי, תעודת זהות, וכרטיס אשראי של הנהג (Visa או Mastercard בלבד: לא דביט, לא Amex/Diners ולא Apple Pay). פיקדון 300 יורו והשתתפות עצמית 1,500 יורו. אסור לחצות לצפון קפריסין" }
   ] }
 ];
 

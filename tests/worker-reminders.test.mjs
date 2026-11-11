@@ -27,7 +27,7 @@ assert.equal(await worker._tick(env, at("2026-11-29T17:36:00Z")), 1); o = await 
 // צהריים לא קבוע (Iason 13:15): אין תזכורת
 assert.equal(await worker._tick(env, at("2026-11-29T11:00:00Z")), 0); console.log("regular lunch: no reminder ✔");
 // יום 4: נסיעה לשדה 10:45 → תזכורת 10:25
-assert.equal(await worker._tick(env, at("2026-11-30T08:28:00Z")), 1); o = await out(); assert.ok(/נסיעה לשדה/.test(o[0].title)); assert.match(o[0].title, /^בעוד 2 דק׳/); console.log("airport departure reminder at 10:30 ✔");
+assert.equal(await worker._tick(env, at("2026-11-30T07:43:00Z")), 1); o = await out(); assert.ok(/נסיעה לשדה/.test(o[0].title)); assert.match(o[0].title, /^בעוד 2 דק׳/); console.log("airport departure reminder at 09:45 ✔");
 // פעילות שסומנה בוצע — אין תזכורת
 await call("PATCH", `/rooms/${CODE}.json`, { init: true, "status/d2-kolossi": "done" });
 assert.equal(await worker._tick(env, at("2026-11-28T08:15:00Z")), 0); console.log("done item: no reminder ✔");
