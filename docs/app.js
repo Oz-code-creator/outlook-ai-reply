@@ -210,10 +210,16 @@
     toast(`הועבר ל-${L.fmt(r5(start))}` + (shifted.length ? ` · הוזזו ${shifted.length} פעילויות` : "") + (blocked ? ` · ⚠ חופף ל"${blocked.title}" (נעולה)` : ""), true);
     return true;
   }
+  // גרירה לשינוי סדר ברשימת המידע: idx = המקום בין שאר השורות (בלי השורה הנגררת)
+  function reorderList(key, id, idx) {
+    const arr = lists()[key], i = arr.findIndex(x => x.id === id); if (i < 0 || idx === i) return false;
+    const others = arr.filter(x => x.id !== id); others.splice(idx, 0, arr[i]);
+    others.forEach((x, k) => { x.o = k; }); S.lists[key] = others; return true;
+  }
   function dragTarget(x, y) {
-    const el = document.elementFromPoint(x, y), tab = el && el.closest("#tabs button[data-d]");
+    const isList = !!(drag && drag.list), el = document.elementFromPoint(x, y), tab = !isList && el && el.closest("#tabs button[data-d]");
     if (tab && /^\d+$/.test(tab.dataset.d)) return { tab };
-    const cards = [...document.querySelectorAll("#list .item:not(.dragging)")];
+    const cards = [...document.querySelectorAll(isList ? "#list .li:not(.dragging)" : "#list .item:not(.dragging)")];
     let idx = cards.length;
     for (let k = 0; k < cards.length; k++) { const r = cards[k].getBoundingClientRect(); if (y < r.top + r.height / 2) { idx = k; break; } }
     return { idx, cards };
@@ -233,12 +239,13 @@
     drag.raf = requestAnimationFrame(dragLoop);
   }
   document.addEventListener("pointerdown", e => {
-    const g = e.target.closest(".grip"); if (!g || typeof selDay !== "number" || drag) return;
-    const card = g.closest(".item"), r = card.getBoundingClientRect();
+    const g = e.target.closest(".grip"); if (!g || drag) return;
+    const isList = !!g.dataset.lgrip; if (isList ? typeof selDay !== "string" : typeof selDay !== "number") return;
+    const card = g.closest(isList ? ".li" : ".item"), r = card.getBoundingClientRect();
     e.preventDefault(); try { g.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     const ghost = card.cloneNode(true); ghost.classList.add("ghost"); ghost.style.cssText = `width:${r.width}px;left:${r.left}px;top:${r.top}px`;
     document.body.appendChild(ghost); card.classList.add("dragging");
-    drag = { id: g.dataset.grip, card, ghost, g, pid: e.pointerId, dy: e.clientY - r.top, x: e.clientX, y: e.clientY, line: null, t: null, raf: 0 };
+    drag = { id: isList ? g.dataset.lid : g.dataset.grip, list: isList ? g.dataset.lgrip : null, card, ghost, g, pid: e.pointerId, dy: e.clientY - r.top, x: e.clientX, y: e.clientY, line: null, t: null, raf: 0 };
     drag.raf = requestAnimationFrame(dragLoop);
   });
   document.addEventListener("pointermove", e => { if (drag && e.pointerId === drag.pid) { drag.x = e.clientX; drag.y = e.clientY; } });
@@ -247,7 +254,8 @@
     const d = drag; cancelAnimationFrame(d.raf); drag = null;
     d.ghost.remove(); if (d.line) d.line.remove(); d.card.classList.remove("dragging");
     document.querySelectorAll("#tabs button.over").forEach(b => b.classList.remove("over"));
-    if (!cancel && d.t) {
+    if (!cancel && d.t && d.list) { if (reorderList(d.list, d.id, d.t.idx)) save(); }
+    else if (!cancel && d.t) {
       const snap = { ov: JSON.parse(JSON.stringify(S.ov || {})), added: JSON.parse(JSON.stringify(S.added || [])) };
       const changed = d.t.tab ? dropOnDay(d.id, +d.t.tab.dataset.d) : dropInList(d.id, d.t.idx);
       if (changed) { undoSnap = snap; save(); }
@@ -519,7 +527,7 @@
   }
   const linkify = s => s.replace(/(\+?\d[\d ]{6,}\d|\b112\b)/g, m => `<a href="tel:${m.replace(/\s/g, "")}">${m}</a>`);
   const rowHtml = (key, x, i, n) => LISTS[key].plain
-    ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><span class="mvb"><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="הזז למעלה">↑</button><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="1" ${i === n - 1 ? "disabled" : ""} aria-label="הזז למטה">↓</button></span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
+    ? `<div class="li"><span class="grip" data-lgrip="${key}" data-lid="${esc(x.id)}" aria-label="גרור לשינוי סדר">⠿</span><span class="tx">${linkify(esc(x.t))}</span><span class="mvb"><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="הזז למעלה">↑</button><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="1" ${i === n - 1 ? "disabled" : ""} aria-label="הזז למטה">↓</button></span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
     : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
   // טאב אלטרנטיבות (לקריאה בלבד): כרטיס לכל מקום, עם "איפה אפשר להכניס" וכפתור הוספה ללוח
   function altHtml() {
