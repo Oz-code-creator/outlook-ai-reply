@@ -7,14 +7,8 @@ await p.click("#tabs button[data-d='info']");
 const texts=async()=>p.$$eval(".li .tx",e=>e.map(x=>x.textContent));
 const t0=await texts();
 console.log("items:",t0.length,"| each row has a drag handle:",(await p.$$(".li .grip")).length===t0.length);
-console.log("first up disabled:",await p.$eval(".li:first-child button[data-dir='-1']",e=>e.disabled),"| last down disabled:",await p.$eval(".li:last-child button[data-dir='1']",e=>e.disabled));
-// ---- חצים ----
-await p.click(".li:nth-child(1) button[data-dir='1']");
-const t1=await texts();
-console.log("arrow: first moved down:",t1[1]===t0[0]&&t1[0]===t0[1]);
-await p.click(".li:nth-child(3) button[data-dir='-1']");
-const t2=await texts();
-console.log("arrow: third moved up:",t2[1]===t1[2]&&t2[2]===t1[1]);
+console.log("no arrow buttons:",(await p.$$("button[data-lmv]")).length===0);
+const t2=t0;
 // ---- גרירה בעכבר: השורה הראשונה לאחר השלישית ----
 const grip=async n=>{const bb=await (await p.$(`.li:nth-child(${n}) .grip`)).boundingBox();return {x:bb.x+bb.width/2,y:bb.y+bb.height/2}};
 const rowBox=async n=>(await (await p.$(`.li:nth-child(${n})`)).boundingBox());

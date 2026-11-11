@@ -124,11 +124,6 @@
       openAdapt(); $("adText").value = `צפוי גשם ב${d.label}. הצע חלופות מתוך: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים והספא במלון, ושמור על ההזמנות.`;
       return;
     }
-    if (t.dataset.lmv) { // סידור ידני של רשימת המידע: ↑ ↓ (הסדר נשמר בשדה o ומסתנכרן)
-      const arr = lists()[t.dataset.lmv], i = arr.findIndex(x => x.id === t.dataset.lid), j = i + (+t.dataset.dir);
-      if (i >= 0 && j >= 0 && j < arr.length) { arr.forEach((x, k) => { x.o = k; }); [arr[i], arr[j]] = [arr[j], arr[i]]; arr[i].o = i; arr[j].o = j; save(); render(); }
-      return;
-    }
     if (t.dataset.lx) { const arr = lists()[t.dataset.lx], i = arr.findIndex(x => x.id === t.dataset.lid); if (i >= 0) { arr.splice(i, 1); save(); render(); } return; }
     if (t.dataset.mic) { dictate(t.dataset.mic); return; }
     if (t.dataset.ladd) { addListItem(t.dataset.ladd); return; }
@@ -527,8 +522,8 @@
   }
   const linkify = s => s.replace(/(\+?\d[\d ]{6,}\d|\b112\b)/g, m => `<a href="tel:${m.replace(/\s/g, "")}">${m}</a>`);
   const rowHtml = (key, x, i, n) => LISTS[key].plain
-    ? `<div class="li"><span class="grip" data-lgrip="${key}" data-lid="${esc(x.id)}" aria-label="גרור לשינוי סדר">⠿</span><span class="tx">${linkify(esc(x.t))}</span><span class="mvb"><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="הזז למעלה">↑</button><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="1" ${i === n - 1 ? "disabled" : ""} aria-label="הזז למטה">↓</button></span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
-    : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
+    ? `<div class="li"><span class="grip" data-lgrip="${key}" data-lid="${esc(x.id)}" aria-label="גרור לשינוי סדר">⠿</span><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
+    :`<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
   // טאב אלטרנטיבות (לקריאה בלבד): כרטיס לכל מקום, עם "איפה אפשר להכניס" וכפתור הוספה ללוח
   function altHtml() {
     const map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q), groups = [["food", "🍽 מסעדות"], ["sight", "📍 אתרים"]];
