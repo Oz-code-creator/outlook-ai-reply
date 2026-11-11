@@ -79,3 +79,4 @@ nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
   #printRoot li{margin:2pt 0}
 }
 .simbar{display:block;width:calc(100% + 28px);margin:8px -14px -10px;padding:7px 14px;border:0;background:#b3261e;color:#fff;font-weight:700;font-size:14px;text-align:center;cursor:pointer}.simbar[hidden]{display:none}
+.mvb{display:flex;flex:none}.mvb button{border:0;background:none;color:var(--mut);font-size:17px;padding:4px 7px}.mvb button:disabled{opacity:.25}

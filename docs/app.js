@@ -124,6 +124,11 @@
       openAdapt(); $("adText").value = `צפוי גשם ב${d.label}. הצע חלופות מתוך: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים והספא במלון, ושמור על ההזמנות.`;
       return;
     }
+    if (t.dataset.lmv) { // סידור ידני של רשימת המידע: ↑ ↓ (הסדר נשמר בשדה o ומסתנכרן)
+      const arr = lists()[t.dataset.lmv], i = arr.findIndex(x => x.id === t.dataset.lid), j = i + (+t.dataset.dir);
+      if (i >= 0 && j >= 0 && j < arr.length) { arr.forEach((x, k) => { x.o = k; }); [arr[i], arr[j]] = [arr[j], arr[i]]; arr[i].o = i; arr[j].o = j; save(); render(); }
+      return;
+    }
     if (t.dataset.lx) { const arr = lists()[t.dataset.lx], i = arr.findIndex(x => x.id === t.dataset.lid); if (i >= 0) { arr.splice(i, 1); save(); render(); } return; }
     if (t.dataset.mic) { dictate(t.dataset.mic); return; }
     if (t.dataset.ladd) { addListItem(t.dataset.ladd); return; }
@@ -513,8 +518,8 @@
     return S.lists;
   }
   const linkify = s => s.replace(/(\+?\d[\d ]{6,}\d|\b112\b)/g, m => `<a href="tel:${m.replace(/\s/g, "")}">${m}</a>`);
-  const rowHtml = (key, x) => LISTS[key].plain
-    ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
+  const rowHtml = (key, x, i, n) => LISTS[key].plain
+    ? `<div class="li"><span class="tx">${linkify(esc(x.t))}</span><span class="mvb"><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="הזז למעלה">↑</button><button data-lmv="${key}" data-lid="${esc(x.id)}" data-dir="1" ${i === n - 1 ? "disabled" : ""} aria-label="הזז למטה">↓</button></span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
     : `<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
   // טאב אלטרנטיבות (לקריאה בלבד): כרטיס לכל מקום, עם "איפה אפשר להכניס" וכפתור הוספה ללוח
   function altHtml() {
@@ -536,7 +541,7 @@
   function listHtml(key) {
     const arr = lists()[key], done = arr.filter(x => x.done).length;
     return `<div class="theme">${LISTS[key].title}${LISTS[key].plain ? "" : " · " + done + "/" + arr.length}</div>
-      <div class="lst">${arr.map(x => rowHtml(key, x)).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
+      <div class="lst">${arr.map((x, i) => rowHtml(key, x, i, arr.length)).join("") || "<p class='muted'>הרשימה ריקה.</p>"}</div>
       <div class="add"><input id="liNew" data-key="${key}" placeholder="הוסיפו פריט…" maxlength="120">${SR ? `<button class="mic" id="liMic" data-mic="${key}" aria-label="הקלטה קולית">🎤</button>` : ""}<button class="primary" data-ladd="${key}">הוסף</button></div>
       <div id="liHint" class="muted" style="margin:6px 4px"></div>
       <div class="acts" style="margin:10px 4px">${window.Sync && Sync.enabled() ? '<button data-share="1">📤 הזמן את בן/בת הזוג</button>' : ""}<button data-lreset="${key}">↺ ברירת מחדל</button></div>`;
