@@ -590,6 +590,15 @@
     const c = e.target.closest("input[data-lk]"); if (!c) return;
     const it = lists()[c.dataset.lk].find(x => x.id === c.dataset.lid); if (it) { it.done = c.checked; save(); render(); }
   });
+  // הדבקת כמה שורות בשדה ההוספה: כל שורה הופכת לפריט (לפרטי טיסות והזמנות, שנשמרים רק בחדר הפרטי)
+  document.addEventListener("paste", e => {
+    if (!e.target || e.target.id !== "liNew") return;
+    const lines = String((e.clipboardData || window.clipboardData).getData("text") || "").split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+    if (lines.length < 2) return;
+    e.preventDefault(); const key = e.target.dataset.key;
+    lines.forEach((t, i) => lists()[key].push({ id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5) + i, t: t.slice(0, 300), done: false, o: Date.now() + i }));
+    save(); render();
+  });
   document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "liNew") { e.preventDefault(); addListItem(e.target.dataset.key); } });
 
   // ---- שיתוף עם בן/בת הזוג (קישור עם הרשימות והסימונים; בלי מפתח ה-API) ----
