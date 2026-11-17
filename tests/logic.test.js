@@ -17,9 +17,9 @@ S = { status: {}, ov: {}, added: [] };
 const meze = P.items.find(i => i.id === "d2-dinner");
 const slot = L.findSlot(P, S, Object.assign({}, meze, { fixed: false, start: L.toMin(meze.start) }), { day: 2, min: L.toMin("21:00") });
 console.log("meze slot", slot); assert(!slot || slot.day !== 3);
-// איחור של 60 דקות ביום 1 ב-14:30
+// איחור של 60 דקות ביום 1 ב-16:00
 S = { status: { "d1-lunch": "done" }, ov: {}, added: [] };
-const sp = L.shiftProposal(P, S, { day: 1, min: L.toMin("14:30") }, 60); console.log(sp.text);
+const sp = L.shiftProposal(P, S, { day: 1, min: L.toMin("16:00") }, 60); console.log(sp.text);
 assert(sp.ops.every(o => o.op !== "move" || o.start + 0 > 0));
 // אימות AI
 const v = L.validateProposals(P, S, [{ text: "x", ops: [{ op: "move", id: "nope", day: 1, start: "10:00" }, { op: "move", id: "d1-port", day: 9, start: "10:00" }, { op: "skip", id: "d1-port" }, { op: "add", item: { title: "קפה", type: "food", day: 1, start: "17:00", dur: 45 } }] }, { text: 3 }]);
