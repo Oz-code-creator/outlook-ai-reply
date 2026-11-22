@@ -24,7 +24,7 @@ assert.equal(await worker._tick(env, at("2026-11-29T08:50:00Z")), 0); console.lo
 assert.equal(await worker._tick(env, at("2026-11-29T17:35:00Z")), 0); console.log("unbooked dinner: no reminder ✔");
 await call("PATCH", `/rooms/${CODE}.json`, { init: true, "booked/d3-dinner": true });
 assert.equal(await worker._tick(env, at("2026-11-29T17:36:00Z")), 1); o = await out(); assert.match(o[0].title, /Kai Sushi/); console.log("booked dinner reminder 30m ✔");
-// צהריים לא קבוע (Iason 13:15): אין תזכורת
+// צהריים לא קבוע (Iason 13:00): אין תזכורת
 assert.equal(await worker._tick(env, at("2026-11-29T11:00:00Z")), 0); console.log("regular lunch: no reminder ✔");
 // יום 4: נסיעה לשדה 10:45 → תזכורת 10:25
 assert.equal(await worker._tick(env, at("2026-11-30T07:43:00Z")), 1); o = await out(); assert.ok(/נסיעה לשדה/.test(o[0].title)); assert.match(o[0].title, /^בעוד 2 דק׳/); console.log("airport departure reminder at 09:45 ✔");
@@ -50,9 +50,9 @@ await worker._tick(env, at("2026-11-29T07:26:00Z")); // 09:26
 o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^צריך לצאת בעוד 39 דק׳: פאנו לפקארה/); console.log("custom lead 40 min before leaving ✔");
 await worker._tick(env, at("2026-11-29T08:05:00Z")); // 10:05: שעת הבוקר שנקבעה
 o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^בוקר טוב/); console.log("custom morning 10:00 ✔");
-await worker._tick(env, at("2026-11-29T11:30:00Z")); // 13:30: לפקארה נגמרת 13:15, ההגדרה 30 דק' אחרי
+await worker._tick(env, at("2026-11-29T11:15:00Z")); // 13:15: לפקארה נגמרת 13:00, ההגדרה 30 דק׳ אחרי
 assert.equal((await out2()).length, 0);
-await worker._tick(env, at("2026-11-29T11:46:00Z")); // 13:46
+await worker._tick(env, at("2026-11-29T11:31:00Z")); // 13:31
 o = await out2(); assert.equal(o.length, 1); assert.match(o[0].title, /^הספקתם\? פאנו לפקארה/); console.log("custom after 30 min ✔");
 await call("PATCH", `/rooms/${CODE2}.json`, { "status/d3-olive": "done", "status/d3-view": "done" }); // חוות הזיתים והתצפית כבר סומנו, כדי לא להפריע לבדיקה
 // ערכים לא תקינים: חסומים לטווח (ארוחה בערב 20:00, נסיעה 10 דק' → יציאה 19:50, foodLead=9999 → 120 → מתריעים מ-17:50)
