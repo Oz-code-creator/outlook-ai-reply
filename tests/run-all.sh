@@ -3,13 +3,13 @@
 # דרישות: node 20+, python3, playwright גלובלי (NODE_PATH). פורטים 8766 (האתר) ו-8767 (שרת סנכרון מדומה).
 cd "$(dirname "$0")" || exit 1
 ROOT="$(cd .. && pwd)"
-cp "$ROOT/cyprus-worker/sync-worker.js" sync-worker.mjs
+node prepare.mjs || exit 1
 export NODE_PATH="$(npm root -g)"
-(cd "$ROOT/docs" && python3 -m http.server 8766 >/dev/null 2>&1 & echo $! > /tmp/cyprus-http.pid)
+(cd "$ROOT/tests/.site" && python3 -m http.server 8766 >/dev/null 2>&1 & echo $! > /tmp/cyprus-http.pid)
 node mock-sync-server.mjs >/dev/null 2>&1 & echo $! > /tmp/cyprus-sync.pid
 sleep 1.5
 fail=0
-for f in logic.test.js worker-*.test.mjs service-worker.test.mjs; do
+for f in logic.test.js plan-live.test.js worker-*.test.mjs service-worker.test.mjs; do
   if node "$f" >/tmp/cyprus-test.out 2>&1; then echo "PASS $f"; else echo "FAIL $f"; tail -5 /tmp/cyprus-test.out; fail=1; fi
 done
 for f in ui-*.js; do

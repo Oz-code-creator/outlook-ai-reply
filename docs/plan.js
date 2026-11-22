@@ -3,8 +3,8 @@ window.PLAN = {
   title: "לימסול 27–30.11.2026",
   days: [
     { n: 1, date: "2026-11-27", label: "שישי 27/11", theme: "נחיתה, עיר עתיקה וסריפולו" },
-    { n: 2, date: "2026-11-28", label: "שבת 28/11", theme: "קולוסי, יין וקוריון" },
-    { n: 3, date: "2026-11-29", label: "ראשון 29/11", theme: "לפקארה, חוות זיתים ותצפית" },
+    { n: 2, date: "2026-11-28", label: "שבת 28/11", theme: "לפקארה, חוות זיתים ותצפית" },
+    { n: 3, date: "2026-11-29", label: "ראשון 29/11", theme: "קולוסי, יין וקוריון" },
     { n: 4, date: "2026-11-30", label: "שני 30/11", theme: "חזרה" }
   ],
   // חלון שימושי לכל יום (לשיבוץ מחדש)
@@ -14,7 +14,7 @@ window.PLAN = {
     "מלון בחוף לימסול המזרחי (~15 דקות מהעיר העתיקה).",
     "מזג אוויר: ~22°C ביום, ~17°C בלילה, שקיעה ~16:30–16:45. הים קריר.",
     "העדפות: יציאה בכל ערב, הפסקת התרעננות בחדר אחה״צ, ארוחות מסורתיות עם קצת גיוון, מחיר לא משנה.",
-    "לפקארה ביום ראשון (לא בשבת). MEZE Taverna סגורה בראשון.",
+    "לפקארה בשבת (הוחלף עם ראשון בגלל מזג האוויר). MEZE Taverna סגורה בראשון, ולכן ארוחת הערב שלה נשארת בשבת. קולוסי וקוריון בראשון.",
     "טיסה חזרה 30/11 ב-14:05 מלרנקה; יציאה מהמלון ב-9:45, החזרת הרכב בשדה לפני 11:00 וצ׳ק-אין עד 11:05.",
     "תכנית גשם: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים, הספא במלון.",
     "נהיגה בצד שמאל. שוכרים רכב: איסוף בשישי 13:30 בשדה לרנקה. בשובר ההחזרה בשני 13:30 באותו שדה, אבל מחזירים לפני 11:00 בגלל הצ׳ק-אין."
@@ -30,19 +30,19 @@ window.PLAN = {
     { id: "d1-night", trip: [5, "walk", "Mazema"], day: 1, start: "21:45", dur: 60, type: "food", title: "בילוי בסריפולו: דרינק או קוקטייל", notes: "רחוב וכיכר סריפולו: מדרחוב עם ברים, פאבים ובתי קפה, הכי תוסס בשישי בערב. בברים בכיכר: Salut (Saripolou 71-73), (in)Theory (קוקטייל בר, Saripolou 53), Blue Apple (פתוח 17:00–02:00).", lat: 34.6754273, lng: 33.0431423, radius: 300 },
 
     { id: "d2-bf", day: 2, start: "08:30", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d2-kolossi", trip: [25, "drive", "המלון"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d313647-Reviews-Kolossi_Castle-Limassol_City_Limassol.html", day: 2, start: "10:30", dur: 45, type: "sight", daylight: true, open: "08:30", close: "17:00", title: "טירת קולוסי", notes: "שעות חורף 8:30–17:00. כאן ישבו האבירים ההוספיטלרים, ומהם קיבל היין Commandaria את שמו (הטעימה הבאה).", lat: 34.6644, lng: 32.9306 },
-    { id: "d2-commandaria", trip: [5, "drive", "קולוסי"], ta: "https://www.tripadvisor.com/Attraction_Review-g1916966-d1759181-Reviews-Cyprus_Wine_Museum-Erimi_Limassol.html", day: 2, start: "11:15", dur: 30, type: "shop", open: "10:00", close: "17:00", title: "טעימת Commandaria במוזיאון היין (ארימי)", lat: 34.670617, lng: 32.911833, radius: 200, notes: "The Cyprus Wine Museum, 42 Pafou, ארימי: כ-3 דקות נסיעה מקולוסי, ובדרך לקוריון. טעימות מודרכות של כמה סגנונות Commandaria (יין הקינוח העתיק שנולד באזור קולוסי). כניסה כ-4–5 יורו, וחבילה עם טעימה כ-10 יורו (לפי אתרי תיירות). אפשר לקנות בקבוק.", reserve: "שעות לפי מקורות שונים: 9:00–17:00 או 10:00–17:00. לוודא בטלפון +357 25 873808 או ב-cypruswinemuseum.com" },
-    { id: "d2-kourion", trip: [5, "drive", "מוזיאון היין"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527735-Reviews-Kourion-Limassol_City_Limassol.html", day: 2, start: "11:45", dur: 120, type: "sight", daylight: true, close: "17:00", title: "קוריון העתיקה", notes: "אמפיתיאטרון ופסיפסים.", reserve: "לאשר טלפונית שהאתר פתוח: +357 25 934250", lat: 34.6641, lng: 32.8856 },
-    { id: "d2-lunch", trip: [5, "drive", "קוריון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2221890-Reviews-Chris_Blue_Beach-Limassol_City_Limassol.html", day: 2, start: "13:45", dur: 90, type: "food", title: "צהריים – Chris Blue Beach", notes: "חוף קוריון, פתוחה 8:30–22:30.", lat: 34.6658863, lng: 32.8771663 },
-    { id: "d2-spa", trip: [35, "drive", "חוף קוריון"], book: true, day: 2, start: "16:30", dur: 120, type: "rest", soft: true, title: "ספא או מנוחה במלון", notes: "ספא פתוח 9:00–20:00. כדאי טיפול זוגי עם ג׳קוזי.", reserve: "לשריין טיפול זוגי מראש", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d2-kolossi", trip: [25, "drive", "המלון"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d313647-Reviews-Kolossi_Castle-Limassol_City_Limassol.html", day: 3, start: "10:30", dur: 45, type: "sight", daylight: true, open: "08:30", close: "17:00", title: "טירת קולוסי", notes: "שעות חורף 8:30–17:00. כאן ישבו האבירים ההוספיטלרים, ומהם קיבל היין Commandaria את שמו (הטעימה הבאה).", lat: 34.6644, lng: 32.9306 },
+    { id: "d2-commandaria", trip: [5, "drive", "קולוסי"], ta: "https://www.tripadvisor.com/Attraction_Review-g1916966-d1759181-Reviews-Cyprus_Wine_Museum-Erimi_Limassol.html", day: 3, start: "11:15", dur: 30, type: "shop", open: "10:00", close: "17:00", title: "טעימת Commandaria במוזיאון היין (ארימי)", lat: 34.670617, lng: 32.911833, radius: 200, notes: "The Cyprus Wine Museum, 42 Pafou, ארימי: כ-3 דקות נסיעה מקולוסי, ובדרך לקוריון. טעימות מודרכות של כמה סגנונות Commandaria (יין הקינוח העתיק שנולד באזור קולוסי). כניסה כ-4–5 יורו, וחבילה עם טעימה כ-10 יורו (לפי אתרי תיירות). אפשר לקנות בקבוק.", reserve: "שעות לפי מקורות שונים: 9:00–17:00 או 10:00–17:00. לוודא בטלפון +357 25 873808 או ב-cypruswinemuseum.com" },
+    { id: "d2-kourion", trip: [5, "drive", "מוזיאון היין"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527735-Reviews-Kourion-Limassol_City_Limassol.html", day: 3, start: "11:45", dur: 120, type: "sight", daylight: true, close: "17:00", title: "קוריון העתיקה", notes: "אמפיתיאטרון ופסיפסים.", reserve: "לאשר טלפונית שהאתר פתוח: +357 25 934250", lat: 34.6641, lng: 32.8856 },
+    { id: "d2-lunch", trip: [5, "drive", "קוריון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2221890-Reviews-Chris_Blue_Beach-Limassol_City_Limassol.html", day: 3, start: "13:45", dur: 90, type: "food", title: "צהריים – Chris Blue Beach", notes: "חוף קוריון, פתוחה 8:30–22:30.", lat: 34.6658863, lng: 32.8771663 },
+    { id: "d2-spa", trip: [35, "drive", "חוף קוריון"], book: true, day: 3, start: "16:30", dur: 120, type: "rest", soft: true, title: "ספא או מנוחה במלון", notes: "ספא פתוח 9:00–20:00. כדאי טיפול זוגי עם ג׳קוזי.", reserve: "לשריין טיפול זוגי מראש", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d2-dinner", trip: [15, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2369481-Reviews-Meze_Taverna_Restaurant-Limassol_City_Limassol.html", day: 2, start: "19:30", dur: 100, type: "food", fixed: true, closedDays: ["2026-11-29"], title: "ארוחת ערב – MEZE Taverna", notes: "אגיו אנדראו 209. פתוחה עד 22:00, סגורה בראשון.", reserve: "חובה להזמין: +357 25 367333", lat: 34.6764937, lng: 33.0475766 },
 
     { id: "d3-bf", day: 3, start: "08:45", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d3-lefkara", trip: [55, "drive", "המלון"], ta: "https://www.tripadvisor.com/Tourism-g1900120-Pano_Lefkara_Larnaka_District-Vacations.html", day: 3, start: "11:00", dur: 135, type: "shop", daylight: true, title: "פאנו לפקארה – תחרה, כסף ומתנות", notes: "המוזיאון המקומי, כנסיית הצלב הקדוש (Timios Stavros), וכפר חג המולד: פעיל בסוף השבוע 28–29/11 לפי Visit Cyprus (שעות לא ידועות: לבדוק באתר לפני). כשעה לקניות: תחרה וכסף. לבוש חם (650 מ׳). הדרך בתוך הכפר: בטאב 🗺.", lat: 34.8666, lng: 33.3028, radius: 600 },
-    { id: "d3-lunch", trip: [5, "walk", "מרכז הכפר"], book: true, ta2: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d33049687-Reviews-To_Piperi_Tavern-Pano_Lefkara_Larnaka_District.html", ta: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d27781720-Reviews-Iason_Tavern-Pano_Lefkara_Larnaka_District.html", day: 3, start: "13:15", dur: 90, type: "food", open: "12:00", close: "18:30", title: "צהריים – Iason Tavern (גיבוי: To Piperi)", notes: "ראשון 12:00–18:30. To Piperi: 11:30–17:00.", reserve: "אולי להזמין: +357 99 668930", lat: 34.8672, lng: 33.3033, radius: 400 },
-    { id: "d3-olive", trip: [5, "drive", "לפקארה"], ta: "https://www.tripadvisor.com/Attraction_Review-g1900120-d14134973-Reviews-Terra_Oliva-Pano_Lefkara_Larnaka_District.html", day: 3, start: "14:50", dur: 30, type: "sight", title: "חוות הזיתים האורגנית Terra Oliva", lat: 34.873001, lng: 33.293633, radius: 300, notes: "החווה כקילומטר מהכפר: Isaac and Solomou Road 12, פאנו לפקארה (olivaterra.eu). כניסה חופשית, חנות עם טעימות. ביקור קצר של 30 דק׳ (ביקור מלא נמשך בדרך כלל כשעה וחצי).", reserve: "שעות חורף לפי אתר צד שלישי: 8:00–17:00. כדאי לוודא באתר לפני" },
-    { id: "d3-view", trip: [10, "drive", "חוות הזיתים"], day: 3, start: "15:30", dur: 30, type: "sight", daylight: true, title: "נקודת תצפית", notes: "נוסעים עוד כ-6 ק״מ מחוות הזיתים לכיוון הכפר Vavatsinia (פחות מ-10 דקות לפי המפה), עד שרואים סככת תצפית מצד ימין. שביל עפר קצר מהכביש הראשי מוביל למצפור. חשוב: לצאת מלפקארה לא אחרי 15:45, כדי לחזור לפני החשכה (השקיעה ב-16:30–16:45). אם מתעכבים, לוותר על התצפית." },
-    { id: "d3-rest", trip: [60, "drive", "התצפית"], day: 3, start: "17:00", dur: 130, type: "rest", soft: true, title: "מנוחה במלון", notes: "מגיעים אחרי נסיעה של כשעה מלפקארה (הערכה). כשעתיים למנוחה לפני Kai Sushi.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d3-lefkara", trip: [55, "drive", "המלון"], ta: "https://www.tripadvisor.com/Tourism-g1900120-Pano_Lefkara_Larnaka_District-Vacations.html", day: 2, start: "11:00", dur: 135, type: "shop", daylight: true, title: "פאנו לפקארה – תחרה, כסף ומתנות", notes: "המוזיאון המקומי, כנסיית הצלב הקדוש (Timios Stavros), וכפר חג המולד: פעיל בסוף השבוע 28–29/11 לפי Visit Cyprus (שעות לא ידועות: לבדוק באתר לפני). כשעה לקניות: תחרה וכסף. לבוש חם (650 מ׳). הדרך בתוך הכפר: בטאב 🗺.", lat: 34.8666, lng: 33.3028, radius: 600 },
+    { id: "d3-lunch", trip: [5, "walk", "מרכז הכפר"], book: true, ta2: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d33049687-Reviews-To_Piperi_Tavern-Pano_Lefkara_Larnaka_District.html", ta: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d27781720-Reviews-Iason_Tavern-Pano_Lefkara_Larnaka_District.html", day: 2, start: "13:15", dur: 90, type: "food", open: "12:00", close: "18:30", title: "צהריים – Iason Tavern (גיבוי: To Piperi)", notes: "12:00–18:30 (לפי המידע לראשון, לשבת לא אומת). To Piperi: 11:30–17:00.", reserve: "אולי להזמין: +357 99 668930", lat: 34.8672, lng: 33.3033, radius: 400 },
+    { id: "d3-olive", trip: [5, "drive", "לפקארה"], ta: "https://www.tripadvisor.com/Attraction_Review-g1900120-d14134973-Reviews-Terra_Oliva-Pano_Lefkara_Larnaka_District.html", day: 2, start: "14:50", dur: 30, type: "sight", title: "חוות הזיתים האורגנית Terra Oliva", lat: 34.873001, lng: 33.293633, radius: 300, notes: "החווה כקילומטר מהכפר: Isaac and Solomou Road 12, פאנו לפקארה (olivaterra.eu). כניסה חופשית, חנות עם טעימות. ביקור קצר של 30 דק׳ (ביקור מלא נמשך בדרך כלל כשעה וחצי).", reserve: "שעות חורף לפי אתר צד שלישי: 8:00–17:00. כדאי לוודא באתר לפני" },
+    { id: "d3-view", trip: [10, "drive", "חוות הזיתים"], day: 2, start: "15:30", dur: 30, type: "sight", daylight: true, title: "נקודת תצפית", notes: "נוסעים עוד כ-6 ק״מ מחוות הזיתים לכיוון הכפר Vavatsinia (פחות מ-10 דקות לפי המפה), עד שרואים סככת תצפית מצד ימין. שביל עפר קצר מהכביש הראשי מוביל למצפור. חשוב: לצאת מלפקארה לא אחרי 15:45, כדי לחזור לפני החשכה (השקיעה ב-16:30–16:45). אם מתעכבים, לוותר על התצפית." },
+    { id: "d3-rest", trip: [60, "drive", "התצפית"], day: 2, start: "17:00", dur: 130, type: "rest", soft: true, title: "מנוחה במלון", notes: "מגיעים אחרי נסיעה של כשעה מלפקארה (הערכה). כשעתיים למנוחה לפני MEZE Taverna.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d3-dinner", trip: [10, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d26223615-Reviews-Kai_Sushi_Bar_Limassol-Limassol_City_Limassol.html", day: 3, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Kai Sushi", notes: "קראון פלאזה, 18:00–23:00.", reserve: "הזמנה דרך המלון: +357 25 851515", lat: 34.688916, lng: 33.0711665 },
 
     { id: "d4-bf", day: 4, start: "08:30", dur: 45, type: "food", fixed: true, title: "ארוחת בוקר", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -157,6 +157,10 @@ window.PLAN.listMigrations = [
   { id: "m11t", list: "todo", remove: ["m9t-b"], add: [
     { id: "m11t-a", t: "ביום שישי: טיסה ב-11:40 מטרמינל 3 בבן-גוריון, להגיע עד 8:40. איסוף הרכב בלרנקה ב-13:30" },
     { id: "m11t-b", t: "לוודא מול אופרן/Europcar שאפשר להחזיר את הרכב ביום שני לפני 11:00 (בשובר ההחזרה ב-13:30)" }
+  ] },
+  { id: "m12", list: "todo", remove: ["d4", "m8-a"], add: [
+    { id: "m12-a", t: "אולי להזמין: Iason בלפקארה, שבת 13:15 (לוודא שעות פתיחה בשבת; גיבוי To Piperi)" },
+    { id: "m12-b", t: "להזמין טיפול ספא זוגי לראשון ~16:30 (עם ג׳קוזי). עוד לא הוזמן" }
   ] }
 ];
 
@@ -187,17 +191,17 @@ window.PLAN.alternatives = [
     addTitle: "ארוחת ערב – The Old Neighbourhood Fish Tavern", addType: "food", addDur: 90, addNotes: "טלפון: 25376082. לבדוק שעות פתיחה והזמנה" },
   { id: "alt-castle", kind: "sight", name: "טירת לימסול והמוזיאון הימי-ביניימי",
     about: "הטירה בעיר העתיקה, נסגרת ב-17:00 (לפי התוכנית, לא אומת). קרובה לסריפולו, לנמל ולאגיו אנדראו. ב-45 דקות רואים אותה. בשישי מסתכלים עליה רק מבחוץ בדרך לנמל.",
-    fit: "רק ביום שיש בו חלון לפני 17:00 בעיר. בשבת בין 15:30 ל-16:15, אחרי Chris Blue Beach ולפני הספא, זה צפוף",
+    fit: "רק ביום שיש בו חלון לפני 17:00 בעיר. בראשון בין 15:30 ל-16:15, אחרי Chris Blue Beach ולפני הספא, זה צפוף",
     lat: 34.6727, lng: 33.0431, mapq: "Limassol Castle", ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527729-Reviews-Limassol_Castle-Limassol_City_Limassol.html",
     addTitle: "טירת לימסול והמוזיאון הימי-ביניימי", addType: "sight", addDur: 45, addNotes: "נסגרת ב-17:00. קרובה לסריפולו ולאגיו אנדראו" },
   { id: "alt-shop", kind: "sight", name: "אגיו אנדראו: קניות ומתנות",
-    about: "רחוב קניות בעיר העתיקה, ליד הטירה. שעה למתנות. בשבת החנויות נסגרות מוקדם (בערך 19:00, לא אומת), וביום ראשון רובן סגורות (לא אומת). מתנות יש גם בלפקארה ביום ראשון ובשדה ביום שני.",
+    about: "רחוב קניות בעיר העתיקה, ליד הטירה. שעה למתנות. בשבת החנויות נסגרות מוקדם (בערך 19:00, לא אומת), וביום ראשון רובן סגורות (לא אומת). מתנות יש גם בלפקארה בשבת ובשדה ביום שני.",
     fit: "אם נשאר זמן בשישי אחה״צ או בשבת לפני 19:00",
     lat: 34.6764937, lng: 33.0475766, mapq: "Agiou Andreou Street Limassol", ta: "https://www.tripadvisor.com/Search?q=Agiou%20Andreou%20Limassol",
     addTitle: "אגיו אנדראו – קניות ומתנות", addType: "shop", addDur: 60, addNotes: "העיר העתיקה, ליד הטירה. שעה למתנות" },
   { id: "alt-garden", kind: "food", name: "The Garden",
     about: "מסעדה וקוקטייל בר עם גינה ירוקה ואווירה נעימה, Vasileos Georgiou 48A, Germasogeia. כ-700 מטר מהמלון, בערך 10 דקות הליכה. לפי TripAdvisor: מטבח איטלקי ויפני, 4.2 מ-542 ביקורות, אווירה 4.6, פתוחה עד חצות. ביקורות מציינות יין וקוקטיילים, ושירות איטי לפעמים. המחירים בינוניים-גבוהים, והאוכל פחות קפריסאי ויותר בינלאומי.",
-    fit: "קוקטייל ליד המלון בערב עייף, למשל בראשון אחרי יום לפקארה, בלי לנסוע לעיר העתיקה",
+    fit: "קוקטייל ליד המלון בערב עייף, למשל אחרי יום לפקארה, בלי לנסוע לעיר העתיקה",
     phone: "25101212", lat: 34.694611, lng: 33.088639, mapq: "The Garden Restaurant Vasileos Georgiou 48A Germasogeia Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g3359582-d3540323-Reviews-The_Garden_Restaurant-Germasogeia_Limassol.html", check: "לוודא שזו המסעדה שהמליצו עליה",
     addTitle: "קוקטייל ב-The Garden (ליד המלון)", addType: "food", addDur: 60, addNotes: "טלפון: 25101212. פתוחה עד חצות. כ-10 דקות הליכה מהמלון" }
 ];

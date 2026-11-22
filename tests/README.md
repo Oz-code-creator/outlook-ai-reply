@@ -12,3 +12,6 @@
 
 `mock-sync-server.mjs` מריץ את קוד ה-Worker האמיתי מול KV בזיכרון, עם Claude ושליחת דחיפה מדומים.
 `sync-worker.mjs` נוצר אוטומטית מ-`cyprus-worker/sync-worker.js` (לא נשמר ב-git).
+
+## הערה: סידור שבת וראשון
+בגרסה 57 הוחלפו תוכניות שבת וראשון. בדיקות המנגנונים (ui-*, worker-core/reminders) נכתבו על הסידור הישן, ולכן `prepare.mjs` (נקרא מ-`run-all.sh`) יוצר ב-`tests/.site` ו-`tests/sync-worker.mjs` עותקים עם הימים של 10 הפעילויות מוחזרים. כך שינויי תוכנית לא שוברים בדיקות של מנגנונים. `plan-live.test.js` ו-`logic.test.js` בודקים את התוכנית החיה עצמה.
