@@ -16,7 +16,7 @@ await A.click(card("קולוסי מוקדם")+" button[data-a='edit']");await A.
 // איפוס
 await A.click("#mvReset");console.log("after reset:",(await A.textContent(card("טירת קולוסי")+" .time")).replace(/\s+/g," ").trim());
 // עריכת פריט נעול (ארוחת ערב)
-await A.click(card("MEZE Taverna")+" button[data-a='edit']");await A.fill("#mvTime","19:45");await A.click("#mvOk");console.log("fixed item moved:",(await A.textContent(card("MEZE Taverna")+" .time")).replace(/\s+/g," ").trim());
+await A.click(card("Mostra Meze")+" button[data-a='edit']");await A.fill("#mvTime","19:45");await A.click("#mvOk");console.log("fixed item moved:",(await A.textContent(card("Mostra Meze")+" .time")).replace(/\s+/g," ").trim());
 // ולידציה
 await A.click("button[data-addday='2']");await A.click("#mvOk");console.log("validation:",(await A.textContent("#mvWarn")).trim(),"| dialog still open:",await A.isVisible("#dlgMove"));
 // הוספה
@@ -25,7 +25,7 @@ console.log("added:",(await A.textContent(card("קפה בחוף")+" h3")).includ
 // סנכרון
 await A.click("#btnSet");await A.fill("#syDb","http://localhost:8767");await A.click("#syGen");await A.click("#syStart");await A.waitForTimeout(900);await A.click("#syInvite");await wait(500);await A.keyboard.press("Escape");
 const B=await mk();B.on("dialog",d=>d.accept());await B.goto(inv);await B.waitForTimeout(1500);await B.click("#tabs button[data-d='2']");
-console.log("B sees edited fixed:",(await B.textContent(card("MEZE Taverna")+" .time")).replace(/\s+/g," ").trim(),"| B sees added:",await B.isVisible(card("קפה בחוף")));
+console.log("B sees edited fixed:",(await B.textContent(card("Mostra Meze")+" .time")).replace(/\s+/g," ").trim(),"| B sees added:",await B.isVisible(card("קפה בחוף")));
 // A משנה שם לפריט תוכנית ומוחק את הפעילות שנוספה
 await A.click(card("טעימת Commandaria")+" button[data-a='edit']");await A.fill("#mvName","קניות במרכז");await A.click("#mvOk");
 await A.click(card("קפה בחוף")+" button[data-a='edit']");await A.click("#mvDel");

@@ -14,7 +14,7 @@ window.PLAN = {
     "מלון בחוף לימסול המזרחי (~15 דקות מהעיר העתיקה).",
     "מזג אוויר: ~22°C ביום, ~17°C בלילה, שקיעה ~16:30–16:45. הים קריר.",
     "העדפות: יציאה בכל ערב, הפסקת התרעננות בחדר אחה״צ, ארוחות מסורתיות עם קצת גיוון, מחיר לא משנה.",
-    "לפקארה בשבת (הוחלף עם ראשון בגלל מזג האוויר). MEZE Taverna סגורה בראשון, ולכן ארוחת הערב שלה נשארת בשבת. קולוסי וקוריון בראשון.",
+    "לפקארה בשבת (הוחלף עם ראשון בגלל מזג האוויר). ארוחת הערב בשבת ב-Mostra Meze (הוזמן ל-20:30). קולוסי וקוריון בראשון.",
     "טיסה חזרה 30/11 ב-14:05 מלרנקה; יציאה מהמלון ב-9:45, החזרת הרכב בשדה לפני 11:00 וצ׳ק-אין עד 11:05.",
     "תכנית גשם: האגורה, מוזיאון Paradox במרינה, מתחם טחנת החרובים, הספא במלון.",
     "נהיגה בצד שמאל. שוכרים רכב: איסוף בשישי 13:30 בשדה לרנקה. בשובר ההחזרה בשני 13:30 באותו שדה, אבל מחזירים לפני 11:00 בגלל הצ׳ק-אין."
@@ -35,14 +35,14 @@ window.PLAN = {
     { id: "d2-kourion", trip: [5, "drive", "מוזיאון היין"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d527735-Reviews-Kourion-Limassol_City_Limassol.html", day: 3, start: "11:45", dur: 120, type: "sight", daylight: true, close: "17:00", title: "קוריון העתיקה", notes: "אמפיתיאטרון ופסיפסים.", reserve: "לאשר טלפונית שהאתר פתוח: +357 25 934250", lat: 34.6641, lng: 32.8856 },
     { id: "d2-lunch", trip: [5, "drive", "קוריון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2221890-Reviews-Chris_Blue_Beach-Limassol_City_Limassol.html", day: 3, start: "13:45", dur: 90, type: "food", title: "צהריים – Chris Blue Beach", notes: "חוף קוריון, פתוחה 8:30–22:30.", lat: 34.6658863, lng: 32.8771663 },
     { id: "d2-spa", trip: [35, "drive", "חוף קוריון"], book: true, day: 3, start: "16:30", dur: 120, type: "rest", soft: true, title: "ספא או מנוחה במלון", notes: "ספא פתוח 9:00–20:00. כדאי טיפול זוגי עם ג׳קוזי.", reserve: "לשריין טיפול זוגי מראש", lat: 34.6974038, lng: 33.0949755, radius: 300 },
-    { id: "d2-dinner", trip: [15, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2369481-Reviews-Meze_Taverna_Restaurant-Limassol_City_Limassol.html", day: 2, start: "19:30", dur: 100, type: "food", fixed: true, closedDays: ["2026-11-29"], title: "ארוחת ערב – MEZE Taverna", notes: "אגיו אנדראו 209. פתוחה עד 22:00, סגורה בראשון.", reserve: "חובה להזמין: +357 25 367333", lat: 34.6764937, lng: 33.0475766 },
+    { id: "d2-dinner", trip: [15, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d23873437-Reviews-Mostra_Meze_Tavern-Limassol_City_Limassol.html", day: 2, start: "20:30", dur: 100, type: "food", fixed: true, title: "ארוחת ערב – Mostra Meze", notes: "מזה קפריסאית, סריפולו 41 (העיר העתיקה). הוזמן לשבת 20:30 לשניים (אישור מ-22/11).", reserve: "טלפון המסעדה: +357 25 101 251", lat: 34.6754273, lng: 33.0431423 },
 
     { id: "d3-bf", day: 3, start: "08:45", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d3-lefkara", trip: [55, "drive", "המלון"], ta: "https://www.tripadvisor.com/Tourism-g1900120-Pano_Lefkara_Larnaka_District-Vacations.html", day: 2, start: "11:00", dur: 135, type: "shop", daylight: true, title: "פאנו לפקארה – תחרה, כסף ומתנות", notes: "המוזיאון המקומי, כנסיית הצלב הקדוש (Timios Stavros), וכפר חג המולד: פעיל בסוף השבוע 28–29/11 לפי Visit Cyprus (שעות לא ידועות: לבדוק באתר לפני). כשעה לקניות: תחרה וכסף. לבוש חם (650 מ׳). הדרך בתוך הכפר: בטאב 🗺.", lat: 34.8666, lng: 33.3028, radius: 600 },
     { id: "d3-lunch", trip: [5, "walk", "מרכז הכפר"], book: true, ta2: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d33049687-Reviews-To_Piperi_Tavern-Pano_Lefkara_Larnaka_District.html", ta: "https://www.tripadvisor.com/Restaurant_Review-g1900120-d27781720-Reviews-Iason_Tavern-Pano_Lefkara_Larnaka_District.html", day: 2, start: "13:15", dur: 90, type: "food", open: "12:00", close: "18:30", title: "צהריים – Iason Tavern (גיבוי: To Piperi)", notes: "12:00–18:30 (לפי המידע לראשון, לשבת לא אומת). To Piperi: 11:30–17:00.", reserve: "אולי להזמין: +357 99 668930", lat: 34.8672, lng: 33.3033, radius: 400 },
     { id: "d3-olive", trip: [5, "drive", "לפקארה"], ta: "https://www.tripadvisor.com/Attraction_Review-g1900120-d14134973-Reviews-Terra_Oliva-Pano_Lefkara_Larnaka_District.html", day: 2, start: "14:50", dur: 30, type: "sight", title: "חוות הזיתים האורגנית Terra Oliva", lat: 34.873001, lng: 33.293633, radius: 300, notes: "החווה כקילומטר מהכפר: Isaac and Solomou Road 12, פאנו לפקארה (olivaterra.eu). כניסה חופשית, חנות עם טעימות. ביקור קצר של 30 דק׳ (ביקור מלא נמשך בדרך כלל כשעה וחצי).", reserve: "שעות חורף לפי אתר צד שלישי: 8:00–17:00. כדאי לוודא באתר לפני" },
     { id: "d3-view", trip: [10, "drive", "חוות הזיתים"], day: 2, start: "15:30", dur: 30, type: "sight", daylight: true, title: "נקודת תצפית", notes: "נוסעים עוד כ-6 ק״מ מחוות הזיתים לכיוון הכפר Vavatsinia (פחות מ-10 דקות לפי המפה), עד שרואים סככת תצפית מצד ימין. שביל עפר קצר מהכביש הראשי מוביל למצפור. חשוב: לצאת מלפקארה לא אחרי 15:45, כדי לחזור לפני החשכה (השקיעה ב-16:30–16:45). אם מתעכבים, לוותר על התצפית." },
-    { id: "d3-rest", trip: [60, "drive", "התצפית"], day: 2, start: "17:00", dur: 130, type: "rest", soft: true, title: "מנוחה במלון", notes: "מגיעים אחרי נסיעה של כשעה מלפקארה (הערכה). כשעתיים למנוחה לפני MEZE Taverna.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
+    { id: "d3-rest", trip: [60, "drive", "התצפית"], day: 2, start: "17:00", dur: 130, type: "rest", soft: true, title: "מנוחה במלון", notes: "מגיעים אחרי נסיעה של כשעה מלפקארה (הערכה). כשעתיים למנוחה לפני Mostra Meze.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d3-dinner", trip: [10, "drive", "המלון"], book: true, ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d26223615-Reviews-Kai_Sushi_Bar_Limassol-Limassol_City_Limassol.html", day: 3, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Kai Sushi", notes: "קראון פלאזה, 18:00–23:00.", reserve: "הזמנה דרך המלון: +357 25 851515", lat: 34.688916, lng: 33.0711665 },
 
     { id: "d4-bf", day: 4, start: "08:30", dur: 45, type: "food", fixed: true, title: "ארוחת בוקר", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -161,6 +161,12 @@ window.PLAN.listMigrations = [
   { id: "m12", list: "todo", remove: ["d4", "m8-a"], add: [
     { id: "m12-a", t: "אולי להזמין: Iason בלפקארה, שבת 13:15 (לוודא שעות פתיחה בשבת; גיבוי To Piperi)" },
     { id: "m12-b", t: "להזמין טיפול ספא זוגי לראשון ~16:30 (עם ג׳קוזי). עוד לא הוזמן" }
+  ] },
+  { id: "m13", list: "todo", remove: ["d2", "d6"], add: [
+    { id: "m13-a", t: "שבת 20:30: Mostra Meze הוזמן. אין צורך להזמין ב-MEZE Taverna" }
+  ] },
+  { id: "m13i", list: "info", remove: ["d7"], add: [
+    { id: "m13i-a", t: "Mostra Meze (שבת 20:30, הוזמן לשניים): +357 25 101 251" }
   ] }
 ];
 
@@ -199,6 +205,11 @@ window.PLAN.alternatives = [
     fit: "אם נשאר זמן בשישי אחה״צ או בשבת לפני 19:00",
     lat: 34.6764937, lng: 33.0475766, mapq: "Agiou Andreou Street Limassol", ta: "https://www.tripadvisor.com/Search?q=Agiou%20Andreou%20Limassol",
     addTitle: "אגיו אנדראו – קניות ומתנות", addType: "shop", addDur: 60, addNotes: "העיר העתיקה, ליד הטירה. שעה למתנות" },
+  { id: "alt-meze", kind: "food", name: "MEZE Taverna",
+    about: "מזה קפריסאית (כולל דגים), אגיו אנדראו 209. פתוחה עד 22:00 וסגורה בראשון (לפי התוכנית הקודמת, לא אומת). חובה להזמין: +357 25 367333. דירוג 4.7 מ-1,733 ביקורות ב-TripAdvisor (לפי תוצאות חיפוש).",
+    fit: "במקום ארוחת ערב אחרת בשישי או בשבת, אם Mostra Meze לא מתאימה. דומה בסגנון ל-Mostra Meze, ולכן לא באותו יום",
+    phone: "25367333", lat: 34.6764937, lng: 33.0475766, mapq: "MEZE Taverna Restaurant Limassol", ta: "https://www.tripadvisor.com/Restaurant_Review-g190382-d2369481-Reviews-Meze_Taverna_Restaurant-Limassol_City_Limassol.html",
+    addTitle: "ארוחת ערב – MEZE Taverna", addType: "food", addDur: 100, addNotes: "חובה להזמין: +357 25 367333" },
   { id: "alt-garden", kind: "food", name: "The Garden",
     about: "מסעדה וקוקטייל בר עם גינה ירוקה ואווירה נעימה, Vasileos Georgiou 48A, Germasogeia. כ-700 מטר מהמלון, בערך 10 דקות הליכה. לפי TripAdvisor: מטבח איטלקי ויפני, 4.2 מ-542 ביקורות, אווירה 4.6, פתוחה עד חצות. ביקורות מציינות יין וקוקטיילים, ושירות איטי לפעמים. המחירים בינוניים-גבוהים, והאוכל פחות קפריסאי ויותר בינלאומי.",
     fit: "קוקטייל ליד המלון בערב עייף, למשל אחרי יום לפקארה, בלי לנסוע לעיר העתיקה",
