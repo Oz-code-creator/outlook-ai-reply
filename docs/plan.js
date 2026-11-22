@@ -26,7 +26,7 @@ window.PLAN = {
     { id: "d1-lunch", trip: [10, "walk", "המלון"], ta: "https://www.tripadvisor.com/Restaurant_Review-g3359582-d3540323-Reviews-The_Garden_Restaurant-Germasogeia_Limassol.html", day: 1, start: "15:15", dur: 75, type: "food", title: "ארוחת צהריים – The Garden", notes: "איטלקי ויפני, Georgiou A 48, גרמסוגיה: כ-700 מטר מהמלון, כ-10 דקות הליכה. פתוחה כל יום 12:00–24:00 (לפי אתר ספרייה, לא אומת). אפשר לבקש ארוחה קלה, כי הארוחה הבאה ב-20:00.", reserve: "טלפון: +357 25 101 212. לוודא שפתוחה בצהריים", lat: 34.694611, lng: 33.088639 },
     { id: "d1-rest", day: 1, start: "16:30", dur: 105, type: "rest", soft: true, title: "מנוחה ומקלחת במלון", notes: "הפסקת התרעננות לפני הערב. יוצאים לעיר ב-18:15.", lat: 34.6974038, lng: 33.0949755, radius: 300 },
     { id: "d1-port", trip: [15, "drive", "המלון"], ta: "https://www.tripadvisor.com/Attraction_Review-g190382-d6960498-Reviews-Limassol_Marina-Limassol_City_Limassol.html", day: 1, start: "19:00", dur: 60, type: "sight", title: "הנמל הישן, טיילת מולוס ופארק חג המולד", notes: "אורות, דוכנים, יין חם. פעיל מ-21/11. טירת לימסול קרובה: אפשר לראות אותה מבחוץ בדרך. טיילת מולוס צמודה לנמל: אפשר לשלב אותה בהליכה.", lat: 34.6704, lng: 33.0443 },
-    { id: "d1-dinner", trip: [10, "walk", "הנמל"], book: true, ta: "https://www.tripadvisor.com/Search?q=Mazema%20Limassol", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "לוודא הזמנת שולחן ל-20:00 ושהמסעדה פתוחה. אינסטגרם: כנראה @mazemaproject (לא אומת)", lat: 34.673984, lng: 33.039054 },
+    { id: "d1-dinner", trip: [10, "walk", "הנמל"], book: true, ta: "https://www.tripadvisor.com/Search?q=Mazema%20Limassol", day: 1, start: "20:00", dur: 90, type: "food", fixed: true, title: "ארוחת ערב – Mazema", notes: "", reserve: "הוזמן (אישור מ-22/11). לוודא שהשעה בהזמנה היא 20:00. אינסטגרם: כנראה @mazemaproject (לא אומת)", lat: 34.673984, lng: 33.039054 },
     { id: "d1-night", trip: [5, "walk", "Mazema"], day: 1, start: "21:45", dur: 60, type: "food", title: "בילוי בסריפולו: דרינק או קוקטייל", notes: "רחוב וכיכר סריפולו: מדרחוב עם ברים, פאבים ובתי קפה, הכי תוסס בשישי בערב. בברים בכיכר: Salut (Saripolou 71-73), (in)Theory (קוקטייל בר, Saripolou 53), Blue Apple (פתוח 17:00–02:00).", lat: 34.6754273, lng: 33.0431423, radius: 300 },
 
     { id: "d2-bf", day: 2, start: "08:30", dur: 60, type: "food", fixed: true, title: "ארוחת בוקר במלון", notes: "", lat: 34.6974038, lng: 33.0949755, radius: 300 },
@@ -172,7 +172,8 @@ window.PLAN.listMigrations = [
   { id: "m15", list: "todo", remove: ["m12-a"] },
   { id: "m16", list: "todo", add: [
     { id: "m16-a", t: "מחר (23/11): להתקשר ל-Iason בלפקארה ולשנות את ההזמנה לשבת מ-14:00 ל-13:00 (+357 99 668930)" }
-  ] }
+  ] },
+  { id: "m17", list: "todo", remove: ["d1"] }
 ];
 
 // טאב 🗺 (לקריאה בלבד): הדרך בתוך הכפר פאנו לפקארה. places: מקומות שנפתחים במפות לפי שם החיפוש.
