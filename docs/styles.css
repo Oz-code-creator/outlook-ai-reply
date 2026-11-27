@@ -83,3 +83,4 @@ nav button.over{outline:3px solid var(--pri);background:#e3f1f7}
 .fxl{display:block;font-size:15px;margin-bottom:8px}.fxl input{display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:10px;font-size:20px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:inherit}
 .fxres{font-size:32px;font-weight:700;color:var(--pri);margin:4px 0 12px;direction:ltr;text-align:right}.fxnote{color:var(--mut);font-size:13px;margin:6px 0 8px}
 .fxex{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:15px;direction:ltr}
+.pcres{margin-top:10px}.pcres p{margin:6px 0;font-size:15px;line-height:1.5}.pcv{border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:17px}.pcv.good{background:#e3f4e6;color:#1d6b2f}.pcv.bad{background:#fde8e6;color:#a1271b}.pcv.same{background:#eef6fa}.pcv div{font-size:14px;font-weight:400}

@@ -538,7 +538,38 @@
       <label class="fxl">שער (שקלים ל-€1)<input id="fxRate" type="text" inputmode="decimal" value="${fx.rate}" autocomplete="off"></label>
       <p class="fxnote" id="fxNote">שער מ-${esc(fx.date)}. שער הכרטיס או הבנק שונה מעט, ובדרך כלל יש עמלה.</p>
       <button class="btn" id="fxUpd" type="button">עדכן שער מהאינטרנט</button></div>
-      <div class="gstop"><b>דוגמאות</b><div class="fxex" id="fxEx"></div></div>`;
+      <div class="gstop"><b>דוגמאות</b><div class="fxex" id="fxEx"></div></div>
+      <div class="theme">🏷 השוואת מחיר למחיר בארץ</div><div class="gstop">
+      <label class="fxl">מה המוצר או השירות?<input id="pcName" type="text" placeholder="למשל: קרם הגנה 200 מ״ל, או תספורת גברים" autocomplete="off"></label>
+      <label class="fxl">המחיר בקפריסין (€)<input id="pcEur" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+      <button class="btn" id="pcGo" type="button">השווה למחיר בארץ</button>
+      <div id="pcRes" class="pcres"></div>
+      <p class="fxnote">ההשוואה היא הערכה של Claude לפי מחירים טיפוסיים בישראל, לא מחיר חי מחנות. צריך מפתח Claude בהגדרות (⚙️) ואינטרנט.</p></div>`;
+  }
+  const PRICE_TOOL = { name: "price_estimate", description: "הערכת מחיר טיפוסי בישראל בשקלים", input_schema: { type: "object", properties: {
+    product: { type: "string", description: "שם המוצר או השירות בעברית, קצר" },
+    low_ils: { type: "number", description: "הערכה נמוכה למחיר בישראל בשקלים כולל מע״מ" },
+    high_ils: { type: "number", description: "הערכה גבוהה למחיר בישראל בשקלים כולל מע״מ" },
+    note: { type: "string", description: "משפט או שניים בעברית פשוטה: על מה ההערכה מבוססת ומה משפיע על המחיר" },
+    confidence: { type: "string", enum: ["low", "medium", "high"] } }, required: ["product", "low_ils", "high_ils", "note", "confidence"] } };
+  async function callPrice(key, name, eur) {
+    const send = payload => fetch("https://api.anthropic.com/v1/messages", { method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" }, body: JSON.stringify(payload) });
+    const system = "אתה עוזר לתייר ישראלי בקפריסין. קבל שם מוצר או שירות ומחיר בקפריסין באירו, והעריך מה המחיר הטיפוסי באותו מוצר או שירות בישראל (שקלים, כולל מע״מ, חנות רגילה). אם אין מספיק פרטים, העריך טווח רחב והורד את רמת הביטחון. אל תמציא מחיר מדויק. עברית פשוטה וקצרה.";
+    const base = { model: "claude-sonnet-5-5", max_tokens: 600, system, messages: [{ role: "user", content: JSON.stringify({ product: name, cyprus_price_eur: eur }) }] };
+    let r = await send(Object.assign({}, base, { tools: [PRICE_TOOL], tool_choice: { type: "tool", name: "price_estimate" } }));
+    if (r.status === 400) r = await send(Object.assign({}, base, { system: system + " החזר JSON בלבד עם המפתחות product, low_ils, high_ils, note, confidence." }));
+    if (!r.ok) { let m = ""; try { const j = await r.json(); m = (j.error && j.error.message) || ""; } catch (e) { /* ignore */ } throw new Error("HTTP " + r.status + (r.status === 401 ? " – המפתח שגוי" : "") + (m ? ": " + m.slice(0, 160) : "")); }
+    const d = await r.json(), blocks = d.content || [], tu = blocks.find(b => b.type === "tool_use");
+    if (tu && tu.input) return tu.input;
+    const text = blocks.map(b => b.text || "").join("").replace(/```(?:json)?/g, ""), m = text.match(/\{[\s\S]*\}/);
+    try { return JSON.parse(m ? m[0] : text); } catch { throw new Error("תשובה לא תקינה"); }
+  }
+  const ils = v => "₪" + Math.round(v).toLocaleString("he-IL");
+  function priceVerdict(eur, rate, low, high) {
+    const here = eur * rate, mid = (low + high) / 2, diff = here - mid, pct = mid > 0 ? diff / mid * 100 : 0;
+    const word = pct <= -10 ? "זול יותר בקפריסין" : pct >= 10 ? "יקר יותר בקפריסין" : "בערך אותו מחיר";
+    return { here, mid, diff, pct, word, cls: pct <= -10 ? "good" : pct >= 10 ? "bad" : "same" };
   }
   function bindCalc() {
     const amt = $("fxAmt"), rate = $("fxRate"), res = $("fxRes"), ex = $("fxEx"), note = $("fxNote");
@@ -554,8 +585,26 @@
       } catch (err) { note.textContent = "אין חיבור לאינטרנט, נשאר השער שמופיע."; }
       upd();
     });
+    $("pcGo").addEventListener("click", async () => {
+      const out = $("pcRes"), name = $("pcName").value.trim(), eur = fxNum($("pcEur").value), rate = fxNum(rate_());
+      if (!name || !(eur > 0)) { out.innerHTML = `<p class="warn">צריך לכתוב מה המוצר ולהכניס מחיר באירו.</p>`; return; }
+      if (!S.settings.apiKey) { out.innerHTML = `<p class="warn">צריך להדביק מפתח Claude בהגדרות (⚙️).</p>`; return; }
+      if (!(rate > 0)) { out.innerHTML = `<p class="warn">השער למעלה לא תקין.</p>`; return; }
+      out.textContent = "בודק…"; $("pcGo").disabled = true;
+      try {
+        const r = await callPrice(S.settings.apiKey, name, eur), low = +r.low_ils, high = +r.high_ils;
+        if (!(low > 0) || !(high >= low)) throw new Error("תשובה לא תקינה");
+        const v = priceVerdict(eur, rate, low, high), conf = { low: "ביטחון נמוך", medium: "ביטחון בינוני", high: "ביטחון גבוה" }[r.confidence] || "";
+        const diffTxt = (v.diff <= 0 ? "חוסכים כ-" : "משלמים יותר בכ-") + ils(Math.abs(v.diff)) + " (" + Math.abs(Math.round(v.pct)) + "%)";
+        out.innerHTML = `<div class="pcv ${v.cls}"><b>${esc(v.word)}</b><div>${esc(diffTxt)}</div></div>
+          <p><b>${esc(r.product || name)}</b><br>בקפריסין: €${eur} = ${ils(v.here)}<br>בארץ (הערכה): ${ils(low)}–${ils(high)}${conf ? " · " + conf : ""}</p>
+          <p>${esc(r.note || "")}</p>`;
+      } catch (err) { out.innerHTML = `<p class="warn">לא הצלחתי להשוות (${esc(err.message)}). בדקו חיבור למפתח ולאינטרנט.</p>`; }
+      $("pcGo").disabled = false;
+    });
     upd();
   }
+  const rate_ = () => $("fxRate").value;
   // טאב אלטרנטיבות (לקריאה בלבד): כרטיס לכל מקום, עם "איפה אפשר להכניס" וכפתור הוספה ללוח
   function altHtml() {
     const map = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q), groups = [["food", "🍽 מסעדות"], ["sight", "📍 אתרים"]];

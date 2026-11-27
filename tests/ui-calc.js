@@ -16,4 +16,20 @@ console.log("rate after update:",await p.inputValue("#fxRate"),"| result:",await
 if(!/42/.test(await p.textContent("#fxRes")))errs.push("update not applied");
 await p.reload();await p.click("#tabs button[data-d='calc']");console.log("rate saved:",await p.inputValue("#fxRate"));
 if(await p.inputValue("#fxRate")!=="4")errs.push("rate not saved");
+// השוואת מחירים (Claude מדומה)
+await p.click("#pcGo");console.log("empty form:",(await p.textContent("#pcRes")).slice(0,40));
+await p.fill("#pcName","קרם הגנה");await p.fill("#pcEur","10");await p.click("#pcGo");
+console.log("no key:",await p.textContent("#pcRes"));
+if(!(await p.textContent("#pcRes")).includes("מפתח"))errs.push("no key message missing");
+await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem("cyprus-trip-v1")||"{}");s.settings=Object.assign(s.settings||{},{apiKey:"test-key"});localStorage.setItem("cyprus-trip-v1",JSON.stringify(s));});
+await p.reload();await p.click("#tabs button[data-d='calc']");
+let sent=null;
+await p.route("https://api.anthropic.com/**",r=>{sent=JSON.parse(r.request().postData());r.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:JSON.stringify({content:[{type:"tool_use",name:"price_estimate",input:{product:"קרם הגנה",low_ils:60,high_ils:80,note:"בארץ קרם הגנה עולה בדרך כלל כך.",confidence:"medium"}}]})});});
+await p.fill("#fxRate","4");await p.fill("#pcName","קרם הגנה");await p.fill("#pcEur","10");await p.click("#pcGo");
+await p.waitForFunction(()=>document.querySelector("#pcRes .pcv"));
+const t=await p.textContent("#pcRes");console.log("compare:",t.replace(/\s+/g," ").slice(0,160));
+if(!t.includes("זול יותר בקפריסין")||!t.includes("₪40")||!t.includes("₪60"))errs.push("bad compare: "+t);
+if(!sent||sent.tools[0].name!=="price_estimate"||!JSON.stringify(sent.messages).includes("קרם"))errs.push("bad request");
+await p.fill("#pcEur","20");await p.click("#pcGo");await p.waitForFunction(()=>document.querySelector("#pcRes .pcv.bad"));
+console.log("expensive:",(await p.textContent("#pcRes")).replace(/\s+/g," ").slice(0,60));
 await b.close();console.log("errors:",JSON.stringify(errs));})();
