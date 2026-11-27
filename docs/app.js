@@ -25,7 +25,7 @@
     const n = now(), items = L.eff(P, S);
     if (!selDay) selDay = n.day || 1;
     $("tabs").innerHTML = P.days.map(d => `<button data-d="${d.n}" class="${d.n === selDay ? "sel" : ""}">${d.label.split(" ")[0]}<small>${d.label.split(" ")[1]}${n.day === d.n ? " • היום" : ""}</small></button>`).join("");
-    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>${P.guide ? `<button data-d="guide" class="${selDay === "guide" ? "sel" : ""}">🗺<small>לפקארה</small></button>` : ""}${(P.alternatives || []).length ? `<button data-d="alt" class="${selDay === "alt" ? "sel" : ""}">💡<small>אלטרנטיבות</small></button>` : ""}<button data-d="calc" class="${selDay === "calc" ? "sel" : ""}">💱<small>מחשבון</small></button>`);
+    $("tabs").insertAdjacentHTML("beforeend", `<button data-d="pack" class="${selDay === "pack" ? "sel" : ""}">🎒<small>אריזה</small></button><button data-d="todo" class="${selDay === "todo" ? "sel" : ""}">✅<small>משימות</small></button><button data-d="info" class="${selDay === "info" ? "sel" : ""}">ℹ️<small>מידע</small></button>${P.guide ? `<button data-d="guide" class="${selDay === "guide" ? "sel" : ""}">🗺<small>לפקארה</small></button>` : ""}${(P.alternatives || []).length ? `<button data-d="alt" class="${selDay === "alt" ? "sel" : ""}">💡<small>אלטרנטיבות</small></button>` : ""}<button data-d="calc" class="${selDay === "calc" ? "sel" : ""}">💱<small>מחשבון השוואת מחיר</small></button>`);
     if (selDay === "alt" && (P.alternatives || []).length) { $("list").innerHTML = altHtml(); renderPrompt(); renderLoc(); return; }
     if (selDay === "guide" && P.guide) { $("list").innerHTML = guideHtml(); renderPrompt(); renderLoc(); return; }
     if (selDay === "calc") { $("list").innerHTML = calcHtml(); bindCalc(); renderPrompt(); renderLoc(); return; }
@@ -525,14 +525,14 @@
   const rowHtml = (key, x, i, n) => LISTS[key].plain
     ? `<div class="li"><span class="grip" data-lgrip="${key}" data-lid="${esc(x.id)}" aria-label="גרור לשינוי סדר">⠿</span><span class="tx">${linkify(esc(x.t))}</span><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`
     :`<div class="li ${x.done ? "done" : ""}"><label><input type="checkbox" data-lk="${key}" data-lid="${esc(x.id)}" ${x.done ? "checked" : ""}><span>${esc(x.t)}</span></label><button class="x" data-lx="${key}" data-lid="${esc(x.id)}" aria-label="מחק">✕</button></div>`;
-  // טאב 💱 מחשבון: אירו ← שקלים. השער נשמר במכשיר (settings.fx), אפשר לעדכן ידנית או מהאינטרנט
+  // טאב 💱 מחשבון השוואת מחיר: אירו ← שקלים. השער נשמר במכשיר (settings.fx), אפשר לעדכן ידנית או מהאינטרנט
   const FX_DEFAULT = { rate: 3.6261, date: "2026-11-27" };
   const fxGet = () => Object.assign({}, FX_DEFAULT, S.settings.fx || {});
   const fxNum = v => parseFloat(String(v).replace(",", "."));
   const fxShow = (eur, rate) => { const e = fxNum(eur), r = fxNum(rate); return isFinite(e) && isFinite(r) && e >= 0 && r > 0 ? "₪ " + (e * r).toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"; };
   function calcHtml() {
     const fx = fxGet();
-    return `<div class="theme">💱 מחשבון: אירו ← שקלים</div><div class="gstop">
+    return `<div class="theme">💱 מחשבון השוואת מחיר: אירו ← שקלים</div><div class="gstop">
       <label class="fxl">סכום באירו (€)<input id="fxAmt" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
       <div class="fxres" id="fxRes">—</div>
       <label class="fxl">שער (שקלים ל-€1)<input id="fxRate" type="text" inputmode="decimal" value="${fx.rate}" autocomplete="off"></label>
