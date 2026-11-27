@@ -776,21 +776,32 @@
   });
 
   // ---- מיקום ----
-  $("btnLoc").addEventListener("click", () => {
-    if (!navigator.geolocation) { $("loc").textContent = "אין תמיכה במיקום בדפדפן"; return; }
-    if (watchId != null) { navigator.geolocation.clearWatch(watchId); watchId = null; pos = null; render(); return; }
-    if (window.Notification && Notification.permission === "default") Notification.requestPermission();
+  // המיקום נשאר פעיל עד שמכבים אותו בלחיצה (S.settings.loc, נשמר במכשיר): שגיאת זמן/קליטה לא מכבה אותו,
+  // והוא מתחדש לבד אחרי פתיחה מחדש של האפליקציה או חזרה אליה מהרקע.
+  const locOn = () => !!(S.settings && S.settings.loc);
+  function stopWatch(keepPos) { if (watchId != null && navigator.geolocation) navigator.geolocation.clearWatch(watchId); watchId = null; if (!keepPos) pos = null; }
+  function startWatch() {
+    if (!navigator.geolocation || watchId != null) return;
     watchId = navigator.geolocation.watchPosition(
       p => { pos = { lat: p.coords.latitude, lng: p.coords.longitude }; render(); },
-      err => { watchId = null; $("loc").textContent = "אין גישה למיקום (" + err.message + ")"; },
-      { enableHighAccuracy: true, maximumAge: 30000, timeout: 30000 });
-    renderLoc();
+      err => {
+        if (err.code === 1) { stopWatch(); S.settings.loc = false; saveQuiet(); $("loc").textContent = "אין הרשאת מיקום. אפשרו מיקום לאתר בהגדרות הדפדפן ולחצו 📍."; }
+        else if (!pos) $("loc").textContent = "מחפש מיקום… (" + err.message + ")"; // ממשיכים לנסות, לא מכבים
+      },
+      { enableHighAccuracy: true, maximumAge: 60000, timeout: 60000 });
+  }
+  $("btnLoc").addEventListener("click", () => {
+    if (!navigator.geolocation) { $("loc").textContent = "אין תמיכה במיקום בדפדפן"; return; }
+    if (locOn() || watchId != null) { stopWatch(); S.settings.loc = false; saveQuiet(); render(); return; }
+    if (window.Notification && Notification.permission === "default") Notification.requestPermission();
+    S.settings.loc = true; saveQuiet(); startWatch(); renderLoc();
   });
+  if (locOn()) startWatch();
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => {});
   if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.type === "status-changed" && window.Sync) { Sync.refresh(); } });
   setInterval(() => { if (rec || (document.activeElement && document.activeElement.id === "liNew")) return; render(); }, 30000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { render(); } });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (locOn()) { stopWatch(true); startWatch(); } render(); } });
   // ---- הדפסה / שמירה כ-PDF של התוכנית הסופית (כולל השינויים, ההזמנות והרשימות שלכם) ----
   function printHtml() {
     const fx = t => esc(t).replace(/(\+?\d[\d ]{6,}\d)/g, '<bdi dir="ltr">$1</bdi>'); // מספרי טלפון בכיוון נכון בתוך טקסט בעברית
